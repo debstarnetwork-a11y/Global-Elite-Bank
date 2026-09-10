@@ -625,180 +625,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [virtualCards, setVirtualCards] = useState<VirtualCard[]>([]);
   const [loanApplications, setLoanApplications] = useState<LoanApplication[]>([]);
-  const [userApplications, setUserApplications] = useState<UserApplication[]>(() => getInitialState('bank_userApplications', [
-    {
-      id: 'app-sophia',
-      name: 'Sophia von Berg',
-      email: 'sophia.berg@genevacapital.ch',
-      date: '2026-09-07T09:30:00Z',
-      status: 'pending',
-      password: 'password123',
-      mobile: '+41 79 555 3421',
-      country: 'Switzerland',
-      nationality: 'Switzerland',
-      occupation: 'Private Fund Manager'
-    },
-    {
-      id: 'app-david',
-      name: 'David K. Sterling',
-      email: 'd.sterling@sterlingholdings.com',
-      date: '2026-09-07T14:15:00Z',
-      status: 'pending',
-      password: 'password123',
-      mobile: '+1 (415) 882-9012',
-      country: 'United States',
-      nationality: 'United States',
-      occupation: 'Managing Director'
-    },
-    {
-      id: 'app-emman',
-      name: 'Emman Debelu',
-      email: 'emmanueldebelu@gmail.com',
-      date: '2026-09-05T12:00:00Z',
-      status: 'approved',
-      password: ''
-    }
-  ]));
+  const [userApplications, setUserApplications] = useState<UserApplication[]>([]);
   const [grantApplications, setGrantApplications] = useState<GrantApplication[]>([]);
-  const [contactInquiries, setContactInquiries] = useState<ContactInquiry[]>(() => getInitialState('bank_contactInquiries', [
-    {
-      id: 'inq-1',
-      name: 'Arthur Pendelton',
-      email: 'arthur.pendelton@crestview-capital.ch',
-      country: 'Switzerland',
-      netWorth: '4',
-      message: 'Requesting consultation on establishing an offshore corporate treasury account with multi-currency SWIFT wire clearance and digital asset custody capabilities.',
-      date: '2026-09-06T11:20:00Z',
-      status: 'new'
-    },
-    {
-      id: 'inq-2',
-      name: 'Elena Rostova',
-      email: 'elena.rostova@monaco-invest.mc',
-      country: 'Monaco',
-      netWorth: '5',
-      message: 'We are seeking private wealth management facilities and high-volume wire transfer authorizations with tailored compliance clearance documentation.',
-      date: '2026-09-06T16:45:00Z',
-      status: 'new'
-    },
-    {
-      id: 'inq-3',
-      name: 'Marcus Vance',
-      email: 'marcus.vance@vancetech.co.uk',
-      country: 'United Kingdom',
-      netWorth: '3',
-      message: 'Inquiring about institutional grant facilities and business credit lines for European expansion.',
-      date: '2026-09-05T08:10:00Z',
-      status: 'replied',
-      replySubject: 'Re: Institutional grant facilities and business credit lines',
-      replyMessage: 'Dear Mr. Vance,\n\nThank you for reaching out to Global Elite Bank. Our Corporate Advisory division has reviewed your inquiry and will be delighted to present our credit facilities.\n\nBest regards,\nCorporate Advisory Team\nGlobal Elite Bank',
-      repliedAt: '2026-09-05T10:30:00Z'
-    }
-  ]));
-  const [investments, setInvestments] = useState<Investment[]>(() => getInitialState('bank_investments', [
-    {
-      id: 'inv-1',
-      userId: 'user-1',
-      amount: 125000,
-      currency: 'USDT',
-      durationDays: 30,
-      startDate: new Date(Date.now() - 10 * 86400000).toISOString(),
-      endDate: new Date(Date.now() + 20 * 86400000).toISOString(),
-      status: 'active',
-      isPrincipalLocked: true,
-      adminApprovedDuration: true,
-      txHash: '0x8f2a9c4b1d6e3f5a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a',
-      profit: 4200
-    },
-    {
-      id: 'inv-2',
-      userId: 'user-1',
-      amount: 2.5,
-      currency: 'BTC',
-      durationDays: 14,
-      startDate: new Date(Date.now() - 2 * 86400000).toISOString(),
-      endDate: new Date(Date.now() + 12 * 86400000).toISOString(),
-      status: 'pending',
-      isPrincipalLocked: true,
-      adminApprovedDuration: false,
-      txHash: 'bc1q8a9f2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0',
-    },
-    {
-      id: 'inv-3',
-      userId: 'user-1',
-      amount: 50000,
-      currency: 'USDT',
-      durationDays: 7,
-      startDate: new Date(Date.now() - 8 * 86400000).toISOString(),
-      endDate: new Date(Date.now() - 1 * 86400000).toISOString(),
-      status: 'matured',
-      isPrincipalLocked: false,
-      adminApprovedDuration: true,
-      txHash: '0x3c5a7b9d1e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4',
-      profit: 1750
-    }
-  ]));
-  const [cryptoWithdrawals, setCryptoWithdrawals] = useState<CryptoWithdrawalRequest[]>(() => getInitialState('bank_crypto_withdrawals', [
-    {
-      id: 'cw-1002',
-      userId: 'user-1',
-      userName: 'Arthur Pendelton',
-      userEmail: 'user@bank.com',
-      amount: 5000,
-      cryptoAmount: 5000,
-      currency: 'USDT',
-      network: 'TRC-20 (Tron)',
-      walletAddress: 'TYDzsYUEpvnYmQk4zGP9sWWcTEd2MiAtW6',
-      requestDate: new Date(Date.now() - 3600000 * 2).toISOString(),
-      status: 'pending',
-      receiptNumber: 'GEB-CRYPTO-REC-9421',
-      networkFee: 12.50,
-      sourceWallet: 'investor'
-    },
-    {
-      id: 'cw-1001',
-      userId: 'user-1',
-      userName: 'Arthur Pendelton',
-      userEmail: 'user@bank.com',
-      amount: 15000,
-      cryptoAmount: 0.2304,
-      currency: 'BTC',
-      network: 'Bitcoin Mainnet',
-      walletAddress: 'bc1q8x9k2mj3w4zp9h45y7q3la458yuvv24x9f6d7g',
-      requestDate: '2026-09-06T14:20:00Z',
-      approvalDate: '2026-09-06T15:05:22Z',
-      status: 'approved',
-      txHash: '0x9b4c7e8a1d2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b',
-      receiptNumber: 'GEB-CRYPTO-REC-8921',
-      networkFee: 12.50,
-      adminNotes: 'Institutional clearance verified. Blockchain dispatch confirmed.',
-      sourceWallet: 'investor'
-    }
-  ]));
-  const [cryptoOrders, setCryptoOrders] = useState<CryptoTradeOrder[]>(() => getInitialState('bank_crypto_orders', [
-    {
-      id: 'ct-101',
-      userId: 'user-1',
-      userName: 'Arthur Pendelton',
-      userEmail: 'user@bank.com',
-      orderType: 'buy',
-      cryptoCurrency: 'BTC',
-      fiatCurrency: 'USD',
-      cryptoAmount: 0.076804,
-      fiatAmount: 5000,
-      exchangeRate: 65100,
-      status: 'approved',
-      requestDate: '2026-09-07T09:15:00Z',
-      approvalDate: '2026-09-07T09:30:15Z',
-      approvedBy: 'Compliance & Digital Asset Admin',
-      receiptNumber: 'GEB-TRADE-48291',
-      txHash: '0x3f8a9b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a',
-      notes: 'Market buy executed at $65,100.00/BTC. Assets allocated.'
-    }
-  ]));
+  const [contactInquiries, setContactInquiries] = useState<ContactInquiry[]>([]);
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [cryptoWithdrawals, setCryptoWithdrawals] = useState<CryptoWithdrawalRequest[]>([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoTradeOrder[]>([]);
   const [mockEmail, setMockEmail] = useState<{to: string, subject: string, body: string} | null>(null);
 
-  const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => getInitialState('bank_adminSettings', {
+  const [adminSettings, setAdminSettings] = useState<AdminSettings>({
     alertThreshold: 10000,
     maxCryptoWithdrawalLimit: 25000,
     requireWireCodes: true,
@@ -877,7 +712,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
       providerName: 'Global Elite Official PayPal',
       accountEmail: 'deposits@globalelitebank.com'
     }
-  }));
+  });
 
   const [isInitializing, setIsInitializing] = useState(true);
   const prevStates = React.useRef<any>({});
@@ -885,6 +720,29 @@ export function BankProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadData() {
       try {
+        
+        const results = await Promise.all([
+          supabase.from('users').select('*'),
+          supabase.from('accounts').select('*'),
+          supabase.from('transactions').select('*'),
+          supabase.from('investments').select('*'),
+          supabase.from('virtual_cards').select('*'),
+          supabase.from('loan_applications').select('*'),
+          supabase.from('grant_applications').select('*'),
+          supabase.from('contact_inquiries').select('*'),
+          supabase.from('user_applications').select('*'),
+          supabase.from('crypto_withdrawal_requests').select('*'),
+          supabase.from('crypto_trade_orders').select('*'),
+          supabase.from('admin_settings').select('*').limit(1).maybeSingle(),
+          supabase.from('investor_wallets').select('*')
+        ]);
+
+        const errors = results.filter(r => r.error).map(r => r.error);
+        if (errors.length > 0) {
+           console.error("Supabase query errors:", errors);
+           alert("Supabase errors: " + JSON.stringify(errors.map(e => e.message)));
+        }
+
         const [
           { data: usersData },
           { data: accountsData },
@@ -899,21 +757,8 @@ export function BankProvider({ children }: { children: ReactNode }) {
           { data: cryptoOrdersData },
           { data: adminSettingsData },
           { data: investorWalletsData }
-        ] = await Promise.all([
-          supabase.from('users').select('*'),
-          supabase.from('accounts').select('*'),
-          supabase.from('transactions').select('*'),
-          supabase.from('investments').select('*'),
-          supabase.from('virtual_cards').select('*'),
-          supabase.from('loan_applications').select('*'),
-          supabase.from('grant_applications').select('*'),
-          supabase.from('contact_inquiries').select('*'),
-          supabase.from('user_applications').select('*'),
-          supabase.from('crypto_withdrawal_requests').select('*'),
-          supabase.from('crypto_trade_orders').select('*'),
-          supabase.from('admin_settings').select('*').limit(1).single(),
-          supabase.from('investor_wallets').select('*')
-        ]);
+        ] = results;
+
 
         if (adminSettingsData) {
           setAdminSettings(snakeToCamel(adminSettingsData));
@@ -936,7 +781,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
           }));
           
           if (!mappedUsers.find((u: any) => u.role === 'admin')) {
-             // We can insert default admin if none exists
+             mappedUsers.push(defaultAdmin);
           }
           setUsers(mappedUsers);
         }
@@ -960,6 +805,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
 
       } catch (err) {
         console.error('Failed to load Supabase data:', err);
+        alert('Supabase Load Error: ' + (err.message || JSON.stringify(err)));
       } finally {
         setIsInitializing(false);
       }
