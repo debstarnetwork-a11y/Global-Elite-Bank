@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { 
   Users, Activity, ShieldAlert, ArrowUpRight, ArrowDownLeft, TrendingUp, 
   Search, Filter, MoreHorizontal, CheckCircle, AlertTriangle, 
@@ -34,8 +34,37 @@ export function AdminDashboard() {
   const [newUserForm, setNewUserForm] = useState({
     name: '', email: '', mobile: '', currency: 'USD', accountType: 'Checking',
     accountNumber: '', btcWallet: '', pin: '', cot: '', swift: '', imf: '', tax: '', aml: '',
-    dob: '', nationality: '', password: '', zipCode: '', occupation: '', residentialAddress: ''
+    dob: '', nationality: '', password: '', zipCode: '', occupation: '', residentialAddress: '',
+    passportPhoto: ''
   });
+
+  const handlePassportPhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('File too large', 'Please choose an image under 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (base64) {
+          setNewUserForm(prev => ({ ...prev, passportPhoto: base64 }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePassportPhotoInputPaste = (input: string) => {
+    let cleanUrl = input.trim();
+    // If HTML <img> tag was pasted, extract src attribute
+    const srcMatch = cleanUrl.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1]) {
+      cleanUrl = srcMatch[1];
+    }
+    setNewUserForm(prev => ({ ...prev, passportPhoto: cleanUrl }));
+  };
 
   const generateRandomCode = (prefix: string, length: number) => {
     return prefix + Math.floor(Math.random() * Math.pow(10, length)).toString().padStart(length, '0');
@@ -55,7 +84,8 @@ export function AdminDashboard() {
       btcWallet: '', pin: generateRandomCode('', 4),
       cot: generateRandomCode('', 7), swift: generateRandomCode('', 7),
       imf: generateRandomCode('', 6), tax: generateRandomCode('GEB', 5),
-      aml: generateRandomCode('AML', 5), dob: '', nationality: '', password: '', zipCode: '', occupation: '', residentialAddress: ''
+      aml: generateRandomCode('AML', 5), dob: '', nationality: '', password: '', zipCode: '', occupation: '', residentialAddress: '',
+      passportPhoto: ''
     });
     setIsAddUserModalOpen(true);
   };
@@ -80,7 +110,8 @@ export function AdminDashboard() {
       password: app.password || 'SecurePass2026!',
       zipCode: app.zipCode || '8001',
       occupation: app.occupation || 'Private Investor / Executive',
-      residentialAddress: app.residentialAddress || app.address || 'Bahnhofstrasse 45, 8001 Zurich'
+      residentialAddress: app.residentialAddress || app.address || 'Bahnhofstrasse 45, 8001 Zurich',
+      passportPhoto: app.profilePicture || app.passportPhoto || ''
     });
     setIsAddUserModalOpen(true);
   };
@@ -127,7 +158,7 @@ export function AdminDashboard() {
       zipCode: newUserForm.zipCode,
       occupation: newUserForm.occupation,
       residentialAddress: newUserForm.residentialAddress,
-      profilePicture: (newUserForm as any).profilePicture,
+      profilePicture: newUserForm.passportPhoto || (newUserForm as any).profilePicture || '',
       accounts: [{
         id: `acc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         type: newUserForm.accountType as 'Checking' | 'Savings' | 'Business',
@@ -1434,6 +1465,68 @@ All Rights Reserved © Global Elite
                   <input type="text" value={newUserForm.residentialAddress} onChange={e => setNewUserForm({...newUserForm, residentialAddress: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground focus:border-primary outline-none" />
                 </div>
                 
+                {/* Passport / ID Document / Profile Photo */}
+                <div className="bg-background/80 border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-foreground/80 uppercase flex items-center gap-1.5">
+                      <ImageIcon size={14} className="text-primary" />
+                      Client Passport / ID Photo
+                    </label>
+                    <span className="text-[10px] text-foreground/50">Upload file or paste HTML/URL</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 items-center">
+                    {newUserForm.passportPhoto ? (
+                      <div className="relative group shrink-0">
+                        <img 
+                          src={newUserForm.passportPhoto} 
+                          alt="Client Passport" 
+                          className="w-20 h-24 object-cover rounded-lg border-2 border-primary/50 shadow-md"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setNewUserForm(prev => ({ ...prev, passportPhoto: '' }))}
+                          className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow hover:bg-rose-600 transition-colors"
+                          title="Remove Photo"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-24 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-foreground/40 shrink-0 bg-background/50">
+                        <ImageIcon size={24} className="mb-1 opacity-50" />
+                        <span className="text-[9px] uppercase font-bold">No Photo</span>
+                      </div>
+                    )}
+
+                    <div className="flex-1 w-full space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-lg text-xs font-bold cursor-pointer transition-colors shadow-sm">
+                          <Upload size={14} />
+                          <span>Upload File</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handlePassportPhotoFileChange} 
+                            className="hidden" 
+                          />
+                        </label>
+                        <span className="text-xs text-foreground/40">or paste URL / HTML below:</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        value={newUserForm.passportPhoto} 
+                        onChange={e => handlePassportPhotoInputPaste(e.target.value)} 
+                        placeholder='Paste image URL or <img src="..." />'
+                        className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:border-primary outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Currency</label>

@@ -14,7 +14,8 @@ import {
   prepareContactInquiryForSupabase,
   prepareUserApplicationForSupabase,
   prepareCryptoWithdrawalForSupabase,
-  prepareCryptoTradeOrderForSupabase
+  prepareCryptoTradeOrderForSupabase,
+  prepareAdminSettingsForSupabase
 } from './lib/syncHelper';
 
 export type UserStatus = 'active' | 'inactive' | 'dormant' | 'suspended' | 'blocked' | 'frozen';
@@ -667,15 +668,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
     code5Message: "The Anti-Money Laundering Passcode is required to enable you to continue with this transaction. Please contact our online customer care representative via live chat; they will help you with the appropriate SWIFT code for this transaction.",
     requireCode5: true,
     requireOtp: false,
-    preferenceContactEmail: "support@globalelite.com",
+    preferenceContactEmail: "globalelitefund@gmail.com",
     websiteCurrency: "$",
     homepageUrl: "",
     requireKycWithdrawal: false,
     requireKycRegistration: false,
     requireEmailVerification: false,
     mailServer: "",
-    emailFrom: "support@globalelite.com",
-    emailFromName: "Global Elite",
+    emailFrom: "globalelitefund@gmail.com",
+    emailFromName: "Global Elite Bank",
     googleClientId: "",
     googleClientSecret: "",
     googleRedirectUrl: "http://yoursite.com/auth/google/callback",
@@ -687,7 +688,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
     logoUrl: 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
     adminEmail: 'mizbryo@gmail.com',
     adminPassword: '12345',
-    contactEmail: 'support@bank.com',
+    contactEmail: 'globalelitefund@gmail.com',
     contactPhone: '+1 (555) 000-0000',
     contactAddress: '109, Feldgüetliweg Meilen Bezirk Meilen Zurich 8706 Switzerland',
     frontendContent: DEFAULT_FRONTEND_CONTENT,
@@ -1203,47 +1204,11 @@ export function BankProvider({ children }: { children: ReactNode }) {
     if (isInitializing) return;
     const syncSettings = async () => {
       try {
-        const payload: any = {
-          id: adminSettings.id || '00000000-0000-0000-0000-000000000001',
-          logo_url: adminSettings.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
-          favicon_url: adminSettings.faviconUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
-          admin_email: adminSettings.adminEmail || 'mizbryo@gmail.com',
-          admin_password: adminSettings.adminPassword || '12345',
-          alert_threshold: adminSettings.alertThreshold,
-          max_crypto_withdrawal_limit: adminSettings.maxCryptoWithdrawalLimit,
-          require_wire_codes: adminSettings.requireWireCodes,
-          code1_name: adminSettings.code1Name,
-          code1_message: adminSettings.code1Message,
-          require_code1: adminSettings.requireCode1,
-          code2_name: adminSettings.code2Name,
-          code2_message: adminSettings.code2Message,
-          require_code2: adminSettings.requireCode2,
-          code3_name: adminSettings.code3Name,
-          code3_message: adminSettings.code3Message,
-          require_code3: adminSettings.requireCode3,
-          code4_name: adminSettings.code4Name,
-          code4_message: adminSettings.code4Message,
-          require_code4: adminSettings.requireCode4,
-          code5_name: adminSettings.code5Name,
-          code5_message: adminSettings.code5Message,
-          require_code5: adminSettings.requireCode5,
-          require_otp: adminSettings.requireOtp,
-          preference_contact_email: adminSettings.preferenceContactEmail,
-          website_currency: adminSettings.websiteCurrency,
-          website_name: adminSettings.websiteName,
-          website_title: adminSettings.websiteTitle,
-          contact_email: adminSettings.contactEmail,
-          contact_phone: adminSettings.contactPhone,
-          contact_address: adminSettings.contactAddress,
-          whatsapp_number: adminSettings.whatsappNumber,
-          active_theme: adminSettings.activeTheme,
-          broker_wallets: adminSettings.brokerWallets,
-          fiat_deposit_instructions: adminSettings.fiatDepositInstructions,
-          e_wallet_instructions: adminSettings.eWalletInstructions,
-          frontend_content: adminSettings.frontendContent,
-          payment_methods: adminSettings.paymentMethods
-        };
-        await supabase.from('admin_settings').upsert(payload);
+        const payload = prepareAdminSettingsForSupabase(adminSettings);
+        const { error } = await supabase.from('admin_settings').upsert(payload);
+        if (error) {
+          console.error('Error syncing admin settings to Supabase:', error);
+        }
         window.localStorage.setItem('bank_adminSettings', JSON.stringify(adminSettings));
       } catch (err) {
         console.error('Error syncing admin settings to Supabase:', err);
@@ -1522,6 +1487,14 @@ Your application for membership is currently being reviewed by our Membership Co
         window.localStorage.setItem('bank_adminSettings', JSON.stringify(updated));
       } catch (e) {
         console.error("Error saving bank_adminSettings to localStorage:", e);
+      }
+      try {
+        const payload = prepareAdminSettingsForSupabase(updated);
+        supabase.from('admin_settings').upsert(payload).then(({ error }) => {
+          if (error) console.error('Error updating admin_settings in Supabase:', error);
+        });
+      } catch (e) {
+        console.error("Error calling Supabase upsert for admin_settings:", e);
       }
       return updated;
     });
