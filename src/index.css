@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme {
+  --font-poppins: "Poppins", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+}
+
+@layer base {
+  :root {
+    --background: #0f172a; /* Deep blue background */
+    --foreground: #ffffff; /* White text */
+    --card: #1e293b;
+    --card-foreground: #ffffff;
+    --primary: #3b82f6; /* Blue */
+    --primary-foreground: #ffffff;
+    --secondary: #a855f7; /* Purple */
+    --secondary-foreground: #ffffff;
+    --accent: #f59e0b; /* Golden/Orange */
+    --accent-foreground: #ffffff;
+    --border: #334155;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: transparent;
+    color: var(--foreground);
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* Transfer Slip Custom Styles */
+  .transfer-slip {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border: 3px solid #10b981;
+    border-radius: 12px;
+    padding: 40px;
+    font-family: 'Times New Roman', serif;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    color: #020617;
+  }
+  .transfer-slip::before {
+    content: "GLOBAL ELITE BANK";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 80px;
+    color: rgba(16, 185, 129, 0.05);
+    font-weight: bold;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+  .slip-header, .slip-details-table, .slip-signature {
+    position: relative;
+    z-index: 1;
+  }
+  .slip-header {
+    border-bottom: 3px solid #10b981;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .slip-logo {
+    width: 150px;
+    height: 60px;
+    background: linear-gradient(45deg, #059669, #10b981);
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-family: sans-serif;
+  }
+  .slip-reference {
+    background: #10b981;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-family: sans-serif;
+  }
+  .slip-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  .slip-details-table td {
+    padding: 15px;
+    border: 1px solid #d1fae5;
+  }
+  .slip-details-table tr:nth-child(even) {
+    background: #ecfdf5;
+  }
+  .slip-amount {
+    font-size: 28px;
+    color: #059669;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    background: #d1fae5;
+    border-radius: 8px;
+  }
+  .slip-signature {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .slip-stamp {
+    width: 120px;
+    height: 120px;
+    border: 3px solid #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    opacity: 0.7;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .security-pattern {
+    background-image: repeating-linear-gradient(
+      45deg,
+      #f0fdf4 0px,
+      #f0fdf4 10px,
+      #d1fae5 10px,
+      #d1fae5 20px
+    );
+    height: 5px;
+    margin: 10px 0;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+}
