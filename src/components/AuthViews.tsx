@@ -134,6 +134,7 @@ Global Elite Bank, Zurich, Switzerland`
   if (step === 2) {
     return (
       <BiometricLogin 
+        user={authenticatedUser}
         onLogin={() => {
            if (authenticatedUser) {
              setCurrentUser(authenticatedUser);

@@ -166,7 +166,7 @@ Key Institutional Information:
     });
 
     const response = await client.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.7-flash",
       contents: formattedContents,
       config: {
         systemInstruction,
@@ -178,7 +178,7 @@ Key Institutional Information:
 
     res.json({
       reply,
-      model: "gemini-2.5-flash",
+      model: "gemini-3.7-flash",
       source: "gemini",
     });
   } catch (error: any) {

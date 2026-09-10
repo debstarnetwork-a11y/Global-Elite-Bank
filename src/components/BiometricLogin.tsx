@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Fingerprint, ShieldCheck, AlertCircle, ShieldAlert, ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
 import { useBank } from '../store';
 
-export function BiometricLogin({ onLogin, onBack }: { onLogin: () => void; onBack?: () => void }) {
+export function BiometricLogin({ onLogin, onBack, user }: { onLogin: () => void; onBack?: () => void; user?: any }) {
   const [status, setStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   const { currentUser, adminSettings } = useBank();
-
-  const isAdmin = currentUser?.role === 'admin' || (typeof window !== 'undefined' && window.location.pathname === '/admin');
+  
+  const displayUser = user || currentUser;
+  const isAdmin = displayUser?.role === 'admin' || (typeof window !== 'undefined' && window.location.pathname === '/admin');
 
   const handleScan = () => {
     if (status === 'scanning' || status === 'success') return;
@@ -62,7 +63,7 @@ export function BiometricLogin({ onLogin, onBack }: { onLogin: () => void; onBac
         </p>
 
         {/* User Identity Chip */}
-        {currentUser && (
+        {displayUser && (
           <div className="w-full bg-background border border-border rounded-xl p-3.5 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
@@ -70,18 +71,18 @@ export function BiometricLogin({ onLogin, onBack }: { onLogin: () => void; onBac
                   ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
                   : 'bg-primary/20 text-primary border border-primary/30'
               }`}>
-                {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : (isAdmin ? 'A' : 'U')}
+                {displayUser.name ? displayUser.name.charAt(0).toUpperCase() : (isAdmin ? 'A' : 'U')}
               </div>
               <div className="min-w-0 text-left">
                 <div className="text-xs font-bold text-foreground truncate flex items-center gap-1.5">
-                  <span>{currentUser.name || (isAdmin ? 'Super Admin' : 'Authorized User')}</span>
+                  <span>{displayUser.name || (isAdmin ? 'Super Admin' : 'Authorized User')}</span>
                   {isAdmin ? (
                     <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">Admin</span>
                   ) : (
                     <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Client</span>
                   )}
                 </div>
-                <div className="text-[11px] text-foreground/50 truncate font-mono">{currentUser.email}</div>
+                <div className="text-[11px] text-foreground/50 truncate font-mono">{displayUser.email}</div>
               </div>
             </div>
             <div className="text-emerald-500 shrink-0 ml-2" title="Password verified">

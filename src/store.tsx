@@ -423,7 +423,8 @@ interface BankContextType {
   approveCryptoTradeOrder: (orderId: string, options?: { approvedBy?: string; customTxHash?: string }) => CryptoTradeOrder | undefined;
   rejectCryptoTradeOrder: (orderId: string, reason?: string) => void;
   adminSettings: AdminSettings;
-  login: (email: string, password?: string, isAdminPath?: boolean) => { success: boolean, error?: string };
+  login: (email: string, password?: string, isAdminPath?: boolean, skipSetCurrentUser?: boolean) => { success: boolean, error?: string, user?: User };
+  setCurrentUser: (user: User | null) => void;
   loginAsAdmin: () => User;
   logout: () => void;
   register: (name: string, email: string, password?: string) => void;
@@ -2202,7 +2203,7 @@ Global Elite Bank, Zurich, Switzerland`
 
   return (
     <BankContext.Provider value={{
-      users, currentUser, transactions, adminSettings, virtualCards, loanApplications, userApplications, grantApplications, contactInquiries, createVirtualCard, updateVirtualCardStatus, deleteVirtualCard, createLoanApplication, updateLoanApplicationStatus, updateUserApplicationStatus, createGrantApplication, updateGrantApplicationStatus,
+      users, currentUser, setCurrentUser, transactions, adminSettings, virtualCards, loanApplications, userApplications, grantApplications, contactInquiries, createVirtualCard, updateVirtualCardStatus, deleteVirtualCard, createLoanApplication, updateLoanApplicationStatus, updateUserApplicationStatus, createGrantApplication, updateGrantApplicationStatus,
       login, loginAsAdmin, logout, register, adminCreateUser, updateUserProfilePicture, adminUpdateUser, updateUserStatus, deleteUser, updateUserCardVisibility,
       updateBalance, createTransaction, updateTransactionStatus, updateAdminSettings, changePassword, createContactInquiry, deleteContactInquiry, updateContactInquiryStatus, sendMockEmail, investments, createInvestment, updateInvestment, deleteInvestment, reinvestProfit, adminAdjustInvestmentDuration,
       cryptoWithdrawals, requestCryptoWithdrawal, approveCryptoWithdrawal, rejectCryptoWithdrawal,
