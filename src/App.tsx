@@ -92,10 +92,10 @@ export default function App() {
     const handleUrlRouteSync = () => {
       if (isCurrentPathAdmin()) {
         if (currentUser?.role !== 'admin') {
-          setAppRoute('login');
+          setAppRoute(prev => prev === 'biometric' ? 'biometric' : 'login');
         } else {
-          setAppRoute('admin');
-          setCurrentView('Admin');
+          setAppRoute(prev => prev === 'biometric' ? 'biometric' : 'admin');
+          setCurrentView(prev => appRoute === 'biometric' ? prev : 'Admin');
         }
       }
     };
@@ -107,7 +107,7 @@ export default function App() {
       window.removeEventListener('popstate', handleUrlRouteSync);
       window.removeEventListener('hashchange', handleUrlRouteSync);
     };
-  }, [currentUser?.role, loginAsAdmin]);
+  }, [currentUser?.role, loginAsAdmin, appRoute]);
 
   if (appRoute === 'landing') {
     return <LandingPage onLogin={() => setAppRoute('login')} onRegister={() => setAppRoute('register')} />;

@@ -15,7 +15,7 @@ export function SignInView({ onBack, onSuccess }: { onBack: () => void, onSucces
     window.location.pathname.toLowerCase().endsWith('/admin') ||
     window.location.hash.toLowerCase().includes('admin')
   );
-  const { login, loginAsAdmin, adminSettings, currentUser, users, adminUpdateUser, sendMockEmail } = useBank();
+  const { login, loginAsAdmin, adminSettings, currentUser, users, adminUpdateUser, sendMockEmail, setCurrentUser } = useBank();
 
   // Forgot Password state
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -121,14 +121,9 @@ Global Elite Bank, Zurich, Switzerland`
       setError("Please enter email and password");
       return;
     }
-    const result = login(email, password, isAdminPath);
-    if (result.success) {
-      const inputEmail = email.trim().toLowerCase();
-      let matched = users.find(u => u.email?.toLowerCase() === inputEmail);
-      if (isAdminPath || inputEmail === 'mizbryo@gmail.com') {
-        matched = users.find(u => u.role === 'admin') || currentUser;
-      }
-      setAuthenticatedUser(matched || currentUser);
+    const result = login(email, password, isAdminPath, true); // true = skipSetCurrentUser
+    if (result.success && result.user) {
+      setAuthenticatedUser(result.user);
       // Require Two-Factor Authentication (Thumbprint biometrics) for all users, including Admin
       setStep(2);
     } else {
@@ -139,7 +134,12 @@ Global Elite Bank, Zurich, Switzerland`
   if (step === 2) {
     return (
       <BiometricLogin 
-        onLogin={() => onSuccess(authenticatedUser || currentUser)} 
+        onLogin={() => {
+           if (authenticatedUser) {
+             setCurrentUser(authenticatedUser);
+             onSuccess(authenticatedUser);
+           }
+        }} 
         onBack={() => setStep(1)} 
       />
     );

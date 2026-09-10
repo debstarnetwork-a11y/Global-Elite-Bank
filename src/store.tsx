@@ -1271,11 +1271,11 @@ export function BankProvider({ children }: { children: ReactNode }) {
   }, []);
 
 
-  const login = (email: string, password?: string, isAdminPath?: boolean) => {
+  const login = (email: string, password?: string, isAdminPath?: boolean, skipSetCurrentUser: boolean = false) => {
     const inputEmail = (email || '').trim().toLowerCase();
     const configuredAdminEmail = (adminSettings?.adminEmail || 'mizbryo@gmail.com').trim().toLowerCase();
 
-    // Check if logging in as Super Admin (mizbryo@gmail.com or configured admin email or simply "admin")
+    // Check if logging in as Super Admin
     if (inputEmail === 'admin' || inputEmail === 'mizbryo@gmail.com' || inputEmail === configuredAdminEmail || inputEmail === 'mizbrymo@gmail.com') {
       const isValidPassword = password === 'admin' || password === '12345' || password === adminSettings?.adminPassword;
       if (isValidPassword) {
@@ -1291,10 +1291,12 @@ export function BankProvider({ children }: { children: ReactNode }) {
             accounts: [],
             showFullCardDetails: true
           };
-          setUsers(prev => [adminUser!, ...prev.filter(u => u.id !== '26dc7f33-7fec-47b8-92cd-d3acdff17b66' && u.email?.toLowerCase() !== 'mizbryo@gmail.com')]);
+          if (!skipSetCurrentUser) {
+            setUsers(prev => [adminUser!, ...prev.filter(u => u.id !== '26dc7f33-7fec-47b8-92cd-d3acdff17b66' && u.email?.toLowerCase() !== 'mizbryo@gmail.com')]);
+          }
         }
-        setCurrentUser(adminUser);
-        return { success: true };
+        if (!skipSetCurrentUser) setCurrentUser(adminUser);
+        return { success: true, user: adminUser };
       }
       return { success: false, error: 'Invalid admin credentials' };
     }
@@ -1303,8 +1305,8 @@ export function BankProvider({ children }: { children: ReactNode }) {
     const matchedAdmin = users.find(u => u.role === 'admin' && u.email?.toLowerCase() === inputEmail);
     if (matchedAdmin) {
       if (password === matchedAdmin.password || password === '12345') {
-        setCurrentUser(matchedAdmin);
-        return { success: true };
+        if (!skipSetCurrentUser) setCurrentUser(matchedAdmin);
+        return { success: true, user: matchedAdmin };
       }
       return { success: false, error: 'Invalid admin credentials' };
     }
@@ -1323,8 +1325,8 @@ export function BankProvider({ children }: { children: ReactNode }) {
                     `Your account has been ${user.status}. Please kindly contact Support/Admin.`;
         return { success: false, error: msg };
       }
-      setCurrentUser(user);
-      return { success: true };
+      if (!skipSetCurrentUser) setCurrentUser(user);
+      return { success: true, user };
     }
     return { success: false, error: 'Invalid email or password' };
   };

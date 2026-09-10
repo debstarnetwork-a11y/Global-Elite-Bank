@@ -66,6 +66,33 @@ export function AdminDashboard() {
     setNewUserForm(prev => ({ ...prev, passportPhoto: cleanUrl }));
   };
 
+  const handleEditPassportPhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('File too large', 'Please choose an image under 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (base64) {
+          setEditUserForm(prev => ({ ...prev, profilePicture: base64 }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditPassportPhotoInputPaste = (input: string) => {
+    let cleanUrl = input.trim();
+    const srcMatch = cleanUrl.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1]) {
+      cleanUrl = srcMatch[1];
+    }
+    setEditUserForm(prev => ({ ...prev, profilePicture: cleanUrl }));
+  };
+
   const generateRandomCode = (prefix: string, length: number) => {
     return prefix + Math.floor(Math.random() * Math.pow(10, length)).toString().padStart(length, '0');
   };
@@ -679,14 +706,66 @@ All Rights Reserved © Global Elite
                       <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Residential Address</label>
                       <input type="text" value={editUserForm.residentialAddress || ''} onChange={e => setEditUserForm({...editUserForm, residentialAddress: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 text-sm focus:border-primary outline-none" />
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Profile Picture URL</label>
-                      <input type="text" value={editUserForm.profilePicture || ''} onChange={e => {
-                        let val = e.target.value;
-                        const imgMatch = val.match(/<img[^>]+src=["']([^"']+)["']/i);
-                        if (imgMatch) val = imgMatch[1];
-                        setEditUserForm({...editUserForm, profilePicture: val});
-                      }} className="w-full bg-background border border-border rounded-lg p-2 text-sm focus:border-primary outline-none" placeholder="Paste image URL or HTML tag..." />
+                    {/* Passport / ID Document / Profile Photo */}
+                    <div className="bg-background/80 border border-border rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-foreground/80 uppercase flex items-center gap-1.5">
+                          <ImageIcon size={14} className="text-primary" />
+                          Client Passport / ID Photo
+                        </label>
+                        <span className="text-[10px] text-foreground/50">Upload file or paste HTML/URL</span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        {editUserForm.profilePicture ? (
+                          <div className="relative group shrink-0">
+                            <img 
+                              src={editUserForm.profilePicture} 
+                              alt="Client Passport" 
+                              className="w-20 h-24 object-cover rounded-lg border-2 border-primary/50 shadow-md"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setEditUserForm(prev => ({ ...prev, profilePicture: '' }))}
+                              className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow hover:bg-rose-600 transition-colors"
+                              title="Remove Photo"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-20 h-24 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-foreground/40 shrink-0 bg-background/50">
+                            <ImageIcon size={24} className="mb-1 opacity-50" />
+                            <span className="text-[9px] uppercase font-bold">No Photo</span>
+                          </div>
+                        )}
+
+                        <div className="flex-1 w-full space-y-2">
+                          <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-lg text-xs font-bold cursor-pointer transition-colors shadow-sm">
+                              <Upload size={14} />
+                              <span>Upload File</span>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                onChange={handleEditPassportPhotoFileChange} 
+                                className="hidden" 
+                              />
+                            </label>
+                            <span className="text-xs text-foreground/40">or paste URL / HTML below:</span>
+                          </div>
+                          <input 
+                            type="text" 
+                            value={editUserForm.profilePicture || ''} 
+                            onChange={e => handleEditPassportPhotoInputPaste(e.target.value)} 
+                            placeholder='Paste image URL or <img src="..." />'
+                            className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:border-primary outline-none font-mono"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Currency</label>
