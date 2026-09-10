@@ -146,10 +146,9 @@ Global Elite Bank, Zurich, Switzerland`
       </button>
 
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-xl">
-                {adminSettings?.logoUrl ? (
+                {adminSettings?.logoUrl || '/logo.png' ? (
           <div className="flex flex-col items-center justify-center mb-6">
-            <img src={adminSettings.logoUrl} alt="Global Elite Bank Logo" className="w-20 h-20 mb-3 object-contain" />
-            
+            <img src={adminSettings?.logoUrl || '/logo.png'} alt="Global Elite Bank Logo" className="w-20 h-20 mb-3 object-contain" />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center mb-6">

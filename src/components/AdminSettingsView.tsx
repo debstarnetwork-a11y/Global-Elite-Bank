@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useBank, DEFAULT_BROKER_WALLETS } from '../store';
-import { Upload, Save, Plus, Trash, CheckCircle, Wallet, Check, QrCode, ExternalLink } from 'lucide-react';
+import { Upload, Save, Plus, Trash, CheckCircle, Wallet, Check, QrCode, ExternalLink, Database } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 export function AdminSettingsView() {
@@ -422,6 +422,78 @@ export function AdminSettingsView() {
                   <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Captcha Site-Key</label>
                   <input type="password" value={adminSettings.captchaSiteKey as string || ''} onChange={e => updateAdminSettings({ captchaSiteKey: e.target.value })} placeholder="From https://www.google.com/recaptcha/admin/create" className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:border-primary outline-none" />
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+        {activeTab === 'recovery' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-foreground mb-1">Local Data Recovery</h2>
+              <p className="text-sm text-foreground/60 mb-6">If your users and transactions did not automatically migrate to the cloud database, you can push them from your local browser storage using this tool.</p>
+              
+              <div className="bg-card border border-border p-6 rounded-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-5">
+                   <Database size={120} />
+                </div>
+                
+                <h3 className="font-bold text-foreground mb-2">Initialize Migration</h3>
+                <p className="text-sm text-foreground/60 mb-6 max-w-lg">
+                  Click the button below to scan this browser's memory and securely push any legacy data into your connected Supabase project. This will not overwrite existing cloud data, it will only merge missing entries.
+                </p>
+
+                <button 
+                  onClick={async (e) => {
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Migrating...</span>';
+                    
+                    try {
+                      const getLocal = (key) => {
+                        try { return JSON.parse(window.localStorage.getItem(key) || '[]'); } catch { return []; }
+                      };
+
+                      const users = getLocal('bank_users');
+                      const txns = getLocal('bank_transactions');
+                      
+                      if (users.length > 0) {
+                        const flatUsers = users.map(u => {
+                          const { accounts, investorWallets, ...rest } = u;
+                          return rest;
+                        });
+                        await supabase.from('users').upsert(flatUsers.map(camelToSnake));
+
+                        const flatAccounts = users.flatMap(u => (u.accounts || []).map(a => ({ ...a, userId: u.id })));
+                        if (flatAccounts.length > 0) {
+                          await supabase.from('accounts').upsert(flatAccounts.map(camelToSnake));
+                        }
+                      }
+
+                      if (txns.length > 0) {
+                        const chunkSize = 100;
+                        for (let i = 0; i < txns.length; i += chunkSize) {
+                          const chunk = txns.slice(i, i + chunkSize);
+                          await supabase.from('transactions').upsert(chunk.map(camelToSnake));
+                        }
+                      }
+                      
+                      btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Migration Complete</span>';
+                      btn.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white', 'border-transparent');
+                      
+                      setTimeout(() => window.location.reload(), 2000);
+                    } catch (err) {
+                      console.error(err);
+                      alert('Error: ' + err.message);
+                      btn.disabled = false;
+                      btn.innerHTML = 'Retry Migration';
+                    }
+                  }}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all"
+                >
+                  Start Data Migration
+                </button>
               </div>
             </div>
           </div>
