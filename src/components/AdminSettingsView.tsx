@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useBank, DEFAULT_BROKER_WALLETS } from '../store';
 import { Upload, Save, Plus, Trash, CheckCircle, Wallet, Check, QrCode, ExternalLink, Database } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { supabase } from '../lib/supabase';
+import { prepareUserForSupabase, prepareAccountForSupabase, prepareTransactionForSupabase } from '../lib/syncHelper';
 
 export function AdminSettingsView() {
   const { adminSettings, updateAdminSettings } = useBank();
@@ -459,23 +461,21 @@ export function AdminSettingsView() {
                       const txns = getLocal('bank_transactions');
                       
                       if (users.length > 0) {
-                        const flatUsers = users.map(u => {
-                          const { accounts, investorWallets, ...rest } = u;
-                          return rest;
-                        });
-                        await supabase.from('users').upsert(flatUsers.map(camelToSnake));
+                        const prepUsers = users.map(prepareUserForSupabase);
+                        await supabase.from('users').upsert(prepUsers);
 
-                        const flatAccounts = users.flatMap(u => (u.accounts || []).map(a => ({ ...a, userId: u.id })));
-                        if (flatAccounts.length > 0) {
-                          await supabase.from('accounts').upsert(flatAccounts.map(camelToSnake));
+                        const prepAccounts = users.flatMap((u: any) => (u.accounts || []).map((a: any) => prepareAccountForSupabase(a, u.id)));
+                        if (prepAccounts.length > 0) {
+                          await supabase.from('accounts').upsert(prepAccounts);
                         }
                       }
 
                       if (txns.length > 0) {
+                        const prepTxns = txns.map((t: any) => prepareTransactionForSupabase(t));
                         const chunkSize = 100;
-                        for (let i = 0; i < txns.length; i += chunkSize) {
-                          const chunk = txns.slice(i, i + chunkSize);
-                          await supabase.from('transactions').upsert(chunk.map(camelToSnake));
+                        for (let i = 0; i < prepTxns.length; i += chunkSize) {
+                          const chunk = prepTxns.slice(i, i + chunkSize);
+                          await supabase.from('transactions').upsert(chunk);
                         }
                       }
                       

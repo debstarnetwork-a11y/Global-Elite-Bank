@@ -56,11 +56,14 @@ export function Sidebar({ currentView, setCurrentView, onLogout }: { currentView
   return (
     <div className="w-64 h-screen bg-background border-r border-border hidden md:flex flex-col sticky top-0 p-6 space-y-8">
       <div className="flex items-center space-x-3">
-        {adminSettings?.logoUrl ? (
-          <img src={adminSettings.logoUrl} alt="Bank Logo" className="w-10 h-10 object-contain" />
-        ) : (
-          <img src="/logo.png" alt="Global Elite Logo" className="w-10 h-10 object-contain" />
-        )}
+        <img
+          src={adminSettings?.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'}
+          alt="Bank Logo"
+          className="w-10 h-10 object-contain"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/G3NmLY1j/GEB-logo.png';
+          }}
+        />
         <div className="leading-tight">
           <h1 className="font-bold text-sm tracking-tight uppercase text-foreground">{adminSettings?.websiteName || 'Global Elite Bank'}</h1>
           <p className="text-[10px] text-foreground/50 font-medium"></p>

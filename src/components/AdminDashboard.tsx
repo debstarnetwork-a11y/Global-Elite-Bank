@@ -355,11 +355,14 @@ All Rights Reserved © Global Elite
       {/* Sidebar - Desktop */}
       <div className="w-64 bg-card border-r border-border overflow-y-auto flex-col h-full shrink-0 hidden lg:flex">
         <div className="p-6 border-b border-border flex items-center gap-3">
-          {adminSettings?.logoUrl ? (
-            <img src={adminSettings.logoUrl} alt="Bank Logo" className="w-8 h-8 object-contain" />
-          ) : (
-            <img src="/logo.png" alt="Global Elite Logo" className="w-8 h-8 object-contain" />
-          )}
+          <img
+            src={adminSettings?.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'}
+            alt="Bank Logo"
+            className="w-8 h-8 object-contain"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/G3NmLY1j/GEB-logo.png';
+            }}
+          />
           <h1 className="text-xl font-bold text-foreground">Admin</h1>
         </div>
         <div className="flex-1 py-4 flex flex-col px-3">
@@ -374,11 +377,14 @@ All Rights Reserved © Global Elite
           <div className="relative w-64 bg-card h-full flex flex-col border-r border-border shadow-2xl animate-in slide-in-from-left">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {adminSettings?.logoUrl ? (
-                  <img src={adminSettings.logoUrl} alt="Bank Logo" className="w-8 h-8 object-contain" />
-                ) : (
-                  <img src="/logo.png" alt="Global Elite Logo" className="w-8 h-8 object-contain" />
-                )}
+                <img
+                  src={adminSettings?.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'}
+                  alt="Bank Logo"
+                  className="w-8 h-8 object-contain"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/G3NmLY1j/GEB-logo.png';
+                  }}
+                />
                 <h1 className="text-xl font-bold text-foreground">Admin</h1>
               </div>
               <button onClick={() => setIsSidebarOpen(false)} className="text-foreground/50 hover:text-foreground">

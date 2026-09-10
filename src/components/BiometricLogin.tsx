@@ -37,15 +37,16 @@ export function BiometricLogin({ onLogin, onBack }: { onLogin: () => void; onBac
 
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-2xl flex flex-col items-center">
         {/* Logo */}
-        {adminSettings?.logoUrl ? (
-          <div className="flex flex-col items-center justify-center mb-4">
-            <img src={adminSettings.logoUrl} alt="Logo" className="w-16 h-16 object-contain" />
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center mb-4">
-            <img src="/logo.png" alt="Global Elite Logo" className="w-14 h-14 object-contain" />
-          </div>
-        )}
+        <div className="flex flex-col items-center justify-center mb-4">
+          <img
+            src={adminSettings?.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'}
+            alt="Global Elite Bank Logo"
+            className="w-16 h-16 object-contain"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/G3NmLY1j/GEB-logo.png';
+            }}
+          />
+        </div>
 
         {/* 2FA Header */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest bg-primary/10 text-primary border border-primary/20 mb-3">

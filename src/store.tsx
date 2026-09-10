@@ -2,6 +2,20 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { Mail, X, ArrowLeft } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { camelToSnake, snakeToCamel } from './lib/casing';
+import { stringToUUID, generateUUID } from './lib/uuid';
+import {
+  prepareUserForSupabase,
+  prepareAccountForSupabase,
+  prepareTransactionForSupabase,
+  prepareVirtualCardForSupabase,
+  prepareLoanForSupabase,
+  prepareGrantForSupabase,
+  prepareInvestmentForSupabase,
+  prepareContactInquiryForSupabase,
+  prepareUserApplicationForSupabase,
+  prepareCryptoWithdrawalForSupabase,
+  prepareCryptoTradeOrderForSupabase
+} from './lib/syncHelper';
 
 export type UserStatus = 'active' | 'inactive' | 'dormant' | 'suspended' | 'blocked' | 'frozen';
 export type AccountType = 'Savings' | 'Checking' | 'Business';
@@ -439,7 +453,7 @@ interface BankContextType {
 }
 
 const defaultAdmin: User = {
-  id: 'admin-1',
+  id: '26dc7f33-7fec-47b8-92cd-d3acdff17b66',
   name: 'Super Admin',
   email: 'mizbryo@gmail.com',
   password: '12345',
@@ -670,7 +684,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
     activeTheme: "dark",
 
 
-    logoUrl: '',
+    logoUrl: 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
     adminEmail: 'mizbryo@gmail.com',
     adminPassword: '12345',
     contactEmail: 'support@bank.com',
@@ -686,7 +700,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
     timezone: 'Pacific/Wallis',
     installationType: 'Main-Domain',
     smsEnabled: true,
-    faviconUrl: '',
+    faviconUrl: 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
     paymentMethods: [
       { id: '1', name: 'Credit Card', type: 'currency', usedFor: 'both', status: 'enabled' },
       { id: '2', name: 'BUSD', type: 'crypto', usedFor: 'withdrawal', status: 'disabled' },
@@ -715,12 +729,10 @@ export function BankProvider({ children }: { children: ReactNode }) {
   });
 
   const [isInitializing, setIsInitializing] = useState(true);
-  const prevStates = React.useRef<any>({});
 
   useEffect(() => {
     async function loadData() {
       try {
-        
         const results = await Promise.all([
           supabase.from('users').select('*'),
           supabase.from('accounts').select('*'),
@@ -737,75 +749,263 @@ export function BankProvider({ children }: { children: ReactNode }) {
           supabase.from('investor_wallets').select('*')
         ]);
 
-        const errors = results.filter(r => r.error).map(r => r.error);
-        if (errors.length > 0) {
-           console.error("Supabase query errors:", errors);
-           alert("Supabase errors: " + JSON.stringify(errors.map(e => e.message)));
-        }
-
         const [
-          { data: usersData },
-          { data: accountsData },
-          { data: txnsData },
-          { data: investmentsData },
-          { data: virtualCardsData },
-          { data: loanAppsData },
-          { data: grantAppsData },
-          { data: contactInquiriesData },
-          { data: userAppsData },
-          { data: cryptoWithdrawalsData },
-          { data: cryptoOrdersData },
+          { data: rawUsers },
+          { data: rawAccounts },
+          { data: rawTxns },
+          { data: rawInvestments },
+          { data: rawVirtualCards },
+          { data: rawLoanApps },
+          { data: rawGrantApps },
+          { data: rawContactInquiries },
+          { data: rawUserApps },
+          { data: rawCryptoWithdrawals },
+          { data: rawCryptoOrders },
           { data: adminSettingsData },
-          { data: investorWalletsData }
+          { data: rawInvestorWallets }
         ] = results;
 
+        let usersList: any[] = rawUsers ? snakeToCamel(rawUsers) : [];
+        let accountsList: any[] = rawAccounts ? snakeToCamel(rawAccounts) : [];
+        let txnsList: any[] = rawTxns ? snakeToCamel(rawTxns) : [];
+        let virtualCardsList: any[] = rawVirtualCards ? snakeToCamel(rawVirtualCards) : [];
+        let investmentsList: any[] = rawInvestments ? snakeToCamel(rawInvestments) : [];
+        let loanAppsList: any[] = rawLoanApps ? snakeToCamel(rawLoanApps) : [];
+        let grantAppsList: any[] = rawGrantApps ? snakeToCamel(rawGrantApps) : [];
+        let contactInquiriesList: any[] = rawContactInquiries ? snakeToCamel(rawContactInquiries) : [];
+        let userAppsList: any[] = rawUserApps ? snakeToCamel(rawUserApps) : [];
+        let cryptoWithdrawalsList: any[] = rawCryptoWithdrawals ? snakeToCamel(rawCryptoWithdrawals) : [];
+        let cryptoOrdersList: any[] = rawCryptoOrders ? snakeToCamel(rawCryptoOrders) : [];
+        let investorWalletsList: any[] = rawInvestorWallets ? snakeToCamel(rawInvestorWallets) : [];
+
+        // Check local storage for existing user/data to automatically sync into Supabase
+        try {
+          const localUsersStr = window.localStorage.getItem('bank_users');
+          if (localUsersStr) {
+            const parsedLocalUsers = JSON.parse(localUsersStr);
+            if (Array.isArray(parsedLocalUsers)) {
+              for (const lu of parsedLocalUsers) {
+                if (!lu || !lu.email) continue;
+                const emailKey = lu.email.trim().toLowerCase();
+                let existingInDb = usersList.find((u: any) => (u.email || '').trim().toLowerCase() === emailKey);
+                let targetUserId = existingInDb ? (existingInDb.id || stringToUUID(existingInDb.id)) : stringToUUID(lu.id);
+
+                if (!existingInDb) {
+                  // User exists locally but not in Supabase yet: migrate them now
+                  const prepUser = prepareUserForSupabase(lu);
+                  const { error: uErr } = await supabase.from('users').upsert(prepUser);
+                  if (!uErr) {
+                    usersList.push(snakeToCamel(prepUser));
+                    targetUserId = prepUser.id;
+                  }
+                }
+
+                // Check and migrate accounts for this user
+                if (lu.accounts && Array.isArray(lu.accounts)) {
+                  for (const acc of lu.accounts) {
+                    const accUUID = stringToUUID(acc.id);
+                    const accExists = accountsList.some((a: any) => a.id === accUUID || a.id === acc.id || (a.accountNumber && a.accountNumber === acc.accountNumber));
+                    if (!accExists) {
+                      const prepAcc = prepareAccountForSupabase(acc, targetUserId);
+                      const { error: aErr } = await supabase.from('accounts').upsert(prepAcc);
+                      if (!aErr) {
+                        accountsList.push(snakeToCamel(prepAcc));
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for users:', e);
+        }
+
+        const validUserIds = new Set(usersList.map((u: any) => u.id));
+        const validAccountIds = new Set(accountsList.map((a: any) => a.id));
+
+        try {
+          const localTxnsStr = window.localStorage.getItem('bank_transactions');
+          if (localTxnsStr) {
+            const parsedLocalTxns = JSON.parse(localTxnsStr);
+            if (Array.isArray(parsedLocalTxns)) {
+              for (const lt of parsedLocalTxns) {
+                const txnId = stringToUUID(lt.id);
+                if (!txnsList.some((t: any) => t.id === txnId || t.id === lt.id)) {
+                  const txUserUUID = stringToUUID(lt.userId);
+                  const effectiveUserId = validUserIds.has(txUserUUID) ? txUserUUID : (usersList[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66');
+                  const prepTxn = prepareTransactionForSupabase(lt, effectiveUserId, validAccountIds);
+                  const { error: tErr } = await supabase.from('transactions').upsert(prepTxn);
+                  if (!tErr) {
+                    txnsList.push(snakeToCamel(prepTxn));
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for transactions:', e);
+        }
+
+        try {
+          const localCardsStr = window.localStorage.getItem('bank_virtualCards');
+          if (localCardsStr) {
+            const parsedLocalCards = JSON.parse(localCardsStr);
+            if (Array.isArray(parsedLocalCards)) {
+              for (const lc of parsedLocalCards) {
+                const cardId = stringToUUID(lc.id);
+                if (!virtualCardsList.some((c: any) => c.id === cardId || c.id === lc.id)) {
+                  const cardUserUUID = stringToUUID(lc.userId);
+                  const effectiveUserId = validUserIds.has(cardUserUUID) ? cardUserUUID : (usersList[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66');
+                  const prepCard = prepareVirtualCardForSupabase(lc, effectiveUserId);
+                  const { error: cErr } = await supabase.from('virtual_cards').upsert(prepCard);
+                  if (!cErr) {
+                    virtualCardsList.push(snakeToCamel(prepCard));
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for cards:', e);
+        }
+
+        try {
+          const localInvsStr = window.localStorage.getItem('bank_investments');
+          if (localInvsStr) {
+            const parsedInvs = JSON.parse(localInvsStr);
+            if (Array.isArray(parsedInvs)) {
+              for (const li of parsedInvs) {
+                const invId = stringToUUID(li.id);
+                if (!investmentsList.some((i: any) => i.id === invId || i.id === li.id)) {
+                  const invUserUUID = stringToUUID(li.userId);
+                  const effectiveUserId = validUserIds.has(invUserUUID) ? invUserUUID : (usersList[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66');
+                  const prepInv = prepareInvestmentForSupabase(li, effectiveUserId);
+                  const { error: iErr } = await supabase.from('investments').upsert(prepInv);
+                  if (!iErr) {
+                    investmentsList.push(snakeToCamel(prepInv));
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for investments:', e);
+        }
+
+        try {
+          const localLoansStr = window.localStorage.getItem('bank_loanApplications');
+          if (localLoansStr) {
+            const parsedLoans = JSON.parse(localLoansStr);
+            if (Array.isArray(parsedLoans)) {
+              for (const ll of parsedLoans) {
+                const loanId = stringToUUID(ll.id);
+                if (!loanAppsList.some((l: any) => l.id === loanId || l.id === ll.id)) {
+                  const loanUserUUID = stringToUUID(ll.userId);
+                  const effectiveUserId = validUserIds.has(loanUserUUID) ? loanUserUUID : (usersList[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66');
+                  const prepLoan = prepareLoanForSupabase(ll, effectiveUserId);
+                  const { error: lErr } = await supabase.from('loan_applications').upsert(prepLoan);
+                  if (!lErr) {
+                    loanAppsList.push(snakeToCamel(prepLoan));
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for loans:', e);
+        }
+
+        try {
+          const localGrantsStr = window.localStorage.getItem('bank_grantApplications');
+          if (localGrantsStr) {
+            const parsedGrants = JSON.parse(localGrantsStr);
+            if (Array.isArray(parsedGrants)) {
+              for (const lg of parsedGrants) {
+                const grantId = stringToUUID(lg.id);
+                if (!grantAppsList.some((g: any) => g.id === grantId || g.id === lg.id)) {
+                  const grantUserUUID = stringToUUID(lg.userId);
+                  const effectiveUserId = validUserIds.has(grantUserUUID) ? grantUserUUID : (usersList[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66');
+                  const prepGrant = prepareGrantForSupabase(lg, effectiveUserId);
+                  const { error: gErr } = await supabase.from('grant_applications').upsert(prepGrant);
+                  if (!gErr) {
+                    grantAppsList.push(snakeToCamel(prepGrant));
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-migration error for grants:', e);
+        }
 
         if (adminSettingsData) {
-          setAdminSettings(snakeToCamel(adminSettingsData));
-        }
-        if (txnsData) setTransactions(snakeToCamel(txnsData));
-        if (investmentsData) setInvestments(snakeToCamel(investmentsData));
-        if (virtualCardsData) setVirtualCards(snakeToCamel(virtualCardsData));
-        if (loanAppsData) setLoanApplications(snakeToCamel(loanAppsData));
-        if (grantAppsData) setGrantApplications(snakeToCamel(grantAppsData));
-        if (contactInquiriesData) setContactInquiries(snakeToCamel(contactInquiriesData));
-        if (userAppsData) setUserApplications(snakeToCamel(userAppsData));
-        if (cryptoWithdrawalsData) setCryptoWithdrawals(snakeToCamel(cryptoWithdrawalsData));
-        if (cryptoOrdersData) setCryptoOrders(snakeToCamel(cryptoOrdersData));
-
-        if (usersData) {
-          const mappedUsers = snakeToCamel(usersData).map((u: any) => ({
-            ...u,
-            accounts: snakeToCamel(accountsData || []).filter((a: any) => a.userId === u.id),
-            investorWallets: snakeToCamel(investorWalletsData || []).find((w: any) => w.userId === u.id) || undefined
+          const camelSettings = snakeToCamel(adminSettingsData);
+          setAdminSettings(prev => ({
+            ...prev,
+            ...camelSettings,
+            logoUrl: adminSettingsData.logo_url || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
+            faviconUrl: adminSettingsData.favicon_url || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png'
           }));
-          
-          if (!mappedUsers.find((u: any) => u.role === 'admin')) {
-             mappedUsers.push(defaultAdmin);
-          }
-          setUsers(mappedUsers);
         }
 
-        // Set baseline for diffs
-        prevStates.current = {
-          users: usersData ? snakeToCamel(usersData) : [],
-          accounts: accountsData ? snakeToCamel(accountsData) : [],
-          investorWallets: investorWalletsData ? snakeToCamel(investorWalletsData) : [],
-          transactions: txnsData ? snakeToCamel(txnsData) : [],
-          investments: investmentsData ? snakeToCamel(investmentsData) : [],
-          virtualCards: virtualCardsData ? snakeToCamel(virtualCardsData) : [],
-          loanApplications: loanAppsData ? snakeToCamel(loanAppsData) : [],
-          grantApplications: grantAppsData ? snakeToCamel(grantAppsData) : [],
-          contactInquiries: contactInquiriesData ? snakeToCamel(contactInquiriesData) : [],
-          userApplications: userAppsData ? snakeToCamel(userAppsData) : [],
-          cryptoWithdrawals: cryptoWithdrawalsData ? snakeToCamel(cryptoWithdrawalsData) : [],
-          cryptoOrders: cryptoOrdersData ? snakeToCamel(cryptoOrdersData) : [],
-          adminSettings: adminSettingsData ? snakeToCamel(adminSettingsData) : null,
-        };
+        setTransactions(txnsList);
+        setInvestments(investmentsList);
+        setVirtualCards(virtualCardsList);
+        setLoanApplications(loanAppsList);
+        setGrantApplications(grantAppsList);
+        setContactInquiries(contactInquiriesList);
+        setUserApplications(userAppsList);
+        setCryptoWithdrawals(cryptoWithdrawalsList);
+        setCryptoOrders(cryptoOrdersList);
 
+        // Map users with nested accounts and investorWallets
+        const mappedUsers: User[] = usersList.map((u: any) => {
+          const uAccounts = accountsList
+            .filter((a: any) => a.userId === u.id || a.user_id === u.id)
+            .map((a: any) => ({
+              id: a.id,
+              userId: a.userId || u.id,
+              accountNumber: a.accountNumber,
+              type: a.type || 'Checking',
+              balance: Number(a.balance) || 0,
+              currency: u.currency || 'USD',
+              status: 'active' as const,
+              iban: a.iban,
+              codes: {
+                swift: a.swiftCode || '',
+                cot: a.cotCode || '',
+                tax: a.taxCode || '',
+                imf: a.imfCode || '',
+                aml: a.amlCode || ''
+              }
+            }));
+
+          const uWallet = investorWalletsList.find((w: any) => w.userId === u.id || w.user_id === u.id);
+
+          return {
+            ...u,
+            role: u.role === 'admin' ? 'admin' : 'client',
+            status: u.status || 'active',
+            accounts: uAccounts,
+            investorWallets: uWallet ? {
+              btc: uWallet.btc || '',
+              eth: uWallet.eth || '',
+              usdt: uWallet.usdt || '',
+              sol: uWallet.sol || '',
+              balance: Number(uWallet.balance) || 0
+            } : undefined
+          };
+        });
+
+        // Ensure defaultAdmin exists
+        if (!mappedUsers.some(u => u.role === 'admin' || u.email?.toLowerCase() === 'mizbryo@gmail.com')) {
+          mappedUsers.unshift(defaultAdmin);
+        }
+
+        setUsers(mappedUsers);
       } catch (err) {
         console.error('Failed to load Supabase data:', err);
-        alert('Supabase Load Error: ' + (err.message || JSON.stringify(err)));
       } finally {
         setIsInitializing(false);
       }
@@ -813,73 +1013,243 @@ export function BankProvider({ children }: { children: ReactNode }) {
     loadData();
   }, []);
 
-  useEffect(() => { window.localStorage.setItem('bank_currentUser', JSON.stringify(currentUser)); }, [currentUser]);
+  useEffect(() => {
+    window.localStorage.setItem('bank_currentUser', JSON.stringify(currentUser));
+  }, [currentUser]);
 
-  // Generic Sync function
-  const syncTable = async (currentItems: any[], tableName: string, stateKey: string) => {
-    if (isInitializing) return;
-    const prevItems = prevStates.current[stateKey] || [];
-    
-    const toUpsert = currentItems.filter(item => {
-      const prevItem = prevItems.find((p: any) => p.id === item.id);
-      return !prevItem || JSON.stringify(prevItem) !== JSON.stringify(item);
-    });
-
-    const toDelete = prevItems.filter((p: any) => !currentItems.find(item => item.id === p.id));
-
-    if (toUpsert.length > 0) {
-      await supabase.from(tableName).upsert(toUpsert.map(camelToSnake));
-    }
-    if (toDelete.length > 0) {
-      await supabase.from(tableName).delete().in('id', toDelete.map((d: any) => d.id));
-    }
-
-    prevStates.current[stateKey] = JSON.parse(JSON.stringify(currentItems));
-  };
-
-  // Sync users, accounts, investorWallets separately since they are nested in state
+  // Sync users and accounts to Supabase
   useEffect(() => {
     if (isInitializing) return;
-    
-    // Extract flat lists
-    const flatUsers = users.map(u => {
-      const { accounts, investorWallets, ...rest } = u;
-      return rest;
-    });
-    
-    const flatAccounts = users.flatMap(u => 
-      (u.accounts || []).map(a => ({ ...a, userId: u.id }))
-    );
-    
-    const flatWallets = users.filter(u => u.investorWallets).map(u => ({
-      ...u.investorWallets,
-      userId: u.id
-    }));
+    const syncUsersAndAccounts = async () => {
+      try {
+        if (users.length > 0) {
+          const prepUsers = users.map(prepareUserForSupabase);
+          await supabase.from('users').upsert(prepUsers);
 
-    syncTable(flatUsers, 'users', 'users');
-    syncTable(flatAccounts, 'accounts', 'accounts');
-    syncTable(flatWallets, 'investor_wallets', 'investorWallets');
-    
+          const prepAccounts = users.flatMap(u =>
+            (u.accounts || []).map(a => prepareAccountForSupabase(a, u.id))
+          );
+          if (prepAccounts.length > 0) {
+            await supabase.from('accounts').upsert(prepAccounts);
+          }
+        }
+        window.localStorage.setItem('bank_users', JSON.stringify(users));
+      } catch (err) {
+        console.error('Error syncing users to Supabase:', err);
+      }
+    };
+    syncUsersAndAccounts();
   }, [users, isInitializing]);
 
-  // Sync others
-  useEffect(() => { syncTable(transactions, 'transactions', 'transactions'); }, [transactions, isInitializing]);
-  useEffect(() => { syncTable(investments, 'investments', 'investments'); }, [investments, isInitializing]);
-  useEffect(() => { syncTable(virtualCards, 'virtual_cards', 'virtualCards'); }, [virtualCards, isInitializing]);
-  useEffect(() => { syncTable(loanApplications, 'loan_applications', 'loanApplications'); }, [loanApplications, isInitializing]);
-  useEffect(() => { syncTable(grantApplications, 'grant_applications', 'grantApplications'); }, [grantApplications, isInitializing]);
-  useEffect(() => { syncTable(contactInquiries, 'contact_inquiries', 'contactInquiries'); }, [contactInquiries, isInitializing]);
-  useEffect(() => { syncTable(userApplications, 'user_applications', 'userApplications'); }, [userApplications, isInitializing]);
-  useEffect(() => { syncTable(cryptoWithdrawals, 'crypto_withdrawal_requests', 'cryptoWithdrawals'); }, [cryptoWithdrawals, isInitializing]);
-  useEffect(() => { syncTable(cryptoOrders, 'crypto_trade_orders', 'cryptoOrders'); }, [cryptoOrders, isInitializing]);
-
+  // Sync transactions to Supabase
   useEffect(() => {
-    if (isInitializing || !adminSettings.id) return;
-    const prevSettings = prevStates.current.adminSettings;
-    if (!prevSettings || JSON.stringify(prevSettings) !== JSON.stringify(adminSettings)) {
-      supabase.from('admin_settings').upsert(camelToSnake(adminSettings)).then();
-      prevStates.current.adminSettings = JSON.parse(JSON.stringify(adminSettings));
-    }
+    if (isInitializing) return;
+    const syncTxns = async () => {
+      try {
+        if (transactions.length > 0) {
+          const validAccounts = new Set<string>(
+            users.flatMap(u => (u.accounts || []).map(a => stringToUUID(a.id)))
+          );
+          const defaultUserId = users[0]?.id || '26dc7f33-7fec-47b8-92cd-d3acdff17b66';
+          const prep = transactions.map(t => prepareTransactionForSupabase(t, defaultUserId, validAccounts));
+          await supabase.from('transactions').upsert(prep);
+        }
+        window.localStorage.setItem('bank_transactions', JSON.stringify(transactions));
+      } catch (err) {
+        console.error('Error syncing transactions to Supabase:', err);
+      }
+    };
+    syncTxns();
+  }, [transactions, isInitializing, users]);
+
+  // Sync virtual cards to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncCards = async () => {
+      try {
+        if (virtualCards.length > 0) {
+          const prep = virtualCards.map(c => prepareVirtualCardForSupabase(c));
+          await supabase.from('virtual_cards').upsert(prep);
+        }
+        window.localStorage.setItem('bank_virtualCards', JSON.stringify(virtualCards));
+      } catch (err) {
+        console.error('Error syncing cards to Supabase:', err);
+      }
+    };
+    syncCards();
+  }, [virtualCards, isInitializing]);
+
+  // Sync investments to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncInvs = async () => {
+      try {
+        if (investments.length > 0) {
+          const prep = investments.map(i => prepareInvestmentForSupabase(i));
+          await supabase.from('investments').upsert(prep);
+        }
+        window.localStorage.setItem('bank_investments', JSON.stringify(investments));
+      } catch (err) {
+        console.error('Error syncing investments to Supabase:', err);
+      }
+    };
+    syncInvs();
+  }, [investments, isInitializing]);
+
+  // Sync loans to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncLoans = async () => {
+      try {
+        if (loanApplications.length > 0) {
+          const prep = loanApplications.map(l => prepareLoanForSupabase(l));
+          await supabase.from('loan_applications').upsert(prep);
+        }
+        window.localStorage.setItem('bank_loanApplications', JSON.stringify(loanApplications));
+      } catch (err) {
+        console.error('Error syncing loans to Supabase:', err);
+      }
+    };
+    syncLoans();
+  }, [loanApplications, isInitializing]);
+
+  // Sync grants to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncGrants = async () => {
+      try {
+        if (grantApplications.length > 0) {
+          const prep = grantApplications.map(g => prepareGrantForSupabase(g));
+          await supabase.from('grant_applications').upsert(prep);
+        }
+        window.localStorage.setItem('bank_grantApplications', JSON.stringify(grantApplications));
+      } catch (err) {
+        console.error('Error syncing grants to Supabase:', err);
+      }
+    };
+    syncGrants();
+  }, [grantApplications, isInitializing]);
+
+  // Sync inquiries to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncInquiries = async () => {
+      try {
+        if (contactInquiries.length > 0) {
+          const prep = contactInquiries.map(prepareContactInquiryForSupabase);
+          await supabase.from('contact_inquiries').upsert(prep);
+        }
+        window.localStorage.setItem('bank_contactInquiries', JSON.stringify(contactInquiries));
+      } catch (err) {
+        console.error('Error syncing contact inquiries to Supabase:', err);
+      }
+    };
+    syncInquiries();
+  }, [contactInquiries, isInitializing]);
+
+  // Sync user applications to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncUserApps = async () => {
+      try {
+        if (userApplications.length > 0) {
+          const prep = userApplications.map(prepareUserApplicationForSupabase);
+          await supabase.from('user_applications').upsert(prep);
+        }
+        window.localStorage.setItem('bank_userApplications', JSON.stringify(userApplications));
+      } catch (err) {
+        console.error('Error syncing user applications to Supabase:', err);
+      }
+    };
+    syncUserApps();
+  }, [userApplications, isInitializing]);
+
+  // Sync crypto withdrawals to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncCryptoWithdrawals = async () => {
+      try {
+        if (cryptoWithdrawals.length > 0) {
+          const prep = cryptoWithdrawals.map(prepareCryptoWithdrawalForSupabase);
+          await supabase.from('crypto_withdrawal_requests').upsert(prep);
+        }
+        window.localStorage.setItem('bank_crypto_withdrawals', JSON.stringify(cryptoWithdrawals));
+      } catch (err) {
+        console.error('Error syncing crypto withdrawals to Supabase:', err);
+      }
+    };
+    syncCryptoWithdrawals();
+  }, [cryptoWithdrawals, isInitializing]);
+
+  // Sync crypto trade orders to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncCryptoOrders = async () => {
+      try {
+        if (cryptoOrders.length > 0) {
+          const prep = cryptoOrders.map(prepareCryptoTradeOrderForSupabase);
+          await supabase.from('crypto_trade_orders').upsert(prep);
+        }
+        window.localStorage.setItem('bank_crypto_orders', JSON.stringify(cryptoOrders));
+      } catch (err) {
+        console.error('Error syncing crypto orders to Supabase:', err);
+      }
+    };
+    syncCryptoOrders();
+  }, [cryptoOrders, isInitializing]);
+
+  // Sync admin settings to Supabase
+  useEffect(() => {
+    if (isInitializing) return;
+    const syncSettings = async () => {
+      try {
+        const payload: any = {
+          id: adminSettings.id || '00000000-0000-0000-0000-000000000001',
+          logo_url: adminSettings.logoUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
+          favicon_url: adminSettings.faviconUrl || 'https://i.ibb.co/G3NmLY1j/GEB-logo.png',
+          admin_email: adminSettings.adminEmail || 'mizbryo@gmail.com',
+          admin_password: adminSettings.adminPassword || '12345',
+          alert_threshold: adminSettings.alertThreshold,
+          max_crypto_withdrawal_limit: adminSettings.maxCryptoWithdrawalLimit,
+          require_wire_codes: adminSettings.requireWireCodes,
+          code1_name: adminSettings.code1Name,
+          code1_message: adminSettings.code1Message,
+          require_code1: adminSettings.requireCode1,
+          code2_name: adminSettings.code2Name,
+          code2_message: adminSettings.code2Message,
+          require_code2: adminSettings.requireCode2,
+          code3_name: adminSettings.code3Name,
+          code3_message: adminSettings.code3Message,
+          require_code3: adminSettings.requireCode3,
+          code4_name: adminSettings.code4Name,
+          code4_message: adminSettings.code4Message,
+          require_code4: adminSettings.requireCode4,
+          code5_name: adminSettings.code5Name,
+          code5_message: adminSettings.code5Message,
+          require_code5: adminSettings.requireCode5,
+          require_otp: adminSettings.requireOtp,
+          preference_contact_email: adminSettings.preferenceContactEmail,
+          website_currency: adminSettings.websiteCurrency,
+          website_name: adminSettings.websiteName,
+          website_title: adminSettings.websiteTitle,
+          contact_email: adminSettings.contactEmail,
+          contact_phone: adminSettings.contactPhone,
+          contact_address: adminSettings.contactAddress,
+          whatsapp_number: adminSettings.whatsappNumber,
+          active_theme: adminSettings.activeTheme,
+          broker_wallets: adminSettings.brokerWallets,
+          fiat_deposit_instructions: adminSettings.fiatDepositInstructions,
+          e_wallet_instructions: adminSettings.eWalletInstructions,
+          frontend_content: adminSettings.frontendContent,
+          payment_methods: adminSettings.paymentMethods
+        };
+        await supabase.from('admin_settings').upsert(payload);
+        window.localStorage.setItem('bank_adminSettings', JSON.stringify(adminSettings));
+      } catch (err) {
+        console.error('Error syncing admin settings to Supabase:', err);
+      }
+    };
+    syncSettings();
   }, [adminSettings, isInitializing]);
 
   
@@ -947,7 +1317,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
         let adminUser = users.find(u => u.role === 'admin' && (u.email?.toLowerCase() === inputEmail || u.email?.toLowerCase() === 'mizbryo@gmail.com'));
         if (!adminUser) {
           adminUser = {
-            id: 'admin-1',
+            id: '26dc7f33-7fec-47b8-92cd-d3acdff17b66',
             name: 'Super Admin',
             email: 'mizbryo@gmail.com',
             password: '12345',
@@ -956,7 +1326,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
             accounts: [],
             showFullCardDetails: true
           };
-          setUsers(prev => [adminUser!, ...prev.filter(u => u.id !== 'admin-1' && u.email?.toLowerCase() !== 'mizbryo@gmail.com')]);
+          setUsers(prev => [adminUser!, ...prev.filter(u => u.id !== '26dc7f33-7fec-47b8-92cd-d3acdff17b66' && u.email?.toLowerCase() !== 'mizbryo@gmail.com')]);
         }
         setCurrentUser(adminUser);
         return { success: true };
@@ -1069,9 +1439,16 @@ export function BankProvider({ children }: { children: ReactNode }) {
         return prev;
       }
 
+      const newUserId = generateUUID();
+      const newAccounts = (userData.accounts || []).map(a => ({
+        ...a,
+        id: generateUUID(),
+        userId: newUserId
+      }));
       const newUser: User = {
         ...userData,
-        id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        id: newUserId,
+        accounts: newAccounts,
         newAccountPromptPending: true,
         accountOpenedAt: new Date().toISOString()
       };
@@ -1081,7 +1458,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
 
   const register = (name: string, email: string, password?: string) => {
     const newApp: UserApplication = {
-      id: `app-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: generateUUID(),
       name,
       email,
       password,
@@ -1151,7 +1528,7 @@ Your application for membership is currently being reviewed by our Membership Co
   };
   
   const createVirtualCard = (card: Omit<VirtualCard, 'id'>) => {
-    const newCard: VirtualCard = { ...card, id: `card-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` };
+    const newCard: VirtualCard = { ...card, id: generateUUID() };
     setVirtualCards(prev => [newCard, ...prev]);
   };
   
@@ -1164,7 +1541,7 @@ Your application for membership is currently being reviewed by our Membership Co
   };
 
   const createLoanApplication = (loan: Omit<LoanApplication, 'id' | 'date'>) => {
-    const newLoan: LoanApplication = { ...loan, id: `loan-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, date: new Date().toISOString() };
+    const newLoan: LoanApplication = { ...loan, id: generateUUID(), date: new Date().toISOString() };
     setLoanApplications(prev => [newLoan, ...prev]);
   };
 
@@ -1245,7 +1622,7 @@ Global Elite Bank, Zurich, Switzerland`
   };
 
   const createGrantApplication = (grant: Omit<GrantApplication, 'id' | 'date'>) => {
-    const newGrant: GrantApplication = { ...grant, id: `grant-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, date: new Date().toISOString() };
+    const newGrant: GrantApplication = { ...grant, id: generateUUID(), date: new Date().toISOString() };
     setGrantApplications(prev => [newGrant, ...prev]);
   };
 
@@ -1277,7 +1654,7 @@ Global Elite Bank, Zurich, Switzerland`
   const createContactInquiry = (inquiry: Omit<ContactInquiry, 'id' | 'date'>) => {
     const newInquiry: ContactInquiry = {
       ...inquiry,
-      id: `inquiry-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: generateUUID(),
       date: new Date().toISOString(),
       status: 'new'
     };
@@ -1320,7 +1697,7 @@ Global Elite Bank, Zurich, Switzerland`
       durationDays: inv.durationDays,
       txHash: inv.txHash,
       userId: inv.userId,
-      id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: generateUUID(),
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       status: (inv as any).status || 'pending',
@@ -1445,7 +1822,7 @@ Global Elite Bank, Zurich, Switzerland`
   const createTransaction = (txn: Omit<Transaction, 'id' | 'date'>) => {
     const newTxn: Transaction = {
       ...txn,
-      id: `txn-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: generateUUID(),
       date: new Date().toISOString(),
     };
     setTransactions(prev => [newTxn, ...prev]);
