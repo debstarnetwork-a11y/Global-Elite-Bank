@@ -281,6 +281,7 @@ export function AdminApplications({ onOpenAccountCreation }: { onOpenAccountCrea
       return;
     }
 
+    const assignedPin = String(editForm.pin || generateRandomCode('', 4)).padStart(4, '0').slice(-4);
     const customUser = {
       name: editForm.name,
       email: editForm.email,
@@ -288,13 +289,14 @@ export function AdminApplications({ onOpenAccountCreation }: { onOpenAccountCrea
       role: 'user' as const,
       status: 'active' as const,
       showFullCardDetails: false,
+      pin: assignedPin,
       accounts: [
         {
           id: `acc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           type: 'Checking' as const,
           accountNumber: trimmedAccNumber,
           balance: 0,
-          pin: editForm.pin,
+          pin: assignedPin,
           codes: {
             swift: editForm.swift,
             cot: editForm.cot,

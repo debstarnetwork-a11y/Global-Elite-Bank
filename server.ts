@@ -112,14 +112,15 @@ function getFallbackResponse(message: string, language: string = "en"): string {
 
 // AI Chat endpoint powered by Gemini
 app.post("/api/chat", async (req, res) => {
-  const { message, history = [], language = "en" } = req.body;
+  const { message, history = [], language = "en", apiKey } = req.body || {};
 
   if (!message || typeof message !== "string") {
     res.status(400).json({ error: "Message is required" });
     return;
   }
 
-  const client = getGeminiClient();
+  const effectiveKey = process.env.GEMINI_API_KEY || apiKey;
+  const client = effectiveKey ? new GoogleGenAI({ apiKey: effectiveKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } }) : getGeminiClient();
 
   if (!client) {
     // Graceful offline fallback
@@ -166,7 +167,7 @@ Key Institutional Information:
     });
 
     const response = await client.models.generateContent({
-      model: "gemini-3.7-flash",
+      model: "gemini-2.5-flash",
       contents: formattedContents,
       config: {
         systemInstruction,

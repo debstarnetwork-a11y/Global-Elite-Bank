@@ -106,7 +106,7 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: "Message is required" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || req.body?.apiKey;
 
   if (!apiKey) {
     const fallbackReply = getFallbackResponse(message, language);

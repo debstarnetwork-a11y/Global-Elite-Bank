@@ -39,6 +39,22 @@
     background-color: transparent;
     color: var(--foreground);
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile-first input optimization to guarantee smooth manual typing and prevent iOS viewport zoom */
+  input, select, textarea {
+    font-size: 16px;
+    touch-action: manipulation;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: inherit;
+    }
   }
 }
 

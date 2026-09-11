@@ -76,7 +76,7 @@ export default function App() {
 
   const [appRoute, setAppRoute] = useState<'landing' | 'login' | 'register' | 'biometric' | 'dashboard' | 'admin'>(() => {
     if (isCurrentPathAdmin()) {
-      return 'admin';
+      return 'login';
     }
     return 'landing';
   });
@@ -87,15 +87,15 @@ export default function App() {
     return 'Dashboard';
   });
 
-  // Enforce admin login whenever /admin is accessed
+  // Enforce admin login and thumbprint biometrics whenever /admin is accessed
   useEffect(() => {
     const handleUrlRouteSync = () => {
       if (isCurrentPathAdmin()) {
         if (currentUser?.role !== 'admin') {
           setAppRoute(prev => prev === 'biometric' ? 'biometric' : 'login');
         } else {
-          setAppRoute(prev => prev === 'biometric' ? 'biometric' : 'admin');
-          setCurrentView(prev => appRoute === 'biometric' ? prev : 'Admin');
+          setAppRoute('admin');
+          setCurrentView('Admin');
         }
       }
     };

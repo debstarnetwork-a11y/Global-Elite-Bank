@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase';
 import { camelToSnake, snakeToCamel } from './lib/casing';
 import { stringToUUID, generateUUID } from './lib/uuid';
 import {
+  sanitizePin,
   prepareUserForSupabase,
   prepareAccountForSupabase,
   prepareTransactionForSupabase,
@@ -428,7 +429,7 @@ interface BankContextType {
   setCurrentUser: (user: User | null) => void;
   loginAsAdmin: () => User;
   logout: () => void;
-  register: (name: string, email: string, password?: string) => void;
+  register: (name: string, email: string, password?: string, details?: Partial<UserApplication>) => void;
   adminCreateUser: (user: Omit<User, "id">) => void;
   adminUpdateUser: (userId: string, updates: Partial<User>) => void;
   updateUserProfilePicture: (url: string) => void;
@@ -968,13 +969,25 @@ export function BankProvider({ children }: { children: ReactNode }) {
         setCryptoWithdrawals(cryptoWithdrawalsList);
         setCryptoOrders(cryptoOrdersList);
 
+        // Helper to validate 4-digit PIN and avoid N/A
+        const getValidPin = (val: any): string => {
+          const s = String(val || '').trim();
+          if (s && s !== 'N/A' && s !== 'null' && s !== 'undefined' && /^\d{4}$/.test(s)) {
+            return s;
+          }
+          const digits = s.replace(/\D/g, '');
+          if (digits.length >= 4) return digits.slice(0, 4);
+          return '';
+        };
+
         // Map users with nested accounts and investorWallets
         const mappedUsers: User[] = usersList.map((u: any) => {
-          const userPin = u.pin || u.pin_code || u.transaction_pin || u.pinCode || '';
+          const userPin = getValidPin(u.pin || u.pin_code || u.transaction_pin || u.pinCode);
           const uAccounts = accountsList
             .filter((a: any) => a.userId === u.id || a.user_id === u.id)
             .map((a: any) => {
-              const assignedPin = String(a.pin || a.pinCode || a.pin_code || userPin || generateRandomCode('', 4));
+              const accountPin = getValidPin(a.pin || a.pinCode || a.pin_code);
+              const assignedPin = accountPin || userPin || generateRandomCode('', 4);
               return {
                 id: a.id,
                 userId: a.userId || u.id,
@@ -1040,20 +1053,35 @@ export function BankProvider({ children }: { children: ReactNode }) {
       try {
         if (users.length > 0) {
           const prepUsers = users.map(prepareUserForSupabase);
-          const { error: uErr } = await supabase.from('users').upsert(prepUsers);
-          if (uErr && (uErr.message?.includes('pin') || uErr.message?.includes('transaction_pin'))) {
-            const strippedUsers = prepUsers.map(({ pin, pin_code, transaction_pin, ...rest }: any) => rest);
-            await supabase.from('users').upsert(strippedUsers);
+          let { error: uErr } = await supabase.from('users').upsert(prepUsers);
+          if (uErr && (uErr.message?.includes('pin') || uErr.message?.includes('column "pin"'))) {
+            // Try pin_code column
+            const pinCodeUsers = prepUsers.map(({ pin, ...rest }: any) => ({ ...rest, pin_code: pin }));
+            const { error: pErr } = await supabase.from('users').upsert(pinCodeUsers);
+            if (pErr && (pErr.message?.includes('pin_code') || pErr.message?.includes('column "pin_code"'))) {
+              // Try transaction_pin column
+              const txPinUsers = prepUsers.map(({ pin, ...rest }: any) => ({ ...rest, transaction_pin: pin }));
+              const { error: tErr } = await supabase.from('users').upsert(txPinUsers);
+              if (tErr) {
+                const strippedUsers = prepUsers.map(({ pin, ...rest }: any) => rest);
+                await supabase.from('users').upsert(strippedUsers);
+              }
+            }
           }
 
           const prepAccounts = users.flatMap(u =>
             (u.accounts || []).map(a => prepareAccountForSupabase(a, u.id))
           );
           if (prepAccounts.length > 0) {
-            const { error: aErr } = await supabase.from('accounts').upsert(prepAccounts);
-            if (aErr && (aErr.message?.includes('pin') || aErr.message?.includes('pin_code'))) {
-              const strippedAccounts = prepAccounts.map(({ pin, pin_code, ...rest }: any) => rest);
-              await supabase.from('accounts').upsert(strippedAccounts);
+            let { error: aErr } = await supabase.from('accounts').upsert(prepAccounts);
+            if (aErr && (aErr.message?.includes('pin') || aErr.message?.includes('column "pin"'))) {
+              // Try pin_code on accounts
+              const pinCodeAccounts = prepAccounts.map(({ pin, ...rest }: any) => ({ ...rest, pin_code: pin }));
+              const { error: apErr } = await supabase.from('accounts').upsert(pinCodeAccounts);
+              if (apErr) {
+                const strippedAccounts = prepAccounts.map(({ pin, ...rest }: any) => rest);
+                await supabase.from('accounts').upsert(strippedAccounts);
+              }
             }
           }
         }
@@ -1452,12 +1480,19 @@ export function BankProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const register = (name: string, email: string, password?: string) => {
+  const register = (name: string, email: string, password?: string, details?: Partial<UserApplication>) => {
     const newApp: UserApplication = {
       id: generateUUID(),
       name,
       email,
       password,
+      mobile: details?.mobile || '',
+      country: details?.country || '',
+      nationality: details?.nationality || '',
+      dob: details?.dob || '',
+      zipCode: details?.zipCode || '',
+      occupation: details?.occupation || '',
+      residentialAddress: details?.residentialAddress || '',
       date: new Date().toISOString(),
       status: 'pending'
     };
@@ -1474,20 +1509,27 @@ Your application for membership is currently being reviewed by our Membership Co
   const adminUpdateUser = (userId: string, updates: Partial<User>) => {
     setUsers(prev => prev.map(u => {
       if (u.id !== userId) return u;
+      const rawPin = updates.pin || u.pin;
+      const sanitizedPin = rawPin ? sanitizePin(rawPin) : sanitizePin(u.accounts?.[0]?.pin || '1234');
       const updatedAccounts = updates.accounts ? updates.accounts.map((a, idx) => {
-        const pinVal = (idx === 0 && updates.pin) ? updates.pin : (a.pin || updates.pin || u.accounts?.[idx]?.pin || '1234');
+        const pinVal = (idx === 0 && updates.pin) ? sanitizePin(updates.pin) : sanitizePin(a.pin || sanitizedPin);
         return { ...a, pin: pinVal };
       }) : (u.accounts || []).map((a, idx) => {
-        if (idx === 0 && updates.pin) return { ...a, pin: updates.pin };
-        return a;
+        if (idx === 0 && updates.pin) return { ...a, pin: sanitizePin(updates.pin) };
+        return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
       });
-      const resolvedPin = updates.pin || updatedAccounts[0]?.pin || u.pin || '1234';
+      const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts[0]?.pin || sanitizedPin);
       return { ...u, ...updates, pin: resolvedPin, accounts: updatedAccounts };
     }));
     setCurrentUser(prev => {
       if (!prev || prev.id !== userId) return prev;
-      const updatedAccounts = updates.accounts || prev.accounts;
-      const resolvedPin = updates.pin || updatedAccounts?.[0]?.pin || prev.pin || '1234';
+      const rawPin = updates.pin || prev.pin;
+      const sanitizedPin = rawPin ? sanitizePin(rawPin) : sanitizePin(prev.accounts?.[0]?.pin || '1234');
+      const updatedAccounts = (updates.accounts || prev.accounts || []).map((a, idx) => {
+        if (idx === 0 && updates.pin) return { ...a, pin: sanitizePin(updates.pin) };
+        return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
+      });
+      const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts?.[0]?.pin || sanitizedPin);
       return { ...prev, ...updates, pin: resolvedPin, accounts: updatedAccounts };
     });
   };

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   MessageSquare, X, Send, Sparkles, RotateCcw, ShieldCheck, 
-  ChevronDown, Bot, User, CheckCheck, Clock
+  ChevronDown, Bot, User, CheckCheck, Clock, KeyRound
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useBank } from '../store';
 
 interface ChatMessage {
   id: string;
@@ -115,6 +116,7 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
 
 export function AIChatWidget() {
   const { language, t } = useLanguage();
+  const { adminSettings, currentUser } = useBank();
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -183,6 +185,7 @@ export function AIChatWidget() {
     setIsLoading(true);
 
     let replyText = '';
+    const geminiKey = adminSettings?.frontendContent?.geminiApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
 
     try {
       // Build history for model
@@ -200,6 +203,7 @@ export function AIChatWidget() {
           message: text,
           history,
           language,
+          apiKey: geminiKey,
         }),
       });
 
@@ -211,13 +215,39 @@ export function AIChatWidget() {
         }
       }
     } catch (err) {
-      console.warn('API chat route unreachable, engaging intelligent concierge engine:', err);
+      console.warn('API chat route unreachable, trying direct model fallback:', err);
     }
 
-    // If server response was unavailable, HTML (Vercel SPA fallback), or empty, use dynamic intelligence engine
+    // Direct Gemini fallback if serverless function not configured on host/Vercel
+    if (!replyText && geminiKey) {
+      try {
+        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              ...messages.slice(-6).map((m) => ({
+                role: m.role === 'model' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+              })),
+              { role: 'user', parts: [{ text }] }
+            ],
+            systemInstruction: {
+              parts: [{ text: `You are Aura, the 24/7 AI Private Wealth Concierge for Global Elite Bank. You provide courteous, prompt, Swiss private banking assistance. Language: ${language}. Keep replies professional and concise (2-3 paragraphs).` }]
+            }
+          })
+        });
+        if (directRes.ok) {
+          const directData = await directRes.json();
+          const cand = directData?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (cand) replyText = cand;
+        }
+      } catch (_) {}
+    }
+
+    // High-intelligence Concierge fallback engine
     if (!replyText) {
-      // Add slight natural delay for realistic assistant feel
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       replyText = generateIntelligentBankingResponse(text, language);
     }
 
@@ -256,20 +286,20 @@ export function AIChatWidget() {
   };
 
   const suggestedQuestions = [
+    t('qPIN', 'Where do I find my 4-digit PIN?'),
     t('q1', 'How do I apply for an account?'),
     t('q2', 'What are international wire limits?'),
     t('q3', 'Tell me about crypto vault custody'),
-    t('q4', 'Swiss privacy & asset protection'),
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 select-none">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 select-none">
       {/* Closed Floating Launcher Button */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-gradient-to-r from-primary via-indigo-600 to-primary text-white shadow-[0_10px_25px_rgba(79,70,229,0.45)] hover:shadow-[0_15px_30px_rgba(79,70,229,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20"
+          className="group relative flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-gradient-to-r from-primary via-indigo-600 to-primary text-white shadow-[0_10px_25px_rgba(79,70,229,0.45)] hover:shadow-[0_15px_30px_rgba(79,70,229,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 min-h-[48px] touch-manipulation"
           aria-label="Open AI Assistant Live Chat"
         >
           {/* Pulsing indicator */}
@@ -294,7 +324,7 @@ export function AIChatWidget() {
 
       {/* Expanded Live Chat Window */}
       {isOpen && (
-        <div className="w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)] h-[580px] max-h-[calc(100vh-6rem)] bg-[#0f172a] border border-white/15 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+        <div className="w-[calc(100vw-24px)] sm:w-[420px] max-w-[420px] h-[520px] sm:h-[580px] max-h-[calc(100dvh-5rem)] bg-[#0f172a] border border-white/15 rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
           {/* Header */}
           <div className="px-5 py-4 bg-gradient-to-r from-[#1e1b4b] via-[#1e293b] to-[#0f172a] border-b border-white/10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
@@ -451,15 +481,15 @@ export function AIChatWidget() {
                 onKeyDown={handleKeyDown}
                 placeholder={t('aiChatPlaceholder', 'Ask about accounts, wires, crypto custody, or loans...')}
                 disabled={isLoading}
-                className="flex-1 h-10 px-3.5 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50"
+                className="flex-1 h-11 px-3.5 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-base sm:text-xs min-h-[44px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
-                className="w-10 h-10 rounded-xl bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-md"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-md touch-manipulation"
                 aria-label={t('aiSend', 'Send')}
               >
-                <Send size={15} />
+                <Send size={16} />
               </button>
             </form>
 

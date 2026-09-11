@@ -366,15 +366,15 @@ Global Elite Bank, Zurich, Switzerland`
             <div>
               <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-2 block">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="name@example.com" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
+                <input type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="name@example.com" />
               </div>
             </div>
             <div>
               <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-2 block">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="••••••••" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
+                <input type="password" autoCapitalize="none" autoCorrect="off" spellCheck="false" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="••••••••" />
               </div>
             </div>
 
@@ -414,10 +414,27 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [dob, setDob] = useState('');
+  const [nationality, setNationality] = useState('');
+  const [residentialAddress, setResidentialAddress] = useState('');
+  const [estimatedNetWorth, setEstimatedNetWorth] = useState('');
+  const [sourceOfWealth, setSourceOfWealth] = useState('');
+  const [annualIncome, setAnnualIncome] = useState('');
+  const [primaryBank, setPrimaryBank] = useState('');
+  const [employmentStatus, setEmploymentStatus] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [selectedServices, setSelectedServices] = useState<string[]>(['Multi-Currency Accounts', 'International Transfers']);
+  const [transactionVolume, setTransactionVolume] = useState('');
   const [error, setError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [declaration, setDeclaration] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
+
+  const toggleService = (service: string) => {
+    setSelectedServices(prev => 
+      prev.includes(service) ? prev.filter(s => s !== service) : [...prev, service]
+    );
+  };
 
   const handleRegister = (e: any) => {
     e.preventDefault();
@@ -435,7 +452,13 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
       return;
     }
     
-    register(name, email, password);
+    register(name, email, password, {
+      dob,
+      nationality,
+      residentialAddress,
+      occupation: employmentStatus || companyName,
+      country: nationality
+    });
     setIsSubmitted(true);
   };
 
@@ -486,23 +509,23 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Full Legal Name*</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                    <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., John Alexander Smith" />
+                    <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., John Alexander Smith" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Email Address*</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., john@email.com" />
+                    <input type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., john@email.com" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Date of Birth*</label>
-                  <input type="date" required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground" />
+                  <input type="date" value={dob} onChange={e => setDob(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Nationality*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={nationality} onChange={e => setNationality(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Nationality</option>
                     <option value="Afghanistan">Afghanistan</option>
                     <option value="Albania">Albania</option>
@@ -703,7 +726,7 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Residential Address*</label>
-                  <input type="text" required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="Full residential address" />
+                  <input type="text" value={residentialAddress} onChange={e => setResidentialAddress(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="Full residential address" />
                 </div>
               </div>
             </div>
@@ -716,14 +739,14 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Password*</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="Min. 6 chars with letters & numbers" />
+                    <input type="password" autoCapitalize="none" autoCorrect="off" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="Min. 6 chars with letters & numbers" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Confirm Password*</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
-                    <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="••••••••" />
+                    <input type="password" autoCapitalize="none" autoCorrect="off" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="••••••••" />
                   </div>
                 </div>
                 <div className="md:col-span-2">
@@ -738,41 +761,41 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Estimated Total Net Worth*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={estimatedNetWorth} onChange={e => setEstimatedNetWorth(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Range</option>
-                    <option value="1">$100K – $500K</option>
-                    <option value="2">$500K – $1M</option>
-                    <option value="3">$1M – $5M</option>
-                    <option value="4">$5M – $10M</option>
-                    <option value="5">$10M+</option>
+                    <option value="$100K – $500K">$100K – $500K</option>
+                    <option value="$500K – $1M">$500K – $1M</option>
+                    <option value="$1M – $5M">$1M – $5M</option>
+                    <option value="$5M – $10M">$5M – $10M</option>
+                    <option value="$10M+">$10M+</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Primary Source of Wealth*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={sourceOfWealth} onChange={e => setSourceOfWealth(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Source</option>
-                    <option value="business">Business Ownership</option>
-                    <option value="employment">Employment / Executive Compensation</option>
-                    <option value="investments">Investments</option>
-                    <option value="inheritance">Inheritance</option>
-                    <option value="realestate">Real Estate</option>
-                    <option value="other">Other</option>
+                    <option value="Business Ownership">Business Ownership</option>
+                    <option value="Employment / Executive Compensation">Employment / Executive Compensation</option>
+                    <option value="Investments">Investments</option>
+                    <option value="Inheritance">Inheritance</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Annual Income (USD)*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={annualIncome} onChange={e => setAnnualIncome(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Range</option>
-                    <option value="1">Under $100K</option>
-                    <option value="2">$100K – $250K</option>
-                    <option value="3">$250K – $500K</option>
-                    <option value="4">$500K – $1M</option>
-                    <option value="5">$1M+</option>
+                    <option value="Under $100K">Under $100K</option>
+                    <option value="$100K – $250K">$100K – $250K</option>
+                    <option value="$250K – $500K">$250K – $500K</option>
+                    <option value="$500K – $1M">$500K – $1M</option>
+                    <option value="$1M+">$1M+</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Primary Bank(s) Currently Used*</label>
-                  <input type="text" required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., UBS, J.P. Morgan" />
+                  <input type="text" value={primaryBank} onChange={e => setPrimaryBank(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="e.g., UBS, J.P. Morgan" />
                 </div>
               </div>
             </div>
@@ -783,19 +806,19 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Employment Status*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={employmentStatus} onChange={e => setEmploymentStatus(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Status</option>
-                    <option value="owner">Business Owner / Entrepreneur</option>
-                    <option value="executive">Executive / C-Suite</option>
-                    <option value="professional">Professional (Doctor, Lawyer, etc.)</option>
-                    <option value="investor">Investor</option>
-                    <option value="retired">Retired</option>
-                    <option value="other">Other</option>
+                    <option value="Business Owner / Entrepreneur">Business Owner / Entrepreneur</option>
+                    <option value="Executive / C-Suite">Executive / C-Suite</option>
+                    <option value="Professional (Doctor, Lawyer, etc.)">Professional (Doctor, Lawyer, etc.)</option>
+                    <option value="Investor">Investor</option>
+                    <option value="Retired">Retired</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Company / Business Name</label>
-                  <input type="text" className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground" placeholder="Enter company name" />
+                  <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="Enter company name" />
                 </div>
               </div>
             </div>
@@ -807,8 +830,13 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                  <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-2 block">Services of Interest*</label>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                    {['Multi-Currency Accounts', 'International Transfers', 'Cryptocurrency Trading', 'Elite Debit Cards', 'Business Banking', 'Wealth Management', 'Concierge Services'].map(service => (
-                     <label key={service} className="flex items-center gap-2 cursor-pointer group">
-                       <input type="checkbox" className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-background" />
+                     <label key={service} className="flex items-center gap-2 cursor-pointer group min-h-[40px] select-none">
+                       <input 
+                         type="checkbox" 
+                         checked={selectedServices.includes(service)}
+                         onChange={() => toggleService(service)}
+                         className="w-5 h-5 rounded border-border text-primary focus:ring-primary focus:ring-offset-background" 
+                       />
                        <span className="text-sm text-foreground/80 group-hover:text-foreground transition-colors">{service}</span>
                      </label>
                    ))}
@@ -817,13 +845,13 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Expected Annual Transaction Volume*</label>
-                  <select required className="w-full bg-background border border-border rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-primary text-foreground appearance-none">
+                  <select value={transactionVolume} onChange={e => setTransactionVolume(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 px-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]">
                     <option value="">Select Range</option>
-                    <option value="1">Under $100K</option>
-                    <option value="2">$100K – $500K</option>
-                    <option value="3">$500K – $1M</option>
-                    <option value="4">$1M – $10M</option>
-                    <option value="5">$10M+</option>
+                    <option value="Under $100K">Under $100K</option>
+                    <option value="$100K – $500K">$100K – $500K</option>
+                    <option value="$500K – $1M">$500K – $1M</option>
+                    <option value="$1M – $10M">$1M – $10M</option>
+                    <option value="$10M+">$10M+</option>
                   </select>
                 </div>
               </div>

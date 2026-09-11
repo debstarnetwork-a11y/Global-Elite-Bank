@@ -1,7 +1,15 @@
 import { stringToUUID } from './uuid';
 
+export function sanitizePin(pin: any): string {
+  const p = String(pin || '').trim();
+  if (/^\d{4}$/.test(p)) return p;
+  const digits = p.replace(/\D/g, '');
+  if (digits.length >= 4) return digits.slice(0, 4);
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
 export function prepareUserForSupabase(user: any) {
-  const pinVal = String(user.pin || user.accounts?.[0]?.pin || '1234');
+  const pinVal = sanitizePin(user.pin || user.accounts?.[0]?.pin || '1234');
   return {
     id: stringToUUID(user.id),
     name: user.name || 'User',
@@ -22,15 +30,13 @@ export function prepareUserForSupabase(user: any) {
     profile_picture: user.profilePicture || null,
     new_account_prompt_pending: Boolean(user.newAccountPromptPending),
     account_opened_at: user.accountOpenedAt || new Date().toISOString(),
-    pin: pinVal,
-    pin_code: pinVal,
-    transaction_pin: pinVal
+    pin: pinVal
   };
 }
 
 export function prepareAccountForSupabase(acc: any, userId?: string) {
   const finalUserId = stringToUUID(acc.userId || userId);
-  const pinVal = String(acc.pin || acc.pinCode || acc.codes?.pin || '1234');
+  const pinVal = sanitizePin(acc.pin || acc.pinCode || acc.codes?.pin || '1234');
   return {
     id: stringToUUID(acc.id),
     user_id: finalUserId,
@@ -39,7 +45,6 @@ export function prepareAccountForSupabase(acc: any, userId?: string) {
     balance: Number(acc.balance) || 0,
     iban: acc.iban || null,
     pin: pinVal,
-    pin_code: pinVal,
     swift_code: acc.codes?.swift || acc.swiftCode || null,
     cot_code: acc.codes?.cot || acc.cotCode || null,
     tax_code: acc.codes?.tax || acc.taxCode || null,
