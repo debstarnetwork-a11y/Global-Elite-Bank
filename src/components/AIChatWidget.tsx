@@ -185,7 +185,7 @@ export function AIChatWidget() {
     setIsLoading(true);
 
     let replyText = '';
-    const geminiKey = adminSettings?.frontendContent?.geminiApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+    const geminiKey = adminSettings?.geminiApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
 
     try {
       // Build history for model

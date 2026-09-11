@@ -830,7 +830,7 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                  <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-2 block">Services of Interest*</label>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                    {['Multi-Currency Accounts', 'International Transfers', 'Cryptocurrency Trading', 'Elite Debit Cards', 'Business Banking', 'Wealth Management', 'Concierge Services'].map(service => (
-                     <label key={service} className="flex items-center gap-2 cursor-pointer group min-h-[40px] select-none">
+                     <label key={service} className="flex items-center gap-2 cursor-pointer group min-h-[44px] touch-manipulation">
                        <input 
                          type="checkbox" 
                          checked={selectedServices.includes(service)}

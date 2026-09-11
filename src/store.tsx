@@ -239,6 +239,15 @@ export interface FiatDepositInstructions {
 
 interface AdminSettings {
   id?: string;
+  websiteName?: string;
+  websiteTitle?: string;
+  websiteKeywords?: string;
+  websiteUrl?: string;
+  whatsappNumber?: string;
+  tidioId?: string;
+  geminiApiKey?: string;
+  timezone?: string;
+  installationType?: string;
   alertThreshold: number;
   maxCryptoWithdrawalLimit?: number;
   requireWireCodes: boolean;

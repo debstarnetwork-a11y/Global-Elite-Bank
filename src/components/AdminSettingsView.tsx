@@ -236,8 +236,12 @@ export function AdminSettingsView() {
               <input type="text" value={adminSettings.whatsappNumber || ''} onChange={e => updateAdminSettings({ whatsappNumber: e.target.value })} className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground focus:border-primary outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Tido livechat id</label>
+              <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Tidio livechat id</label>
               <input type="text" value={adminSettings.tidioId || ''} onChange={e => updateAdminSettings({ tidioId: e.target.value })} className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground focus:border-primary outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Gemini API Key (AI Chat)</label>
+              <input type="password" value={adminSettings.geminiApiKey || ''} onChange={e => updateAdminSettings({ geminiApiKey: e.target.value })} className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground focus:border-primary outline-none" placeholder="AI Studio API Key" />
             </div>
             <div>
               <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">Timezone</label>
