@@ -1093,6 +1093,25 @@ export function BankProvider({ children }: { children: ReactNode }) {
               }
             }
           }
+
+          const prepInvestorWallets = users
+            .filter(u => u.investorWallets)
+            .map(u => ({
+              id: stringToUUID(u.id),
+              user_id: stringToUUID(u.id),
+              btc: u.investorWallets!.btc || '',
+              eth: u.investorWallets!.eth || '',
+              usdt: u.investorWallets!.usdt || '',
+              sol: u.investorWallets!.sol || '',
+              balance: Number(u.investorWallets!.balance) || 0
+            }));
+
+          if (prepInvestorWallets.length > 0) {
+            const { error: wErr } = await supabase.from('investor_wallets').upsert(prepInvestorWallets);
+            if (wErr) {
+              console.error('Error syncing investor_wallets to Supabase:', wErr);
+            }
+          }
         }
         window.localStorage.setItem('bank_users', JSON.stringify(users));
       } catch (err) {

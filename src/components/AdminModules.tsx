@@ -3074,7 +3074,6 @@ export function AdminInvestors() {
       }
 
       if (type === 'credit') {
-        updateBalance(userId, accountId, numAmount);
         createTransaction({
           userId,
           accountId,
@@ -3085,7 +3084,6 @@ export function AdminInvestors() {
         });
         showToast(`Successfully credited $${numAmount.toLocaleString()} to ${user.name}'s ${acc.type} account.`);
       } else {
-        updateBalance(userId, accountId, -numAmount);
         createTransaction({
           userId,
           accountId,
