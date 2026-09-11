@@ -293,7 +293,7 @@ export function AIChatWidget() {
   ];
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 select-none">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
       {/* Closed Floating Launcher Button */}
       {!isOpen && (
         <button

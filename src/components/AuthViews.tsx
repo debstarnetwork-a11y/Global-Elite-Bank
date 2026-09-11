@@ -212,7 +212,7 @@ Global Elite Bank, Zurich, Switzerland`
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1.5 block">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input
                       type="email"
                       id="forgot-password-email-input"
@@ -291,7 +291,7 @@ Global Elite Bank, Zurich, Switzerland`
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1.5 block">New Password</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input
                       type="password"
                       id="forgot-password-new-input"
@@ -310,7 +310,7 @@ Global Elite Bank, Zurich, Switzerland`
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1.5 block">Confirm New Password</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input
                       type="password"
                       id="forgot-password-confirm-input"
@@ -508,14 +508,14 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Full Legal Name*</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., John Alexander Smith" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Email Address*</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground" placeholder="e.g., john@email.com" />
                   </div>
                 </div>
@@ -738,14 +738,14 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Password*</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input type="password" autoCapitalize="none" autoCorrect="off" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="Min. 6 chars with letters & numbers" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest mb-1 block">Confirm Password*</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4 pointer-events-none" />
                     <input type="password" autoCapitalize="none" autoCorrect="off" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px]" placeholder="••••••••" />
                   </div>
                 </div>
