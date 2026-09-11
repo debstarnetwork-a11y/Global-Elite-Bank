@@ -172,6 +172,32 @@ export function CryptoDashboard() {
     }
   };
 
+  const [isSubmittingStake, setIsSubmittingStake] = useState(false);
+  const [stakeError, setStakeError] = useState('');
+  const [stakeSuccess, setStakeSuccess] = useState(false);
+
+  const handleStakeNow = () => {
+    setStakeError('');
+    setStakeSuccess(false);
+    
+    if (!currentUser) {
+      setStakeError('Please log in to your account to stake assets.');
+      return;
+    }
+    
+    if (parsedAmount <= 0) {
+      setStakeError('Please enter a valid amount to stake.');
+      return;
+    }
+    
+    setIsSubmittingStake(true);
+    setTimeout(() => {
+      setIsSubmittingStake(false);
+      setStakeSuccess(true);
+      setTimeout(() => setStakeSuccess(false), 5000);
+    }, 600);
+  };
+
   const handleConfirmOrder = () => {
     setTradeError('');
     if (!currentUser) {
@@ -929,8 +955,30 @@ export function CryptoDashboard() {
                </div>
              </div>
              
-             <button className="w-full mt-6 sm:mt-8 bg-primary hover:bg-primary/90 text-white font-bold py-3 sm:py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] text-xs sm:text-sm">
-               Stake Now
+             {stakeError && (
+               <div className="mt-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs sm:text-sm font-bold flex items-start gap-2 relative z-10">
+                 <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                 {stakeError}
+               </div>
+             )}
+             
+             {stakeSuccess && (
+               <div className="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs sm:text-sm font-bold flex items-start gap-2 relative z-10">
+                 <ShieldCheck size={16} className="shrink-0 mt-0.5" />
+                 Staking request submitted successfully.
+               </div>
+             )}
+
+             <button 
+               onClick={handleStakeNow}
+               disabled={isSubmittingStake}
+               className="w-full mt-6 sm:mt-8 relative z-10 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 sm:py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] text-xs sm:text-sm flex justify-center items-center gap-2"
+             >
+               {isSubmittingStake ? (
+                 <><div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div> Processing...</>
+               ) : (
+                 'Stake Now'
+               )}
              </button>
           </div>
         </div>
