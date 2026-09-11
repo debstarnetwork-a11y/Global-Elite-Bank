@@ -299,7 +299,7 @@ export function AIChatWidget() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-gradient-to-r from-primary via-indigo-600 to-primary text-white shadow-[0_10px_25px_rgba(79,70,229,0.45)] hover:shadow-[0_15px_30px_rgba(79,70,229,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 min-h-[48px] touch-manipulation"
+          className="group relative flex items-center gap-2 sm:gap-3 pl-3 sm:pl-4 pr-4 sm:pr-5 py-2 sm:py-3 rounded-full bg-gradient-to-r from-primary via-indigo-600 to-primary text-white shadow-[0_10px_25px_rgba(79,70,229,0.45)] hover:shadow-[0_15px_30px_rgba(79,70,229,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 min-h-[44px] touch-manipulation"
           aria-label="Open AI Assistant Live Chat"
         >
           {/* Pulsing indicator */}
@@ -312,12 +312,17 @@ export function AIChatWidget() {
             <Sparkles size={16} className="text-yellow-300 animate-pulse" />
           </div>
 
-          <div className="text-left">
+          <div className="text-left hidden sm:block">
             <div className="text-xs font-black tracking-wide uppercase flex items-center gap-1.5 leading-tight">
               <span>{t('chatWithConcierge', 'AI Concierge')}</span>
               <span className="text-[9px] bg-white/25 px-1.5 py-0.2 rounded font-mono">24/7</span>
             </div>
             <div className="text-[10px] text-white/80 font-medium">Aura • Private Wealth</div>
+          </div>
+          <div className="text-left sm:hidden">
+            <div className="text-[11px] font-black tracking-wide uppercase leading-tight">
+              {t('chatWithConcierge', 'AI Concierge')}
+            </div>
           </div>
         </button>
       )}

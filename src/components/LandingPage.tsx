@@ -177,18 +177,18 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
             <div>
               <h4 className="font-bold text-foreground mb-6">{t('newsletterSignup', 'Newsletter Signup')}</h4>
               <p className="text-sm text-foreground/70 mb-4">{t('newsletterDesc', 'Subscribe to receive exclusive insights, financial briefings, and updates from Global Elite Bank.')}</p>
-              <form onSubmit={handleSubscribe} className="flex gap-2">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                 <input 
                   type="email" 
                   placeholder={t('emailAddress', 'Email address')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary text-foreground" 
+                  className="flex-1 bg-background border border-border rounded-lg px-4 py-3 sm:py-2 text-base sm:text-sm focus:outline-none focus:border-primary text-foreground min-h-[44px] w-full" 
                   required
                 />
                 <button 
                   type="submit"
-                  className="bg-primary text-white font-bold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+                  className="bg-primary text-white font-bold px-4 py-3 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap min-h-[44px] w-full sm:w-auto"
                 >
                   {isSubscribed ? t('subscribed', 'Subscribed ✓') : t('subscribe', 'Subscribe')}
                 </button>
@@ -204,9 +204,9 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
             </div>
           </div>
           
-          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-foreground/50 text-center md:text-left">
-             <p>© 2026 {adminSettings?.websiteName || 'Global Elite Bank'}. All rights reserved. Global Elite Bank is a private financial institution headquartered in Switzerland. All banking services are subject to membership approval and applicable regulatory requirements.</p>
-             <div className="flex items-center gap-3">
+          <div className="pt-8 pb-28 md:pb-12 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-foreground/50 text-center md:text-left">
+             <p className="max-w-2xl">© 2026 {adminSettings?.websiteName || 'Global Elite Bank'}. All rights reserved. Global Elite Bank is a private financial institution headquartered in Switzerland. All banking services are subject to membership approval and applicable regulatory requirements.</p>
+             <div className="flex items-center justify-center gap-3 w-full md:w-auto md:pr-48">
                <a 
                  id="footer-social-facebook"
                  href="https://www.facebook.com" 
