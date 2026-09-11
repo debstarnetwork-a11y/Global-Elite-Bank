@@ -222,7 +222,7 @@ export function AdminApplications({ onOpenAccountCreation }: { onOpenAccountCrea
       email: app.email,
       password: app.password || 'BankPass2026#',
       accountNumber: generateRandomCode('', 16),
-      pin: '0000',
+      pin: generateRandomCode('', 4),
       swift: generateRandomCode('', 7),
       cot: generateRandomCode('COT', 4),
       tax: generateRandomCode('GEB', 5),
@@ -582,8 +582,17 @@ export function AdminApplications({ onOpenAccountCreation }: { onOpenAccountCrea
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-foreground/50 uppercase tracking-widest mb-1 block">PIN</label>
-                  <input type="text" value={editForm.pin || ""} onChange={e => setEditForm({...editForm, pin: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2.5 text-sm text-foreground focus:border-primary outline-none font-mono" />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-foreground/50 uppercase tracking-widest block">4-Digit Transaction PIN</label>
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, pin: generateRandomCode('', 4) })}
+                      className="text-[10px] font-bold text-primary hover:underline"
+                    >
+                      Generate New PIN
+                    </button>
+                  </div>
+                  <input type="text" maxLength={4} value={editForm.pin || ""} onChange={e => setEditForm({...editForm, pin: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2.5 text-sm text-foreground focus:border-primary outline-none font-mono" placeholder="4-digit PIN" />
                 </div>
               </div>
 

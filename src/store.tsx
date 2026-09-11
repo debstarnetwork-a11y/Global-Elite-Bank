@@ -94,6 +94,7 @@ export interface User {
   status: UserStatus;
   accounts: Account[];
   showFullCardDetails: boolean;
+  pin?: string;
   mobile?: string;
   currency?: string;
   btcWallet?: string;
@@ -525,7 +526,11 @@ function sanitizeUsers(usersList: any[]): User[] {
       if (!userAccNums.has(accNum) && !seenAccountNumbers.has(accNum)) {
         userAccNums.add(accNum);
         seenAccountNumbers.add(accNum);
-        validUniqueAccounts.push(acc);
+        const resolvedPin = acc.pin || acc.pinCode || acc.pin_code || rawUser.pin || rawUser.pin_code || '1234';
+        validUniqueAccounts.push({
+          ...acc,
+          pin: resolvedPin
+        });
       }
     }
 
@@ -553,9 +558,11 @@ function sanitizeUsers(usersList: any[]): User[] {
     if (seenIds.has(userId)) continue;
     seenIds.add(userId);
 
+    const primaryPin = validUniqueAccounts[0]?.pin || rawUser.pin || '1234';
     sanitized.push({
       ...rawUser,
       id: userId,
+      pin: primaryPin,
       accounts: validUniqueAccounts
     });
   }
@@ -963,32 +970,39 @@ export function BankProvider({ children }: { children: ReactNode }) {
 
         // Map users with nested accounts and investorWallets
         const mappedUsers: User[] = usersList.map((u: any) => {
+          const userPin = u.pin || u.pin_code || u.transaction_pin || u.pinCode || '';
           const uAccounts = accountsList
             .filter((a: any) => a.userId === u.id || a.user_id === u.id)
-            .map((a: any) => ({
-              id: a.id,
-              userId: a.userId || u.id,
-              accountNumber: a.accountNumber,
-              type: a.type || 'Checking',
-              balance: Number(a.balance) || 0,
-              currency: u.currency || 'USD',
-              status: 'active' as const,
-              iban: a.iban,
-              codes: {
-                swift: a.swiftCode || '',
-                cot: a.cotCode || '',
-                tax: a.taxCode || '',
-                imf: a.imfCode || '',
-                aml: a.amlCode || ''
-              }
-            }));
+            .map((a: any) => {
+              const assignedPin = String(a.pin || a.pinCode || a.pin_code || userPin || generateRandomCode('', 4));
+              return {
+                id: a.id,
+                userId: a.userId || u.id,
+                accountNumber: a.accountNumber,
+                type: a.type || 'Checking',
+                balance: Number(a.balance) || 0,
+                currency: u.currency || 'USD',
+                status: 'active' as const,
+                iban: a.iban,
+                pin: assignedPin,
+                codes: {
+                  swift: a.swiftCode || '',
+                  cot: a.cotCode || '',
+                  tax: a.taxCode || '',
+                  imf: a.imfCode || '',
+                  aml: a.amlCode || ''
+                }
+              };
+            });
 
           const uWallet = investorWalletsList.find((w: any) => w.userId === u.id || w.user_id === u.id);
+          const finalPin = uAccounts[0]?.pin || userPin || generateRandomCode('', 4);
 
           return {
             ...u,
             role: u.role === 'admin' ? 'admin' : 'client',
             status: u.status || 'active',
+            pin: finalPin,
             accounts: uAccounts,
             investorWallets: uWallet ? {
               btc: uWallet.btc || '',
@@ -1026,13 +1040,21 @@ export function BankProvider({ children }: { children: ReactNode }) {
       try {
         if (users.length > 0) {
           const prepUsers = users.map(prepareUserForSupabase);
-          await supabase.from('users').upsert(prepUsers);
+          const { error: uErr } = await supabase.from('users').upsert(prepUsers);
+          if (uErr && (uErr.message?.includes('pin') || uErr.message?.includes('transaction_pin'))) {
+            const strippedUsers = prepUsers.map(({ pin, pin_code, transaction_pin, ...rest }: any) => rest);
+            await supabase.from('users').upsert(strippedUsers);
+          }
 
           const prepAccounts = users.flatMap(u =>
             (u.accounts || []).map(a => prepareAccountForSupabase(a, u.id))
           );
           if (prepAccounts.length > 0) {
-            await supabase.from('accounts').upsert(prepAccounts);
+            const { error: aErr } = await supabase.from('accounts').upsert(prepAccounts);
+            if (aErr && (aErr.message?.includes('pin') || aErr.message?.includes('pin_code'))) {
+              const strippedAccounts = prepAccounts.map(({ pin, pin_code, ...rest }: any) => rest);
+              await supabase.from('accounts').upsert(strippedAccounts);
+            }
           }
         }
         window.localStorage.setItem('bank_users', JSON.stringify(users));
@@ -1408,14 +1430,20 @@ export function BankProvider({ children }: { children: ReactNode }) {
       }
 
       const newUserId = generateUUID();
-      const newAccounts = (userData.accounts || []).map(a => ({
-        ...a,
-        id: generateUUID(),
-        userId: newUserId
-      }));
+      const newAccounts = (userData.accounts || []).map(a => {
+        const pinCode = String(a.pin || userData.pin || generateRandomCode('', 4));
+        return {
+          ...a,
+          id: generateUUID(),
+          userId: newUserId,
+          pin: pinCode
+        };
+      });
+      const primaryPin = newAccounts[0]?.pin || userData.pin || generateRandomCode('', 4);
       const newUser: User = {
         ...userData,
         id: newUserId,
+        pin: primaryPin,
         accounts: newAccounts,
         newAccountPromptPending: true,
         accountOpenedAt: new Date().toISOString()
@@ -1444,8 +1472,24 @@ Your application for membership is currently being reviewed by our Membership Co
   };
 
   const adminUpdateUser = (userId: string, updates: Partial<User>) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
-    setCurrentUser(prev => (prev && prev.id === userId ? { ...prev, ...updates } : prev));
+    setUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      const updatedAccounts = updates.accounts ? updates.accounts.map((a, idx) => {
+        const pinVal = (idx === 0 && updates.pin) ? updates.pin : (a.pin || updates.pin || u.accounts?.[idx]?.pin || '1234');
+        return { ...a, pin: pinVal };
+      }) : (u.accounts || []).map((a, idx) => {
+        if (idx === 0 && updates.pin) return { ...a, pin: updates.pin };
+        return a;
+      });
+      const resolvedPin = updates.pin || updatedAccounts[0]?.pin || u.pin || '1234';
+      return { ...u, ...updates, pin: resolvedPin, accounts: updatedAccounts };
+    }));
+    setCurrentUser(prev => {
+      if (!prev || prev.id !== userId) return prev;
+      const updatedAccounts = updates.accounts || prev.accounts;
+      const resolvedPin = updates.pin || updatedAccounts?.[0]?.pin || prev.pin || '1234';
+      return { ...prev, ...updates, pin: resolvedPin, accounts: updatedAccounts };
+    });
   };
 
   const updateUserStatus = (userId: string, status: UserStatus) => {

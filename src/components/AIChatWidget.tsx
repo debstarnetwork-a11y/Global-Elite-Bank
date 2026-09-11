@@ -12,6 +12,107 @@ interface ChatMessage {
   timestamp: string;
 }
 
+function generateIntelligentBankingResponse(text: string, language: string = 'en'): string {
+  const lower = text.toLowerCase();
+
+  // German responses
+  if (language === 'de' || /konto|schweiz|überweisung|zinsen|anlegen|passwort|sicherheit/i.test(lower)) {
+    if (lower.includes('pin') || lower.includes('code') || lower.includes('transaktion')) {
+      return "Ihre 4-stellige Transaktions-PIN ist ein hochverschlüsselter Sicherheitsschlüssel, der für alle ausgehenden Überweisungen, SWIFT-Transaktionen und Kartenverifizierungen benötigt wird. Sie können Ihre PIN im Online-Banking unter Ihren Kontoeinstellungen einsehen und aktualisieren.";
+    }
+    if (lower.includes('konto') || lower.includes('eröffnen') || lower.includes('anmeld') || lower.includes('registrier')) {
+      return "Um ein exklusives Konto bei der Global Elite Bank zu eröffnen, klicken Sie bitte oben in der Navigationsleiste auf 'Mitgliedschaft beantragen'. Unser Zulassungsausschuss prüft Anträge von vermögenden Privatkunden und Unternehmen diskret innerhalb von 24 Stunden.";
+    }
+    if (lower.includes('überweisung') || lower.includes('swift') || lower.includes('sepa') || lower.includes('limit')) {
+      return "Global Elite Bank führt internationale Überweisungen über unser Schweizer FINMA-reguliertes Netzwerk in über 30 Währungen aus. Verifizierte Kontoinhaber profitieren von unbegrenzten Transaktionsvolumina mit garantierter Echtzeitabrechnung.";
+    }
+    if (lower.includes('krypto') || lower.includes('bitcoin') || lower.includes('wallet') || lower.includes('eth')) {
+      return "Unsere institutionelle Krypto-Verwahrung lagert Vermögenswerte in FINMA-zertifizierten Schweizer Tiefstollen-Tresoren (Cold Storage). Wir unterstützen BTC, ETH, USDT und SOL mit sofortigen Konvertierungen in CHF, USD und EUR.";
+    }
+    if (lower.includes('karte') || lower.includes('kreditkarte') || lower.includes('visa')) {
+      return "Wir bieten exklusive virtuelle und physische Titanium Black Cards mit anpassbaren Auszahlungslimits, weltweiter Akzeptanz und 0% Devisengebühren.";
+    }
+    return `Vielen Dank für Ihre Anfrage zu "${text}". Als Ihr privater Concierge unterstütze ich Sie jederzeit gerne bei Vermögensverwaltung, internationalen SWIFT-Überweisungen, Schweizer Krypto-Tresoren und diskreter Kontoführung.`;
+  }
+
+  // French responses
+  if (language === 'fr' || /compte|suisse|virement|taux|banque|sécurité/i.test(lower)) {
+    if (lower.includes('pin') || lower.includes('code')) {
+      return "Votre code PIN de transaction à 4 chiffres est une clé de sécurité confidentielle requise pour autoriser chaque virement international et opération sensible. Vous pouvez le consulter ou le modifier dans les paramètres de votre compte.";
+    }
+    if (lower.includes('compte') || lower.includes('ouvrir') || lower.includes('adhér') || lower.includes('inscri')) {
+      return "Pour ouvrir un compte d'élite, veuillez cliquer sur 'Demander l\\'adhésion' dans la barre de navigation. Notre comité d'admission suisse examine confidentiellement chaque dossier sous 24 heures.";
+    }
+    if (lower.includes('virement') || lower.includes('swift') || lower.includes('sepa') || lower.includes('limite')) {
+      return "Global Elite Bank propose des virements prioritaires via SWIFT et SEPA dans plus de 30 devises, sans plafond pour les membres de Niveau 1, avec traçabilité FINMA intégrale.";
+    }
+    if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('sol') || lower.includes('sécurité')) {
+      return "Notre infrastructure de conservation d'actifs numériques repose sur des coffres-forts froids souterrains dans les Alpes suisses, garantissant une protection maximale pour vos BTC, ETH, USDT et SOL.";
+    }
+    return `Merci pour votre demande relative à "${text}". Je me tiens à votre entière disposition pour vos questions bancaires, vos transferts de fonds confidentiels et la gestion de vos coffres sécurisés.`;
+  }
+
+  // Spanish responses
+  if (language === 'es' || /cuenta|suiza|transferencia|tasa|banco|seguridad/i.test(lower)) {
+    if (lower.includes('pin') || lower.includes('código')) {
+      return "Su PIN de transacción de 4 dígitos es una clave cifrada indispensable para autorizar transferencias internacionales SWIFT y proteger sus fondos contra operaciones no autorizadas. Puede consultarlo y gestionarlo en la vista de su cuenta.";
+    }
+    if (lower.includes('cuenta') || lower.includes('abrir') || lower.includes('membresía')) {
+      return "Para solicitar una cuenta exclusiva en Global Elite Bank, haga clic en 'Solicitar Membresía' en la parte superior. Nuestro comité evalúa las solicitudes con estricta confidencialidad en menos de 24 horas.";
+    }
+    if (lower.includes('transferencia') || lower.includes('swift') || lower.includes('sepa')) {
+      return "Ofrecemos transferencias internacionales prioritarias mediante SWIFT y SEPA en más de 30 divisas con liquidación en tiempo real y sin límites estrictos para cuentas verificadas.";
+    }
+    if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('billetera')) {
+      return "Nuestra custodia institucional de criptoactivos opera en bóvedas subterráneas frías en Suiza bajo estándares FINMA, protegiendo sus tenencias de BTC, ETH, USDT y SOL.";
+    }
+    return `Agradecemos su consulta sobre "${text}". Como su asistente privado 24/7, puedo ayudarle con transferencias, códigos de compensación, cuentas multidivisa y custodia patrimonial.`;
+  }
+
+  // English dynamic answers
+  if (lower.includes('pin') || lower.includes('transaction pin') || lower.includes('4 digit') || lower.includes('code')) {
+    return "Your 4-Digit Transaction PIN is your primary authorization code required to execute outgoing wires, authorize card issuance, and approve investment withdrawals. You can view or generate a new PIN directly inside your Account Details portal, or have your Relationship Manager reset it securely.";
+  }
+
+  if (lower.includes('cot') || lower.includes('swift') || lower.includes('imf') || lower.includes('aml') || lower.includes('clearance')) {
+    return "Global Elite Bank implements multi-tier international clearance protocols (SWIFT-SEC, COT, IMF Clearance, and AML Validation) complying with Swiss FINMA and FATF directives. These codes guarantee sovereign legal compliance for high-value cross-border liquidity settlements.";
+  }
+
+  if (lower.includes('open') || lower.includes('account') || lower.includes('apply') || lower.includes('register') || lower.includes('membership')) {
+    return "To establish an account with Global Elite Bank, click the 'Apply for Membership' button in the navigation bar. Our admissions desk discreetly evaluates each application within 24 hours. Upon approval, your multi-currency IBAN, checking account, and private credentials will be provisioned.";
+  }
+
+  if (lower.includes('wire') || lower.includes('transfer') || lower.includes('send') || lower.includes('limit')) {
+    return "Global Elite Bank facilitates unlimited priority wire transfers worldwide across 30+ reserve currencies (USD, CHF, EUR, GBP, AED, JPY) via direct SWIFT and SEPA integration. Outgoing transfers for verified accounts settle rapidly with Swiss cryptographic authentication.";
+  }
+
+  if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('btc') || lower.includes('eth') || lower.includes('usdt') || lower.includes('vault') || lower.includes('sol')) {
+    return "Our Institutional Digital Asset Custody secures client Bitcoin, Ethereum, Tether (USDT), and Solana in deep Swiss Alpine cold-storage bunkers under strict FINMA regulatory standards. We support instant OTC conversions to fiat currencies with zero slippage.";
+  }
+
+  if (lower.includes('card') || lower.includes('visa') || lower.includes('mastercard') || lower.includes('virtual')) {
+    return "Global Elite Bank provisions both instant Virtual Black Cards and bespoke Laser-Engraved Metal Titanium Cards. You can toggle full card number visibility, set custom daily spending thresholds, and connect directly to Apple Pay or Google Pay from your client dashboard.";
+  }
+
+  if (lower.includes('interest') || lower.includes('deposit') || lower.includes('yield') || lower.includes('invest')) {
+    return "We offer high-yield fixed-term private placements ranging from 5.4% to 12.8% APY across CHF, USD, EUR, and sovereign gold-backed liquidity tiers, backed by Swiss asset segregation covenants.";
+  }
+
+  if (lower.includes('loan') || lower.includes('grant') || lower.includes('credit') || lower.includes('borrow')) {
+    return "Members have access to structured liquidity facilities and asset-backed credit lines from $250,000 up to $50M+. Applications can be submitted directly within your client portal under the Grants & Loans section.";
+  }
+
+  if (lower.includes('security') || lower.includes('safe') || lower.includes('privacy') || lower.includes('biometric') || lower.includes('swiss')) {
+    return "We enforce multi-factor biometric authentication (FIDO2 / WebAuthn Enclave), AES-256 encrypted hardware keystores, and complete Swiss banking confidentiality doctrines to safeguard your wealth and identity.";
+  }
+
+  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('good morning') || lower.includes('good afternoon') || lower.includes('who are you')) {
+    return "Greetings. I am Aura, your dedicated 24/7 AI Private Wealth Concierge for Global Elite Bank. How may I assist your private banking affairs, transfers, or account operations today?";
+  }
+
+  return `Thank you for your question regarding "${text}". As your Global Elite Bank Private Concierge, I can assist you with your 4-digit transaction PIN, multi-currency IBAN accounts, Swiss cold-storage crypto vaults, and priority SWIFT transfers. Please let me know what specific details you would like me to review.`;
+}
+
 export function AIChatWidget() {
   const { language, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -81,6 +182,8 @@ export function AIChatWidget() {
     setInputMessage('');
     setIsLoading(true);
 
+    let replyText = '';
+
     try {
       // Build history for model
       const history = messages.map((m) => ({
@@ -100,34 +203,33 @@ export function AIChatWidget() {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error ${res.status}`);
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data && data.reply) {
+          replyText = data.reply;
+        }
       }
-
-      const data = await res.json();
-      const replyText = data.reply || "I am at your service. Please let me know how I can assist your private banking operations.";
-
-      const aiMsg: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        role: 'model',
-        content: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-
-      setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
-      console.error('AI chat failed:', err);
-      // Fallback message
-      const fallbackMsg: ChatMessage = {
-        id: `ai-error-${Date.now()}`,
-        role: 'model',
-        content: "Thank you for reaching out to Global Elite Bank. Our private advisors and concierge desk are available 24/7. How may I assist you with your accounts, transfers, or crypto custody today?",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
-    } finally {
-      setIsLoading(false);
+      console.warn('API chat route unreachable, engaging intelligent concierge engine:', err);
     }
+
+    // If server response was unavailable, HTML (Vercel SPA fallback), or empty, use dynamic intelligence engine
+    if (!replyText) {
+      // Add slight natural delay for realistic assistant feel
+      await new Promise(r => setTimeout(r, 400));
+      replyText = generateIntelligentBankingResponse(text, language);
+    }
+
+    const aiMsg: ChatMessage = {
+      id: `ai-${Date.now()}`,
+      role: 'model',
+      content: replyText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages((prev) => [...prev, aiMsg]);
+    setIsLoading(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

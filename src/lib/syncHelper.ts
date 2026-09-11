@@ -1,6 +1,7 @@
 import { stringToUUID } from './uuid';
 
 export function prepareUserForSupabase(user: any) {
+  const pinVal = String(user.pin || user.accounts?.[0]?.pin || '1234');
   return {
     id: stringToUUID(user.id),
     name: user.name || 'User',
@@ -20,12 +21,16 @@ export function prepareUserForSupabase(user: any) {
     country: user.country || null,
     profile_picture: user.profilePicture || null,
     new_account_prompt_pending: Boolean(user.newAccountPromptPending),
-    account_opened_at: user.accountOpenedAt || new Date().toISOString()
+    account_opened_at: user.accountOpenedAt || new Date().toISOString(),
+    pin: pinVal,
+    pin_code: pinVal,
+    transaction_pin: pinVal
   };
 }
 
 export function prepareAccountForSupabase(acc: any, userId?: string) {
   const finalUserId = stringToUUID(acc.userId || userId);
+  const pinVal = String(acc.pin || acc.pinCode || acc.codes?.pin || '1234');
   return {
     id: stringToUUID(acc.id),
     user_id: finalUserId,
@@ -33,6 +38,8 @@ export function prepareAccountForSupabase(acc: any, userId?: string) {
     type: acc.type || 'Checking',
     balance: Number(acc.balance) || 0,
     iban: acc.iban || null,
+    pin: pinVal,
+    pin_code: pinVal,
     swift_code: acc.codes?.swift || acc.swiftCode || null,
     cot_code: acc.codes?.cot || acc.cotCode || null,
     tax_code: acc.codes?.tax || acc.taxCode || null,

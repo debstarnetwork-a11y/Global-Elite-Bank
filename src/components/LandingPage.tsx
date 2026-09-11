@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Facebook, Twitter } from 'lucide-react';
+import { Facebook, Twitter, Menu, X } from 'lucide-react';
 import { HomeView } from './landing/HomeView';
 import { AboutView } from './landing/AboutView';
 import { ServicesView } from './landing/ServicesView';
@@ -15,6 +15,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
   const { t } = useLanguage();
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'legal' | null>(null);
   const [currentView, setCurrentView] = useState<'home' | 'about' | 'services' | 'contact'>('home');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -42,36 +43,97 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
   return (
     <div className="min-h-screen flex flex-col font-sans text-white">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-[#0f172a]/60 backdrop-blur-md relative group">
+      <nav className="sticky top-0 z-50 bg-[#0f172a]/90 backdrop-blur-md relative group border-b border-white/10">
         <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-accent via-accent to-accent group-hover:from-[#1e3a8a] group-hover:via-accent group-hover:to-secondary group-active:from-[#1e3a8a] group-active:via-accent group-active:to-secondary transition-all duration-300"></div>
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative z-10">
-          <button onClick={() => setCurrentView('home')} className="flex items-center gap-3">
-            <img src="https://i.ibb.co/G3NmLY1j/GEB-logo.png" alt="GEB Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold text-foreground tracking-tight">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative z-10 gap-2">
+          {/* Logo & Bank Name */}
+          <button onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0 text-left">
+            <img src={adminSettings?.logoUrl || "https://i.ibb.co/G3NmLY1j/GEB-logo.png"} alt="GEB Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0" />
+            <span className="text-sm sm:text-lg md:text-xl font-bold text-foreground tracking-tight truncate max-w-[130px] sm:max-w-[220px] md:max-w-none">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
           </button>
           
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <button onClick={() => setCurrentView('home')} className={`${currentView === 'home' ? 'text-primary' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('home', 'Home')}</button>
-            <button onClick={() => setCurrentView('about')} className={`${currentView === 'about' ? 'text-primary' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('about', 'About')}</button>
-            <button onClick={() => setCurrentView('services')} className={`${currentView === 'services' ? 'text-primary' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('services', 'Services')}</button>
-            <button onClick={() => setCurrentView('contact')} className={`${currentView === 'contact' ? 'text-primary' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('contact', 'Contact')}</button>
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium">
+            <button onClick={() => setCurrentView('home')} className={`${currentView === 'home' ? 'text-primary font-semibold' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('home', 'Home')}</button>
+            <button onClick={() => setCurrentView('about')} className={`${currentView === 'about' ? 'text-primary font-semibold' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('about', 'About')}</button>
+            <button onClick={() => setCurrentView('services')} className={`${currentView === 'services' ? 'text-primary font-semibold' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('services', 'Services')}</button>
+            <button onClick={() => setCurrentView('contact')} className={`${currentView === 'contact' ? 'text-primary font-semibold' : 'text-foreground/70'} hover:text-primary transition-colors`}>{t('contact', 'Contact')}</button>
           </div>
-          <div className="flex items-center gap-4">
-            <LanguageDropdown variant="navbar" />
+
+          {/* Action buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <div className="hidden sm:block">
+              <LanguageDropdown variant="navbar" />
+            </div>
             <button 
               onClick={onLogin}
-              className="text-sm font-bold text-foreground hover:text-primary transition-colors px-4 py-2"
+              className="text-xs sm:text-sm font-bold text-foreground hover:text-primary transition-colors px-2.5 sm:px-4 py-2 rounded-lg"
             >
               {t('login', 'Login')}
             </button>
             <button 
               onClick={onRegister}
-              className="text-sm font-bold bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+              className="hidden sm:inline-flex text-xs sm:text-sm font-bold bg-primary text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] whitespace-nowrap"
             >
               {t('applyMembership', 'Apply for Membership')}
             </button>
+
+            {/* Mobile Hamburger Menu Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-foreground/80 hover:text-foreground hover:bg-white/10 transition-colors focus:outline-none shrink-0"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
         </div>
+
+        {/* Collapsible Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-[#0f172a]/95 backdrop-blur-xl border-b border-white/10 px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col space-y-1">
+              <button 
+                onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} 
+                className={`text-left py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'home' ? 'bg-primary/20 text-primary font-semibold' : 'text-white/80 hover:bg-white/5'}`}
+              >
+                {t('home', 'Home')}
+              </button>
+              <button 
+                onClick={() => { setCurrentView('about'); setIsMobileMenuOpen(false); }} 
+                className={`text-left py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'about' ? 'bg-primary/20 text-primary font-semibold' : 'text-white/80 hover:bg-white/5'}`}
+              >
+                {t('about', 'About')}
+              </button>
+              <button 
+                onClick={() => { setCurrentView('services'); setIsMobileMenuOpen(false); }} 
+                className={`text-left py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'services' ? 'bg-primary/20 text-primary font-semibold' : 'text-white/80 hover:bg-white/5'}`}
+              >
+                {t('services', 'Services')}
+              </button>
+              <button 
+                onClick={() => { setCurrentView('contact'); setIsMobileMenuOpen(false); }} 
+                className={`text-left py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'contact' ? 'bg-primary/20 text-primary font-semibold' : 'text-white/80 hover:bg-white/5'}`}
+              >
+                {t('contact', 'Contact')}
+              </button>
+            </div>
+
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-white/60 font-medium">Language</span>
+                <LanguageDropdown variant="navbar" />
+              </div>
+              <button 
+                onClick={() => { setIsMobileMenuOpen(false); onRegister(); }}
+                className="w-full text-center text-sm font-bold bg-primary text-white py-2.5 rounded-xl shadow-lg hover:bg-primary/90 transition-all"
+              >
+                {t('applyMembership', 'Apply for Membership')}
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main className="flex-1">

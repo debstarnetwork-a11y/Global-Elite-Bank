@@ -801,12 +801,34 @@ All Rights Reserved © Global Elite
                       <input type="text" value={editUserForm.btcWallet || ''} onChange={e => setEditUserForm({...editUserForm, btcWallet: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 text-sm focus:border-primary outline-none font-mono" placeholder="Enter client Bitcoin wallet address" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-foreground/50 uppercase mb-1">4 Digit Transaction Pin</label>
-                      <input type="text" maxLength={4} value={editUserForm.accounts?.[0]?.pin || ''} onChange={e => {
-                        const accs = [...(editUserForm.accounts || [])];
-                        if (accs.length > 0) accs[0] = { ...accs[0], pin: e.target.value };
-                        setEditUserForm({...editUserForm, accounts: accs});
-                      }} className="w-full bg-background border border-border rounded-lg p-2 text-sm font-mono focus:border-primary outline-none" />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-foreground/50 uppercase">4 Digit Transaction Pin</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newPin = generateRandomCode('', 4);
+                            const accs = [...(editUserForm.accounts || [])];
+                            if (accs.length > 0) accs[0] = { ...accs[0], pin: newPin };
+                            setEditUserForm({ ...editUserForm, accounts: accs, pin: newPin });
+                          }}
+                          className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          Generate New PIN
+                        </button>
+                      </div>
+                      <input 
+                        type="text" 
+                        maxLength={4} 
+                        value={editUserForm.accounts?.[0]?.pin || editUserForm.pin || ''} 
+                        onChange={e => {
+                          const val = e.target.value;
+                          const accs = [...(editUserForm.accounts || [])];
+                          if (accs.length > 0) accs[0] = { ...accs[0], pin: val };
+                          setEditUserForm({...editUserForm, accounts: accs, pin: val});
+                        }} 
+                        className="w-full bg-background border border-border rounded-lg p-2 text-sm font-mono focus:border-primary outline-none" 
+                        placeholder="e.g. 1234"
+                      />
                     </div>
 
                     <div className="pt-4 space-y-4">
@@ -1071,7 +1093,24 @@ All Rights Reserved © Global Elite
                           return;
                         }
                       }
-                      adminUpdateUser(currentActiveUser.id, editUserForm); 
+                      const finalPin = editUserForm.pin || editUserForm.accounts?.[0]?.pin || generateRandomCode('', 4);
+                      const updatedAccounts = (editUserForm.accounts || []).map((a: any, idx: number) => {
+                        if (idx === 0) return { ...a, pin: finalPin };
+                        return a;
+                      });
+                      adminUpdateUser(currentActiveUser.id, {
+                        ...editUserForm,
+                        pin: finalPin,
+                        accounts: updatedAccounts.length > 0 ? updatedAccounts : [{
+                          id: `acc-${Date.now()}`,
+                          accountNumber: generateRandomCode('', 11),
+                          type: 'Checking',
+                          iban: '',
+                          balance: 0,
+                          pin: finalPin,
+                          codes: { swift: '', cot: '', tax: '', imf: '', aml: '' }
+                        }]
+                      }); 
                       setIsEditingUser(false); 
                       showToast('User Updated', 'Details saved successfully'); 
                     }} className="flex-1 px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90">Save Changes</button>
@@ -1138,8 +1177,21 @@ All Rights Reserved © Global Elite
                         <div className="text-sm font-mono text-foreground break-all bg-background/50 p-2 rounded-lg border border-border/50">{currentActiveUser.btcWallet || 'No wallet assigned'}</div>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-foreground/50 uppercase mb-1">4 Digit Transaction Pin</div>
-                        <div className="text-sm font-mono text-foreground">{currentActiveUser.accounts?.[0]?.pin || 'N/A'}</div>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="text-xs font-bold text-foreground/50 uppercase">4 Digit Transaction Pin</div>
+                          <button
+                            onClick={() => {
+                              const newPin = generateRandomCode('', 4);
+                              const accs = (currentActiveUser.accounts || []).map((a, idx) => idx === 0 ? { ...a, pin: newPin } : a);
+                              adminUpdateUser(currentActiveUser.id, { pin: newPin, accounts: accs });
+                              showToast('PIN Generated', `Transaction PIN updated to ${newPin}`);
+                            }}
+                            className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                          >
+                            Generate PIN
+                          </button>
+                        </div>
+                        <div className="text-sm font-mono text-foreground font-bold tracking-widest">{currentActiveUser.accounts?.[0]?.pin || currentActiveUser.pin || '1234'}</div>
                       </div>
                     </div>
 
