@@ -426,8 +426,8 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
           </div>
 
           <p className="text-xs text-center mt-6 text-[#6b7280] relative z-10">
-            This is a system-generated receipt. Verify authenticity via blockchain QR code or visit <br/>
-            <span className="font-bold text-[#000000]">verify.globalelitebank.com</span>
+            This is a system-generated receipt. Verify authenticity via blockchain QR code or contact <br/>
+            <span className="font-bold text-[#000000]">verify@globalelitebank.com</span>
           </p>
         </div>
       </div>
