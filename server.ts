@@ -601,46 +601,18 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const possiblePaths = [
-      path.join(__dirname, "dist", "index.html"),
-      path.join(process.cwd(), "dist", "index.html"),
-      path.join(process.cwd(), "public_html", "index.html"),
-      path.join(__dirname, "index.html"),
-      path.join(process.cwd(), "index.html"),
-    ];
-    let distPath = fs.existsSync(path.join(__dirname, "dist"))
+    const distPath = fs.existsSync(path.join(__dirname, "dist"))
       ? path.join(__dirname, "dist")
       : (fs.existsSync(path.join(process.cwd(), "dist")) ? path.join(process.cwd(), "dist") : process.cwd());
-    for (const p of possiblePaths) {
-      if (fs.existsSync(p)) {
-        distPath = path.dirname(p);
-        break;
-      }
-    }
-    app.use(express.static(distPath));
-    if (distPath !== process.cwd()) {
-      app.use(express.static(process.cwd()));
-    }
+
+    app.use(express.static(distPath, { index: false }));
     app.use("/assets", express.static(path.join(distPath, "assets")));
-    app.use("/assets", express.static(path.join(process.cwd(), "dist", "assets")));
-    
-    app.get("*", (_req, res) => {
-      const htmlCandidates = [
-        path.join(__dirname, "dist", "index.html"),
-        path.join(process.cwd(), "dist", "index.html"),
-        path.join(distPath, "index.html"),
-        path.join(process.cwd(), "index.html")
-      ];
-      for (const h of htmlCandidates) {
-        if (fs.existsSync(h)) {
-          const content = fs.readFileSync(h, "utf-8");
-          if (!content.includes("/src/main.tsx")) {
-            res.sendFile(h);
-            return;
-          }
-        }
-      }
-      res.sendFile(path.join(distPath, "index.html"));
+
+    app.get(["/", "/index.html", "*"], (_req, res) => {
+      const distHtml = fs.existsSync(path.join(distPath, "index.html"))
+        ? path.join(distPath, "index.html")
+        : path.join(process.cwd(), "dist", "index.html");
+      res.sendFile(distHtml);
     });
   }
 
