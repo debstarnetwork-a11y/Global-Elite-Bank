@@ -556,12 +556,13 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const possiblePaths = [
-      import_path.default.join(__dirname, "index.html"),
       import_path.default.join(__dirname, "dist", "index.html"),
       import_path.default.join(process.cwd(), "dist", "index.html"),
+      import_path.default.join(process.cwd(), "public_html", "index.html"),
+      import_path.default.join(__dirname, "index.html"),
       import_path.default.join(process.cwd(), "index.html")
     ];
-    let distPath = process.cwd();
+    let distPath = import_fs.default.existsSync(import_path.default.join(__dirname, "dist")) ? import_path.default.join(__dirname, "dist") : import_fs.default.existsSync(import_path.default.join(process.cwd(), "dist")) ? import_path.default.join(process.cwd(), "dist") : process.cwd();
     for (const p of possiblePaths) {
       if (import_fs.default.existsSync(p)) {
         distPath = import_path.default.dirname(p);
@@ -569,13 +570,28 @@ async function startServer() {
       }
     }
     app.use(import_express.default.static(distPath));
-    app.use(import_express.default.static(process.cwd()));
+    if (distPath !== process.cwd()) {
+      app.use(import_express.default.static(process.cwd()));
+    }
     app.use("/assets", import_express.default.static(import_path.default.join(distPath, "assets")));
-    app.use("/assets", import_express.default.static(distPath));
-    app.use("/assets", import_express.default.static(process.cwd()));
+    app.use("/assets", import_express.default.static(import_path.default.join(process.cwd(), "dist", "assets")));
     app.get("*", (_req, res) => {
-      const htmlFile = import_fs.default.existsSync(import_path.default.join(distPath, "index.html")) ? import_path.default.join(distPath, "index.html") : import_path.default.join(process.cwd(), "index.html");
-      res.sendFile(htmlFile);
+      const htmlCandidates = [
+        import_path.default.join(__dirname, "dist", "index.html"),
+        import_path.default.join(process.cwd(), "dist", "index.html"),
+        import_path.default.join(distPath, "index.html"),
+        import_path.default.join(process.cwd(), "index.html")
+      ];
+      for (const h of htmlCandidates) {
+        if (import_fs.default.existsSync(h)) {
+          const content = import_fs.default.readFileSync(h, "utf-8");
+          if (!content.includes("/src/main.tsx")) {
+            res.sendFile(h);
+            return;
+          }
+        }
+      }
+      res.sendFile(import_path.default.join(distPath, "index.html"));
     });
   }
   app.listen(PORT, () => {
