@@ -5,4 +5,4 @@ deployment:
     - /bin/cp -a . $DEPLOYPATH/
     - /bin/mkdir -p $DEPLOYPATH/tmp
     - /bin/touch $DEPLOYPATH/tmp/restart.txt
-    - if [ -d "/home/glolbka/public_html" ]; then /bin/cp -a dist/* /home/glolbka/public_html/ 2>/dev/null || true; fi
+    - if [ -d "/home/glolbka/public_html" ]; then /bin/cp -a dist/. /home/glolbka/public_html/ 2>/dev/null || true; fi
