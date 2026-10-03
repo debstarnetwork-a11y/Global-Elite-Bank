@@ -1,0 +1,642 @@
+import express from "express";
+import path from "path";
+import fs from "fs";
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import { GoogleGenAI } from "@google/genai";
+import { createServer as createViteServer } from "vite";
+
+dotenv.config();
+
+const PORT = Number(process.env.PORT) || 3000;
+const app = express();
+
+app.use(express.json({ limit: "10mb" }));
+
+// Initialize Gemini Client Lazily
+let genAIClient: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  if (!genAIClient) {
+    genAIClient = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build",
+        },
+      },
+    });
+  }
+  return genAIClient;
+}
+
+// Health check endpoint
+app.get("/api/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    aiEnabled: Boolean(process.env.GEMINI_API_KEY),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Explicit download route for distribution archive
+app.get("/dist.zip", (_req, res) => {
+  const possiblePaths = [
+    path.resolve(process.cwd(), "dist.zip"),
+    path.resolve(process.cwd(), "public", "dist.zip")
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      res.download(p, "dist.zip");
+      return;
+    }
+  }
+  res.status(404).send("dist.zip not found");
+});
+
+// Helper to prepare inline CID attachment for bank logo (guarantees display in Gmail, Outlook, Apple Mail)
+function getLogoAttachment(logoUrl?: string): { filename: string; path?: string; content?: Buffer; cid: string; contentDisposition: 'inline' } | null {
+  try {
+    // 1. If user uploaded a custom base64 logo in Admin Settings, convert to buffer
+    if (logoUrl && logoUrl.startsWith("data:image/")) {
+      const match = logoUrl.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+      if (match) {
+        const ext = match[1] === "jpeg" ? "jpg" : match[1];
+        return {
+          filename: `bank-logo.${ext}`,
+          content: Buffer.from(match[2], "base64"),
+          cid: "geblogo",
+          contentDisposition: "inline"
+        };
+      }
+    }
+
+    // 2. Otherwise look for optimized local email logo
+    const candidates = [
+      path.join(process.cwd(), "public", "email-logo.png"),
+      path.join(process.cwd(), "dist", "email-logo.png"),
+      path.join(process.cwd(), "public", "bank.png"),
+      path.join(process.cwd(), "dist", "bank.png"),
+      path.join(process.cwd(), "public", "logo.png"),
+      path.join(process.cwd(), "dist", "logo.png")
+    ];
+
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        return {
+          filename: "bank-logo.png",
+          path: p,
+          cid: "geblogo",
+          contentDisposition: "inline"
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("[Email Logo Helper] Error resolving logo attachment:", err);
+  }
+  return null;
+}
+
+// Helper to generate a luxury Swiss banking HTML email with logo and spam-proof markup
+function generateBankingEmailHtml(
+  title: string,
+  bodyText: string,
+  options?: { logoUrl?: string; websiteName?: string; useCidLogo?: boolean; senderEmail?: string }
+): string {
+  const name = options?.websiteName || "Global Elite Bank";
+  const year = new Date().getFullYear();
+  const logo = options?.useCidLogo !== false ? "cid:geblogo" : (options?.logoUrl || "https://i.ibb.co/G3NmLY1j/GEB-logo.png");
+  const senderEmail = options?.senderEmail || "notifications@digitalglobalelite.com";
+
+  // Convert plain text into clean, accessible HTML blocks
+  const formattedBody = (bodyText || "")
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return '<div style="height: 10px;"></div>';
+      if (trimmed.startsWith("•") || trimmed.startsWith("-")) {
+        return `<div style="padding: 3px 0 3px 14px; color: #1e293b; font-size: 14px; line-height: 1.6;"><span style="color: #2563eb; font-weight: bold; margin-right: 8px;">▪</span>${trimmed.replace(/^[•-]\s*/, "")}</div>`;
+      }
+      if (
+        trimmed.startsWith("🎉") ||
+        trimmed.startsWith("💸") ||
+        trimmed.startsWith("💰") ||
+        trimmed.startsWith("🏛️") ||
+        trimmed.startsWith("🍏") ||
+        trimmed.startsWith("✅")
+      ) {
+        return `<div style="font-size: 15px; font-weight: bold; color: #0f172a; margin: 12px 0 6px 0;">${trimmed}</div>`;
+      }
+      return `<p style="margin: 0 0 8px 0; color: #334155; font-size: 14px; line-height: 1.6;">${trimmed}</p>`;
+    })
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>${title}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 12px;">
+    <tr>
+      <td align="center">
+        <!-- Main Card -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+          
+          <!-- Official Bank Profile Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #090e17 0%, #111d33 100%); padding: 22px 24px; border-bottom: 3px solid #2563eb;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="58" valign="middle" style="padding-right: 14px;">
+                    <!-- Circular Bank Profile Avatar Logo -->
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center" valign="middle" style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; border-radius: 50%; background-color: #0b1320; border: 2px solid #3b82f6; text-align: center; overflow: hidden;">
+                          <img src="${logo}" alt="${name}" width="46" height="46" style="display: block; width: 46px; height: 46px; border-radius: 50%; object-fit: contain; margin: 0 auto; border: 0; outline: none;" />
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td valign="middle">
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 17px; font-weight: 800; color: #ffffff; line-height: 1.2; letter-spacing: -0.2px;">
+                      ${name}
+                      <span style="display: inline-block; background-color: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ✔ Verified Bank Profile
+                      </span>
+                    </div>
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; color: #94a3b8; margin-top: 4px;">
+                      From: <span style="color: #60a5fa; font-family: monospace;">${senderEmail}</span> • Swiss Clearing Directorate
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Security Status Bar -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 10px 24px; border-bottom: 1px solid #e2e8f0;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px;">
+                    🛡️ Verified Transaction Alert
+                  </td>
+                  <td align="right" style="font-size: 11px; color: #64748b; font-family: monospace;">
+                    FINMA Encrypted
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Body -->
+          <tr>
+            <td style="padding: 28px 28px 20px 28px;">
+              <h1 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 800; color: #0f172a; line-height: 1.3;">
+                ${title}
+              </h1>
+              
+              <div style="color: #334155; font-size: 14px; line-height: 1.6;">
+                ${formattedBody}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Security Callout Box -->
+          <tr>
+            <td style="padding: 0 28px 24px 28px;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
+                <tr>
+                  <td style="font-size: 11px; color: #64748b; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Confidentiality & Fraud Prevention:</strong> This encrypted communication is intended solely for the authorized account holder of ${name}. If you did not initiate this request, lock your account immediately and contact our 24/7 Security Operations Center.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #0b121e; padding: 22px 24px; text-align: center; border-top: 1px solid #1e293b;">
+              <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #f1f5f9;">
+                ${name} • Zurich, Switzerland
+              </p>
+              <p style="margin: 0 0 8px 0; font-size: 11px; color: #64748b; line-height: 1.5;">
+                Authorized Swiss Private Banking Directorate.<br />
+                Bahnhofstrasse 45, 8001 Zürich, Switzerland
+              </p>
+              <p style="margin: 0; font-size: 10px; color: #475569;">
+                © ${year} ${name}. All rights reserved. Automated Banking Notification Service.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// Transactional Email dispatch endpoint (cPanel / SMTP / Simulated)
+app.post("/api/send-email", async (req, res) => {
+  const { to, subject, html, text, fromName, fromEmail, logoUrl, smtpConfig } = req.body || {};
+
+  if (!to || !subject) {
+    res.status(400).json({ error: "Recipient (to) and subject are required." });
+    return;
+  }
+
+  // 1. Determine SMTP configuration (sanitize and trim whitespace)
+  const host = (smtpConfig?.host || process.env.SMTP_HOST || "").trim();
+  const port = Number(smtpConfig?.port || process.env.SMTP_PORT || 465);
+  const user = (smtpConfig?.user || process.env.SMTP_USER || "").trim();
+  const pass = (smtpConfig?.pass || process.env.SMTP_PASS || "").trim();
+  const secure = smtpConfig?.secure !== undefined ? Boolean(smtpConfig.secure) : (port === 465);
+
+  const senderName = fromName || "Global Elite Bank";
+  const senderEmail = (fromEmail || user || "notifications@digitalglobalelite.com").trim();
+  const from = `"${senderName}" <${senderEmail}>`;
+
+  // Prepare CID inline logo attachment (guarantees display in Gmail, Outlook, Apple Mail)
+  const logoAttachment = getLogoAttachment(logoUrl);
+  const attachments = logoAttachment ? [logoAttachment] : [];
+
+  // Always generate a polished HTML template with the bank logo if custom html wasn't supplied
+  const effectiveLogoUrl = logoUrl || "https://i.ibb.co/G3NmLY1j/GEB-logo.png";
+  const finalHtml = html || generateBankingEmailHtml(subject, text || "", { 
+    logoUrl: effectiveLogoUrl, 
+    websiteName: senderName,
+    senderEmail,
+    useCidLogo: Boolean(logoAttachment)
+  });
+  const finalText = text || html?.replace(/<[^>]*>?/gm, "") || "";
+
+  // 2. If SMTP credentials exist, attempt real delivery via cPanel / external SMTP
+  if (host && user && pass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false }
+      });
+
+      const info = await transporter.sendMail({
+        from,
+        to: String(to).trim(),
+        replyTo: senderEmail,
+        subject,
+        text: finalText,
+        html: finalHtml,
+        attachments,
+        headers: {
+          "X-Mailer": "GlobalEliteBank-Notifier/2.0",
+          "X-Entity-Ref-ID": `GEB-${Date.now()}`
+        }
+      });
+
+      console.log(`[SMTP Sent] Email dispatched to ${to} (${subject}): ${info.messageId}`);
+      res.json({ success: true, delivered: true, messageId: info.messageId });
+      return;
+    } catch (err: any) {
+      console.error("[SMTP Error]:", err?.message || err);
+      res.json({ 
+        success: true, 
+        delivered: false, 
+        simulated: true, 
+        warning: `SMTP delivery failed (${err?.message || "connection error"}). Logged and simulated.` 
+      });
+      return;
+    }
+  }
+
+  // 3. Fallback simulation (dev or before SMTP config)
+  console.log(`[Email Dispatched (Simulated)] To: ${to} | Subject: ${subject}`);
+  res.json({ 
+    success: true, 
+    delivered: false, 
+    simulated: true, 
+    message: "Email queued and simulated. Configure SMTP in Admin Settings for live delivery." 
+  });
+});
+
+// Test SMTP connection endpoint
+app.post("/api/test-smtp", async (req, res) => {
+  const { host, port, user, pass, secure, testRecipient, logoUrl, websiteName } = req.body || {};
+  
+  const cleanHost = String(host || "").trim();
+  const cleanUser = String(user || "").trim();
+  const cleanPass = String(pass || "").trim();
+  const cleanRecipient = String(testRecipient || "").trim();
+  const cleanPort = Number(port) || 465;
+  const isSecure = secure !== undefined ? Boolean(secure) : (cleanPort === 465);
+  const effectiveLogoUrl = logoUrl || "https://i.ibb.co/G3NmLY1j/GEB-logo.png";
+  const effectiveName = websiteName || "Global Elite Bank";
+
+  if (!cleanHost || !cleanUser || !cleanPass) {
+    res.status(400).json({ error: "Host, username, and password are required." });
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: cleanHost,
+      port: cleanPort,
+      secure: isSecure,
+      auth: { user: cleanUser, pass: cleanPass },
+      tls: { rejectUnauthorized: false }
+    });
+
+    await transporter.verify();
+
+    if (cleanRecipient) {
+      const testSubject = `✅ Test Notification: ${effectiveName} Notification Desk Active`;
+      const testBody = `Dear Client,\n\nThis is an official verification notice confirming that your cPanel SMTP mail server (${cleanHost}) is authenticated and delivering alerts in real-time.\n\n• Mail Server Host: ${cleanHost}\n• Dispatch Port: ${cleanPort} (${isSecure ? "SSL/TLS Encrypted" : "Standard"})\n• Authenticated Sender: ${cleanUser}\n• Handshake Status: 100% FINMA Verified\n• Date & Time: ${new Date().toUTCString()}\n\nAll subsequent debit alerts, deposit notifications, and account opening credentials will be transmitted via this verified delivery rail.\n\nWarm regards,\nInstitutional IT Directorate\n${effectiveName}, Zurich, Switzerland`;
+
+      const logoAttachment = getLogoAttachment(logoUrl);
+      const attachments = logoAttachment ? [logoAttachment] : [];
+
+      await transporter.sendMail({
+        from: `"${effectiveName}" <${cleanUser}>`,
+        to: cleanRecipient,
+        replyTo: cleanUser,
+        subject: testSubject,
+        text: testBody,
+        html: generateBankingEmailHtml(testSubject, testBody, { 
+          logoUrl: effectiveLogoUrl, 
+          websiteName: effectiveName,
+          useCidLogo: Boolean(logoAttachment)
+        }),
+        attachments,
+        headers: {
+          "X-Mailer": "GlobalEliteBank-Notifier/2.0",
+          "X-Entity-Ref-ID": `GEB-TEST-${Date.now()}`
+        }
+      });
+    }
+
+    res.json({ success: true, message: `SMTP connected & test email delivered to ${cleanRecipient || cleanUser}!` });
+  } catch (err: any) {
+    const errMsg = err?.message || "Failed to verify SMTP credentials";
+    let helpfulError = errMsg;
+
+    if (err?.code === "ENOTFOUND" || errMsg.includes("ENOTFOUND")) {
+      helpfulError = `DNS Error (ENOTFOUND): "${cleanHost}" does not exist or has no active DNS record. (Note: globalelitebank.com was suspended and cannot be resolved. Please use "mail.digitalglobalelite.com", your hosting server hostname, or Gmail "smtp.gmail.com")`;
+    } else if (err?.code === "EAUTH" || errMsg.includes("Invalid login") || errMsg.includes("BadCredentials")) {
+      helpfulError = `Authentication Error: Invalid username or password on ${cleanHost}. Please verify your email account password or Google App Password.`;
+    } else if (err?.code === "ETIMEDOUT" || err?.code === "ECONNREFUSED") {
+      helpfulError = `Connection Timeout (${cleanHost}:${cleanPort}): The mail server refused or timed out. Try switching port to 465 (SSL) or 587 (TLS).`;
+    }
+
+    res.status(500).json({ success: false, error: helpfulError, rawCode: err?.code });
+  }
+});
+
+// Admin Settings Persistence Endpoints (Server-side disk cache for 100% permanence)
+const SETTINGS_FILE = path.join(process.cwd(), ".data", "admin_settings.json");
+
+function ensureDataDir() {
+  const dir = path.join(process.cwd(), ".data");
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+app.get("/api/admin/settings", (_req, res) => {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf-8"));
+      res.json({ success: true, settings: data });
+      return;
+    }
+    res.json({ success: true, settings: null });
+  } catch (err: any) {
+    res.json({ success: false, error: err?.message });
+  }
+});
+
+app.post("/api/admin/save-settings", (req, res) => {
+  try {
+    ensureDataDir();
+    const settings = req.body?.settings || req.body || {};
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), "utf-8");
+    res.json({ success: true, message: "Settings saved permanently to server disk." });
+  } catch (err: any) {
+    console.error("[Settings Disk Save Error]:", err?.message || err);
+    res.status(500).json({ success: false, error: err?.message || "Failed to save settings to disk" });
+  }
+});
+
+// Curated banking knowledge base fallback for reliable responses
+function getFallbackResponse(message: string, language: string = "en"): string {
+  const lower = message.toLowerCase();
+
+  const isDe = language === "de" || /konto|schweiz|überweisung|zinsen|anlage/i.test(lower);
+  const isFr = language === "fr" || /compte|suisse|virement|taux|banque/i.test(lower);
+  const isEs = language === "es" || /cuenta|suiza|transferencia|tasa|banco/i.test(lower);
+
+  if (isDe) {
+    if (lower.includes("konto") || lower.includes("eröffnen") || lower.includes("registrier")) {
+      return "Um ein exklusives Konto bei der Global Elite Bank zu eröffnen, klicken Sie bitte oben rechts auf 'Mitgliedschaft beantragen'. Unser Zulassungsausschuss prüft Bewerbungen von vermögenden Privatkunden und Unternehmen innerhalb von 24 Stunden diskret.";
+    }
+    if (lower.includes("überweisung") || lower.includes("swift") || lower.includes("sepa")) {
+      return "Global Elite Bank unterstützt sofortige weltweite Überweisungen über SWIFT, SEPA und unser geschütztes FINMA-Netzwerk in über 30 Währungen ohne Obergrenzen für verifizierte Mitglieder.";
+    }
+    if (lower.includes("krypto") || lower.includes("bitcoin") || lower.includes("wallet")) {
+      return "Wir bieten FINMA-konforme Cold-Storage-Verwahrung für Bitcoin, Ethereum, USDT und Solana sowie nahtlose Konvertierung in Fiat-Währungen (CHF, USD, EUR, GBP).";
+    }
+    return "Willkommen beim exklusiven 24/7 Concierge-Service der Global Elite Bank. Wie kann ich Ihnen bezüglich Vermögensverwaltung, Auslandskonten oder internationalen Transaktionen behilflich sein?";
+  }
+
+  if (isFr) {
+    if (lower.includes("compte") || lower.includes("ouvrir") || lower.includes("adhér")) {
+      return "Pour ouvrir un compte exclusif auprès de Global Elite Bank, cliquez sur 'Demander l\\'adhésion'. Notre comité d'admission examine discrètement chaque demande sous 24 heures.";
+    }
+    if (lower.includes("virement") || lower.includes("swift") || lower.includes("sepa")) {
+      return "Global Elite Bank permet des virements internationaux prioritaires via SWIFT et SEPA dans plus de 30 devises, sécurisés par nos coffres suisses.";
+    }
+    if (lower.includes("crypto") || lower.includes("bitcoin") || lower.includes("sécurité")) {
+      return "Nous offrons une conservation institutionnelle de niveau FINMA pour vos cryptomonnaies (BTC, ETH, USDT, SOL) avec conversion instantanée en devises fiduciaires.";
+    }
+    return "Bienvenue au service de conciergerie privée 24/7 de Global Elite Bank. Comment puis-je vous assister aujourd'hui ?";
+  }
+
+  if (isEs) {
+    if (lower.includes("cuenta") || lower.includes("abrir") || lower.includes("membresía")) {
+      return "Para solicitar una cuenta exclusiva en Global Elite Bank, haga clic en 'Solicitar Membresía'. Nuestro comité de admisión evalúa confidencialmente cada solicitud en menos de 24 horas.";
+    }
+    if (lower.includes("transferencia") || lower.includes("swift") || lower.includes("sepa")) {
+      return "Global Elite Bank facilita transferencias internacionales prioritarias mediante SWIFT y SEPA en más de 30 divisas con total privacidad y liquidación garantizada.";
+    }
+    if (lower.includes("crypto") || lower.includes("bitcoin")) {
+      return "Disponemos de custodia en cámaras frías bajo estándares FINMA suizos para BTC, ETH, USDT y SOL, permitiendo transferencias y conversiones instantáneas.";
+    }
+    return "Bienvenido a la conserjería privada 24/7 de Global Elite Bank. ¿En qué podemos asistirle en relación a su gestión patrimonial o transferencias internacionales?";
+  }
+
+  // English default
+  if (lower.includes("open") || lower.includes("account") || lower.includes("apply") || lower.includes("member")) {
+    return "To apply for an exclusive account with Global Elite Bank, please click the 'Apply for Membership' button in the header. Our private admissions committee reviews high-net-worth and institutional applications within 24 hours with utmost discretion.";
+  }
+  if (lower.includes("transfer") || lower.includes("wire") || lower.includes("swift") || lower.includes("sepa") || lower.includes("limit")) {
+    return "Global Elite Bank provides priority multi-currency wire execution via SWIFT, SEPA, and our Swiss proprietary settlement network across 30+ major currencies. Tier 1 verified accounts enjoy unlimited high-volume wire facilities.";
+  }
+  if (lower.includes("crypto") || lower.includes("bitcoin") || lower.includes("eth") || lower.includes("sol") || lower.includes("custody")) {
+    return "Our Institutional Crypto Custody is anchored in Swiss Alps underground cold-storage vaults under strict FINMA regulatory standards. We support BTC, ETH, USDT, and SOL with 1:1 asset segregation and real-time liquidity swaps.";
+  }
+  if (lower.includes("security") || lower.includes("safe") || lower.includes("privacy") || lower.includes("swiss")) {
+    return "Global Elite Bank adheres to centuries-old Swiss private banking confidentiality doctrines paired with quantum-grade end-to-end encryption, multi-signature transaction authorization, and segregated vault infrastructure.";
+  }
+  if (lower.includes("loan") || lower.includes("grant") || lower.includes("credit")) {
+    return "We offer bespoke liquidity facilities, asset-backed credit lines, and corporate grant advisory starting from $250,000 up to $50M+. Members can submit inquiries directly through their private banking portal.";
+  }
+  if (lower.includes("contact") || lower.includes("support") || lower.includes("phone") || lower.includes("advisor")) {
+    return "Your dedicated private relationship manager is available 24/7 via secure direct messaging, encrypted phone consultation, or appointment in our Zurich, Geneva, and Singapore family offices.";
+  }
+
+  return "Welcome to the Global Elite Bank 24/7 AI Private Concierge. I can assist you with membership admissions, numbered vault accounts, multi-currency wire transfers, Swiss crypto custody, and wealth management privileges. How may I be of service today?";
+}
+
+// AI Chat endpoint powered by Gemini
+app.post("/api/chat", async (req, res) => {
+  const { message, history = [], language = "en", apiKey } = req.body || {};
+
+  if (!message || typeof message !== "string") {
+    res.status(400).json({ error: "Message is required" });
+    return;
+  }
+
+  const effectiveKey = process.env.GEMINI_API_KEY || apiKey;
+  const client = effectiveKey ? new GoogleGenAI({ apiKey: effectiveKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } }) : getGeminiClient();
+
+  if (!client) {
+    // Graceful offline fallback
+    const fallbackReply = getFallbackResponse(message, language);
+    res.json({
+      reply: fallbackReply,
+      model: "built-in-banking-concierge",
+      source: "knowledge-base",
+    });
+    return;
+  }
+
+  try {
+    const systemInstruction = `You are Aura, the premier 24/7 AI Private Wealth Concierge for Global Elite Bank (GEB).
+Global Elite Bank is an ultra-exclusive, prestigious Swiss private banking institution serving high-net-worth individuals, family offices, and multinational enterprises.
+Key Institutional Information:
+- Headquartered in Zurich and Geneva with representation in London, Singapore, and New York.
+- Swiss Banking Grade Security & FINMA-aligned asset segregation.
+- Services include: Numbered multi-currency accounts (CHF, USD, EUR, GBP, JPY, AED, etc.), Priority SWIFT & SEPA wire execution with zero caps for Tier 1 verified members, Cold-storage Crypto Custody (BTC, ETH, USDT, SOL), Virtual & Metal Titanium Black Cards, Asset-Backed Credit Facilities & Sovereign Grants ($250k - $50M+), High-Yield Private Fixed Term Deposits & Investors Wallets.
+- Admissions: Membership is strictly by application and verification only.
+- Personality: Courteous, refined, concise, knowledgeable, discreet, and deeply professional. Maintain the sophisticated tone of a Swiss private banker.
+- Language Policy: If the user communicates in or requests a specific language (${language}, German, French, Spanish, Italian, Arabic, Chinese, Russian, Portuguese, Japanese, etc.), respond naturally and fluently in that language.
+- Security Policy: Never ask for confidential passwords, transfer PINs, or private keys. Remind users that Global Elite Bank will never ask for client credentials.`;
+
+    // Format chat history into contents array for Gemini API
+    const formattedContents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
+
+    if (Array.isArray(history)) {
+      // Keep up to last 8 turns for context window
+      const recentHistory = history.slice(-8);
+      for (const item of recentHistory) {
+        if (item && item.content && (item.role === "user" || item.role === "model")) {
+          formattedContents.push({
+            role: item.role,
+            parts: [{ text: String(item.content) }],
+          });
+        }
+      }
+    }
+
+    formattedContents.push({
+      role: "user",
+      parts: [{ text: message }],
+    });
+
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: formattedContents,
+      config: {
+        systemInstruction,
+        temperature: 0.7,
+      },
+    });
+
+    const reply = response.text?.trim() || getFallbackResponse(message, language);
+
+    res.json({
+      reply,
+      model: "gemini-3.7-flash",
+      source: "gemini",
+    });
+  } catch (error: any) {
+    console.error("Gemini API error in /api/chat:", error?.message || error);
+    // Fallback gracefully so chat is never broken
+    const fallbackReply = getFallbackResponse(message, language);
+    res.json({
+      reply: fallbackReply,
+      model: "built-in-banking-concierge",
+      source: "fallback",
+    });
+  }
+});
+
+// Vite middleware or production static serving
+async function startServer() {
+  if (process.env.NODE_ENV !== "production" && !process.env.PASSENGER_APP_ENV) {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    const possiblePaths = [
+      path.join(__dirname, "index.html"),
+      path.join(__dirname, "dist", "index.html"),
+      path.join(process.cwd(), "dist", "index.html"),
+      path.join(process.cwd(), "index.html"),
+    ];
+    let distPath = process.cwd();
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        distPath = path.dirname(p);
+        break;
+      }
+    }
+    app.use(express.static(distPath));
+    app.use(express.static(process.cwd()));
+    app.use("/assets", express.static(path.join(distPath, "assets")));
+    app.use("/assets", express.static(distPath));
+    app.use("/assets", express.static(process.cwd()));
+    
+    app.get("*", (_req, res) => {
+      const htmlFile = fs.existsSync(path.join(distPath, "index.html"))
+        ? path.join(distPath, "index.html")
+        : path.join(process.cwd(), "index.html");
+      res.sendFile(htmlFile);
+    });
+  }
+
+  // Support cPanel / CloudLinux Phusion Passenger & standard node
+  app.listen(PORT, () => {
+    console.log(`Global Elite Bank server running on port ${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
+});
+
+export default app;

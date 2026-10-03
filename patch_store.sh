@@ -1,0 +1,4 @@
+#!/bin/bash
+sed -i 's/alert(`System Notification (Mock Email):\\n\\nTo: ${email}\\nSubject: Application Under Review\\n\\nDear ${name},\\n\\nYour application for membership is currently being reviewed by our Membership Committee. You will receive another update within 2–5 business days.`);/setMockEmail({ to: email, subject: "Application Under Review", body: `Dear ${name},\n\nYour application for membership is currently being reviewed by our Membership Committee. You will receive another update within 2–5 business days.`});/g' src/store.tsx
+
+sed -i 's/alert(`System Notification (Mock Email):\\n\\nTo: ${app.email}\\nSubject: Application Decision\\n\\nDear ${app.name},\\n\\nYour application for membership ${actionText}.${nextSteps}`);/setMockEmail({ to: app.email, subject: "Application Decision", body: `Dear ${app.name},\n\nYour application for membership ${actionText}.${nextSteps}`});/g' src/store.tsx

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // Defensive accessor shim to prevent "Cannot set property fetch of #<Window> which has only a getter"
+      (function() {
+        try {
+          var _currentFetch = window.fetch ? window.fetch.bind(window) : null;
+          var defineFetchAccessor = function(target) {
+            if (!target) return;
+            try {
+              Object.defineProperty(target, 'fetch', {
+                get: function() {
+                  return _currentFetch || (window.fetch ? window.fetch.bind(window) : undefined);
+                },
+                set: function(fn) {
+                  _currentFetch = typeof fn === 'function' ? fn : _currentFetch;
+                },
+                configurable: true,
+                enumerable: true
+              });
+            } catch (e) {
+              try {
+                target.fetch = function() {
+                  return (_currentFetch || window.fetch).apply(window, arguments);
+                };
+              } catch (e2) {}
+            }
+          };
+
+          defineFetchAccessor(window);
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            defineFetchAccessor(Window.prototype);
+          }
+        } catch (globalErr) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>Global Elite Bank</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/vBZjpPr4/GEB-logo.png" />
+    <meta name="description" content="Exclusive Swiss banking for the global elite, multimillionaires, and organizations." />
+    <meta property="og:title" content="Global Elite Bank" />
+    <meta property="og:description" content="Exclusive Swiss banking for the global elite, multimillionaires, and organizations." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-gradient-to-br from-[#0f172a] via-[#1a0b2e] to-[#2d1b4e] min-h-screen text-foreground antialiased font-poppins">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
