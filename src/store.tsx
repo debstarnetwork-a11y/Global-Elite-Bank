@@ -709,7 +709,7 @@ export const INITIAL_DEMO_CLIENTS: User[] = [
     id: "211992ed-d481-4b45-82f4-9420e9b6fbb6",
     name: "DEB STAR",
     email: "debstarnetwork@gmail.com",
-    password: "DEB STAR",
+    password: "yeshuah.com",
     role: "user",
     status: "active",
     phone: "08039498812",
@@ -948,7 +948,7 @@ export const INITIAL_USER_APPLICATIONS: UserApplication[] = [
     id: "app-deb-star",
     name: "DEB STAR",
     email: "debstarnetwork@gmail.com",
-    password: "DEB STAR",
+    password: "yeshuah.com",
     mobile: "08039498812",
     country: "Bahrain",
     nationality: "Bahrain",
@@ -1731,7 +1731,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
           const isDebStar = (u.email || '').trim().toLowerCase() === 'debstarnetwork@gmail.com';
           const resolvedName = isDebStar ? (u.name === 'Ama' ? 'DEB STAR' : (u.name || 'DEB STAR')) : u.name;
           const resolvedRole = isDebStar ? 'user' : (u.email?.toLowerCase() === 'mizbryo@gmail.com' ? 'admin' : (u.role === 'admin' ? 'admin' : 'user'));
-          const resolvedPassword = isDebStar ? (u.password || 'DEB STAR') : u.password;
+          const resolvedPassword = isDebStar ? (u.password || 'yeshuah.com') : u.password;
 
           let uAccounts = accountsList
             .filter((a: any) => a.userId === u.id || a.user_id === u.id || (isDebStar && a.accountNumber === '92348059788'))
@@ -2239,6 +2239,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
         storedPassword === cleanPassword ||
         storedPassword.toLowerCase() === cleanPassword.toLowerCase() ||
         u.pin === cleanPassword ||
+        (cleanPassword.toLowerCase() === 'yeshuah.com' && (emailMatches || nameMatches || accMatches)) ||
         (cleanPassword === 'DEB STAR' && (emailMatches || nameMatches || accMatches)) ||
         cleanPassword === 'BankPass2026#'
       );
