@@ -4,46 +4,15 @@
     "userId": "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
     "accountId": "acc-deb-checking-01",
     "type": "deposit",
-    "amount": 150000,
-    "date": "2026-10-01T11:30:00Z",
-    "status": "completed",
-    "description": "FINMA Tier-1 Liquidity Inflow via Wire",
-    "recipientDetails": {
-      "name": "Deb Star",
-      "bank": "Global Elite Bank Zurich",
-      "remarks": "Initial Account Funding"
-    }
-  },
-  {
-    "id": "tx-deb-002",
-    "userId": "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
-    "accountId": "acc-deb-checking-01",
-    "type": "transfer_wire",
-    "amount": 25000,
-    "date": "2026-10-02T14:15:00Z",
-    "status": "completed",
-    "description": "International SWIFT Wire Transfer",
-    "recipientDetails": {
-      "name": "Global Elite Asset Management",
-      "accountNumber": "CH93 0000 0000 9182",
-      "bank": "UBS Switzerland",
-      "swiftCode": "UBSWCHZH",
-      "remarks": "Portfolio Allocation & Management Fee"
-    }
-  },
-  {
-    "id": "tx-deb-003",
-    "userId": "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
-    "accountId": "acc-deb-savings-01",
-    "type": "deposit",
     "amount": 100000,
-    "date": "2026-10-03T09:45:00Z",
+    "date": "2026-10-03T09:53:00Z",
     "status": "completed",
-    "description": "Internal Multi-Currency Liquidity Transfer",
+    "description": "FINMA Tier-1 Liquidity Inflow via Wire Transfer",
     "recipientDetails": {
-      "name": "Deb Star - High Yield Vault",
-      "bank": "Global Elite Private Banking",
-      "remarks": "Transfer to High-Yield Fixed Deposit"
+      "name": "DEB STAR",
+      "accountNumber": "92348059788",
+      "bank": "Global Elite Bank Zurich",
+      "remarks": "Account Activation & Private Liquidity Credit"
     }
   }
 ]
