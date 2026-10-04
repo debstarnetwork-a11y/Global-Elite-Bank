@@ -1,4 +1,4 @@
-import { Bell, Search, Menu, CheckCheck, X, ArrowUpRight, ShieldCheck, Coins, CreditCard, Clock, ExternalLink, Sparkles } from 'lucide-react';
+import { Bell, Search, Menu, CheckCheck, X, ArrowUpRight, ShieldCheck, Coins, CreditCard, Clock, ExternalLink, Sparkles, User as UserIcon } from 'lucide-react';
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useBank, CryptoWithdrawalRequest } from '../store';
 import { CryptoReceiptModal } from './CryptoReceiptModal';
@@ -464,12 +464,18 @@ export function Header({ onNavigateView, onToggleSidebar }: HeaderProps) {
               </div>
               <p className="text-sm font-bold text-foreground">{currentUser?.name || 'User'}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl border-2 border-accent p-0.5 shrink-0 overflow-hidden shadow-xs">
-              <img 
-                src={currentUser?.profilePicture || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop"} 
-                alt="Profile" 
-                className="w-full h-full rounded-[9px] object-cover"
-              />
+            <div className="w-10 h-10 rounded-xl border-2 border-accent p-0.5 shrink-0 overflow-hidden shadow-xs flex items-center justify-center bg-card">
+              {currentUser?.profilePicture ? (
+                <img 
+                  src={currentUser.profilePicture} 
+                  alt="Profile" 
+                  className="w-full h-full rounded-[9px] object-cover"
+                />
+              ) : (
+                <div className="w-full h-full rounded-[9px] bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                  {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : <UserIcon size={16} />}
+                </div>
+              )}
             </div>
           </div>
         </div>

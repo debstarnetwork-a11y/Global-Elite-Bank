@@ -738,8 +738,8 @@ All Rights Reserved © Global Elite
                               src={editUserForm.profilePicture} 
                               alt="Client Passport" 
                               className="w-20 h-24 object-cover rounded-lg border-2 border-primary/50 shadow-md"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
+                              onError={() => {
+                                setEditUserForm(prev => ({ ...prev, profilePicture: '' }));
                               }}
                             />
                             <button
@@ -1627,8 +1627,8 @@ All Rights Reserved © Global Elite
                           src={newUserForm.passportPhoto} 
                           alt="Client Passport" 
                           className="w-20 h-24 object-cover rounded-lg border-2 border-primary/50 shadow-md"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
+                          onError={() => {
+                            setNewUserForm(prev => ({ ...prev, passportPhoto: '' }));
                           }}
                         />
                         <button

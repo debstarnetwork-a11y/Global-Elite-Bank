@@ -126,12 +126,18 @@ export function SettingsView() {
             <p className="text-sm text-foreground/50">Update your account headshot or passport photo by pasting an image URL.</p>
             
             <div className="flex items-center gap-4 py-4">
-              <div className="w-20 h-20 rounded-full border-2 border-primary p-1 shrink-0">
-                <img 
-                  src={currentUser?.profilePicture || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop"} 
-                  alt="Profile" 
-                  className="w-full h-full rounded-full object-cover"
-                />
+              <div className="w-20 h-20 rounded-full border-2 border-primary p-1 shrink-0 flex items-center justify-center bg-card">
+                {currentUser?.profilePicture ? (
+                  <img 
+                    src={currentUser.profilePicture} 
+                    alt="Profile" 
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+                    {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : <User size={28} />}
+                  </div>
+                )}
               </div>
               <div className="flex-1">
                 <form onSubmit={handleProfileImageSubmit} className="space-y-3">
