@@ -40,11 +40,14 @@ export function BiometricLogin({ onLogin, onBack, user }: { onLogin: () => void;
         {/* Logo */}
         <div className="flex flex-col items-center justify-center mb-4">
           <img
-            src={adminSettings?.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'}
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
             alt="Global Elite Bank Logo"
             className="w-16 h-16 object-contain"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              const target = e.currentTarget as HTMLImageElement;
+              if (!target.src.includes('postimg.cc')) {
+                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              }
             }}
           />
         </div>

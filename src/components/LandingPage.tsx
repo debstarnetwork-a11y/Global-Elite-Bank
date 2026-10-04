@@ -48,7 +48,17 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative z-10">
           {/* Logo & Bank Name */}
           <button onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} className="flex items-center gap-2 sm:gap-3 shrink-0 text-left">
-            <img src={adminSettings?.logoUrl || "https://i.postimg.cc/vBZjpPr4/GEB-logo.png"} alt="GEB Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'; }} />
+            <img 
+              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'} 
+              alt="GEB Logo" 
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0" 
+              onError={(e) => { 
+                const target = e.currentTarget as HTMLImageElement;
+                if (!target.src.includes('postimg.cc')) {
+                  target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                }
+              }} 
+            />
             <span className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight whitespace-nowrap">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
           </button>
           
@@ -146,7 +156,17 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-1">
               <div className="flex items-center gap-3 mb-6">
-                <img src={adminSettings?.logoUrl || "https://i.postimg.cc/vBZjpPr4/GEB-logo.png"} alt="GEB Logo" className="w-8 h-8 object-contain" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'; }} />
+                <img 
+                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'} 
+                  alt="GEB Logo" 
+                  className="w-8 h-8 object-contain" 
+                  onError={(e) => { 
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.src.includes('postimg.cc')) {
+                      target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                    }
+                  }} 
+                />
                 <span className="text-lg font-bold text-foreground tracking-tight">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
               </div>
               <p className="text-sm text-foreground/60 leading-relaxed mb-6">
@@ -171,6 +191,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
                 <li><button onClick={() => setActiveModal('privacy')} className="hover:text-primary transition-colors">{t('privacyPolicy', 'Privacy Policy')}</button></li>
                 <li><button onClick={() => setActiveModal('terms')} className="hover:text-primary transition-colors">{t('termsOfService', 'Terms of Service')}</button></li>
                 <li><button onClick={() => setActiveModal('legal')} className="hover:text-primary transition-colors">{t('regulatoryDisclosures', 'Regulatory Disclosures')}</button></li>
+                <li><a href="/admin" className="hover:text-primary transition-colors flex items-center gap-1.5 opacity-80 hover:opacity-100"><span>Admin Portal</span></a></li>
               </ul>
             </div>
             

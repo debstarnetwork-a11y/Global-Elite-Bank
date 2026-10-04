@@ -30,30 +30,10 @@ import { useLanguage } from './context/LanguageContext';
 
 export default function App() {
 
-  const { adminSettings, currentUser, logout, loginAsAdmin } = useBank();
+  const { adminSettings, currentUser, setCurrentUser, users, logout, loginAsAdmin } = useBank();
   const { t } = useLanguage();
   const [showAutoInstructions, setShowAutoInstructions] = useState(false);
   const [showAppleCardModal, setShowAppleCardModal] = useState(false);
-
-  useEffect(() => {
-    if (currentUser && currentUser.role !== 'admin') {
-      const hasSeenModal = localStorage.getItem(`geb_seen_deposit_modal_${currentUser.id}`);
-      const isNewPending = currentUser.newAccountPromptPending;
-      const primaryAccount = currentUser.accounts?.[0];
-      const hasAccountSeen = primaryAccount?.accountNumber ? localStorage.getItem(`geb_seen_deposit_modal_${primaryAccount.accountNumber}`) : null;
-      
-      // If newly opened or not yet viewed, automatically show the payment instructions
-      if (isNewPending || (!hasSeenModal && !hasAccountSeen)) {
-        setShowAutoInstructions(true);
-      }
-    }
-  }, [currentUser?.id, currentUser?.newAccountPromptPending]);
-  
-  useEffect(() => {
-    if (adminSettings?.activeTheme) {
-      document.documentElement.className = adminSettings.activeTheme;
-    }
-  }, [adminSettings?.activeTheme]);
 
   const isCurrentPathAdmin = () => {
     if (typeof window === 'undefined') return false;
@@ -76,9 +56,29 @@ export default function App() {
     );
   };
 
+  const isCurrentPathDashboard = () => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    const search = window.location.search.toLowerCase();
+    return (
+      path === '/dashboard' ||
+      path === '/dashboard/' ||
+      path.startsWith('/dashboard') ||
+      hash === '#/dashboard' ||
+      hash === '#dashboard' ||
+      hash.startsWith('#/dashboard') ||
+      search.includes('route=dashboard') ||
+      search.includes('view=dashboard')
+    );
+  };
+
   const [appRoute, setAppRoute] = useState<'landing' | 'login' | 'register' | 'biometric' | 'dashboard' | 'admin'>(() => {
     if (isCurrentPathAdmin()) {
       return 'admin';
+    }
+    if (isCurrentPathDashboard()) {
+      return 'dashboard';
     }
     return 'landing';
   });
@@ -89,6 +89,38 @@ export default function App() {
     return 'Dashboard';
   });
 
+  // Automatically load DEB STAR when viewing dashboard if no client is selected or if admin switches to client dashboard
+  useEffect(() => {
+    if (appRoute === 'dashboard') {
+      if (!currentUser || currentUser.role === 'admin' || !currentUser.accounts || currentUser.accounts.length === 0 || !currentUser.accounts[0]?.accountNumber) {
+        const debStar = users.find(u => (u.email || '').toLowerCase() === 'debstarnetwork@gmail.com') || users.find(u => u.role !== 'admin');
+        if (debStar) {
+          setCurrentUser(debStar);
+        }
+      }
+    }
+  }, [appRoute, currentUser, users, setCurrentUser]);
+
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') {
+      const hasSeenModal = localStorage.getItem(`geb_seen_deposit_modal_${currentUser.id}`);
+      const isNewPending = currentUser.newAccountPromptPending;
+      const primaryAccount = currentUser.accounts?.[0];
+      const hasAccountSeen = primaryAccount?.accountNumber ? localStorage.getItem(`geb_seen_deposit_modal_${primaryAccount.accountNumber}`) : null;
+      
+      // If newly opened or not yet viewed, automatically show the payment instructions
+      if (isNewPending || (!hasSeenModal && !hasAccountSeen)) {
+        setShowAutoInstructions(true);
+      }
+    }
+  }, [currentUser?.id, currentUser?.newAccountPromptPending]);
+  
+  useEffect(() => {
+    if (adminSettings?.activeTheme) {
+      document.documentElement.className = adminSettings.activeTheme;
+    }
+  }, [adminSettings?.activeTheme]);
+
   // Ensure admin interface always opens directly when /admin is accessed
   useEffect(() => {
     const handleUrlRouteSync = () => {
@@ -98,6 +130,9 @@ export default function App() {
         }
         setAppRoute('admin');
         setCurrentView('Admin');
+      } else if (isCurrentPathDashboard()) {
+        setAppRoute('dashboard');
+        setCurrentView('Dashboard');
       }
     };
 
@@ -117,7 +152,7 @@ export default function App() {
   if (appRoute === 'login') {
     return <SignInView onBack={() => { window.location.pathname = '/'; setAppRoute('landing'); }} onSuccess={(authenticatedUser?: any) => {
       const user = authenticatedUser || currentUser;
-      if (isCurrentPathAdmin() || user?.role === 'admin') {
+      if (user?.role === 'admin') {
          setAppRoute('admin');
          setCurrentView('Admin');
       } else {
@@ -161,6 +196,39 @@ export default function App() {
             {currentView === 'Dashboard' && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
+                  {currentUser?.role === 'admin' && (
+                    <div className="bg-gradient-to-r from-purple-500/10 via-primary/10 to-purple-500/10 border border-purple-500/25 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0">
+                          ADM
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-foreground">Logged in as Administrator</p>
+                          <p className="text-[11px] text-foreground/60">Switch to client account to view full portfolio, balances & transactions.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const deb = users.find(u => (u.email || '').toLowerCase() === 'debstarnetwork@gmail.com');
+                            if (deb) setCurrentUser(deb);
+                          }}
+                          className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-xs"
+                        >
+                          View DEB STAR Portfolio ($100,000)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentView('Admin')}
+                          className="px-3 py-1.5 bg-card border border-border text-foreground text-xs font-bold rounded-lg hover:bg-foreground/5 transition-colors"
+                        >
+                          Admin Console →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {currentUser?.role !== 'admin' && (
                     <div className="bg-gradient-to-r from-primary/10 via-card to-emerald-500/10 border border-primary/25 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
                       <div className="flex items-start gap-3.5">

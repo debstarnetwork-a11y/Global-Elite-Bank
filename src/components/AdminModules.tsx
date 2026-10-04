@@ -42,7 +42,7 @@ function formatRelativeDate(isoStringOrTimestamp?: string | number): string {
 }
 
 export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string) => void }) {
-  const { users, updateUserStatus } = useBank();
+  const { users, updateUserStatus, setCurrentUser } = useBank();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [perPage, setPerPage] = useState('10');
@@ -213,6 +213,16 @@ export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string)
                       {formatRelativeDate(client.accountOpenedAt)}
                     </td>
                     <td className="p-4 text-right flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => {
+                          setCurrentUser(client);
+                          window.location.href = '/?view=Dashboard';
+                        }}
+                        className="text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors bg-sky-500/10 px-2.5 py-1.5 rounded border border-sky-500/20"
+                        title="Open User Dashboard as this client"
+                      >
+                        View Dashboard
+                      </button>
                       <button onClick={() => onManageUser && onManageUser(client.id)} className="text-xs font-bold text-emerald-500 hover:text-emerald-400 transition-colors bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20">Manage</button>
                       <div className="relative group inline-block text-left">
                         <button className="text-foreground/70 hover:text-foreground transition-colors inline-flex align-middle p-2 rounded-md hover:bg-white/5 border border-border">

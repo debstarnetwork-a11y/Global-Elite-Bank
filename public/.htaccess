@@ -1,7 +1,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+  # Allow direct access to real files
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  # Direct SPA routes to index.html
   RewriteRule ^admin(/.*)?$ /index.html [L]
+  RewriteRule ^dashboard(/.*)?$ /index.html [L]
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

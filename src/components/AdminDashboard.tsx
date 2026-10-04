@@ -16,7 +16,7 @@ import {
 } from './AdminModules';
 
 export function AdminDashboard() {
-  const { users, adminUpdateUser, updateUserStatus, adminCreateUser, createTransaction, deleteUser, transactions, updateTransactionStatus, logout, adminSettings, updateAdminSettings, userApplications, updateUserApplicationStatus, currentUser, restoreDemoClients } = useBank();
+  const { users, adminUpdateUser, updateUserStatus, adminCreateUser, createTransaction, deleteUser, transactions, updateTransactionStatus, logout, adminSettings, updateAdminSettings, userApplications, updateUserApplicationStatus, currentUser, setCurrentUser, restoreDemoClients } = useBank();
   
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
@@ -440,11 +440,14 @@ All Rights Reserved © Global Elite
       <div className="w-64 bg-card border-r border-border overflow-y-auto flex-col h-full shrink-0 hidden lg:flex">
         <div className="p-6 border-b border-border flex items-center gap-3">
           <img
-            src={adminSettings?.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'}
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
             alt="Bank Logo"
             className="w-8 h-8 object-contain"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              const target = e.currentTarget as HTMLImageElement;
+              if (!target.src.includes('postimg.cc')) {
+                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              }
             }}
           />
           <h1 className="text-xl font-bold text-foreground">Admin</h1>
@@ -462,11 +465,14 @@ All Rights Reserved © Global Elite
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
-                  src={adminSettings?.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'}
+                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
                   alt="Bank Logo"
                   className="w-8 h-8 object-contain"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.src.includes('postimg.cc')) {
+                      target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                    }
                   }}
                 />
                 <h1 className="text-xl font-bold text-foreground">Admin</h1>
@@ -611,9 +617,20 @@ All Rights Reserved © Global Elite
                     <tr key={user.id} className="hover:bg-white/5 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-border flex items-center justify-center font-bold text-foreground shrink-0">
-                            {user.name.charAt(0)}
-                          </div>
+                          {user.profilePicture ? (
+                            <img
+                              src={user.profilePicture}
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full object-cover border border-primary/40 shadow-xs shrink-0"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-border flex items-center justify-center font-bold text-foreground shrink-0">
+                              {user.name.charAt(0)}
+                            </div>
+                          )}
                           <div>
                             <p className="text-sm font-bold text-foreground">{user.name}</p>
                             <div className="flex items-center gap-2 text-[10px] text-foreground/50 font-mono mt-0.5">
@@ -1154,14 +1171,62 @@ All Rights Reserved © Global Elite
                   <div className="space-y-4">
                     <div className="flex justify-between items-center border-b border-border pb-2">
                       <h4 className="text-sm font-bold text-foreground uppercase tracking-widest">USER INFORMATION</h4>
-                      <div className="relative group">
-                        <button className="text-foreground/50 hover:text-foreground bg-white/5 p-1 rounded">
-                          <MoreHorizontal size={16} />
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentUser(currentActiveUser);
+                            try {
+                              localStorage.setItem('bank_currentUser', JSON.stringify(currentActiveUser));
+                            } catch (e) {}
+                            window.location.href = '/?route=dashboard';
+                          }}
+                          className="px-3 py-1 bg-primary/10 text-primary border border-primary/25 rounded-lg text-xs font-bold hover:bg-primary/20 transition-colors flex items-center gap-1.5"
+                          title="Open user dashboard as this client"
+                        >
+                          <ArrowUpRight size={13} />
+                          <span>View User Dashboard</span>
                         </button>
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 p-1">
-                          <button onClick={() => { setIsEditingUser(true); setEditUserForm(currentActiveUser); }} className="w-full text-left px-3 py-2 text-sm font-bold text-foreground hover:bg-white/5 rounded-md">Edit Account</button>
-                          <button onClick={() => { deleteUser(currentActiveUser.id); setIsUserModalOpen(false); showToast('User Deleted', 'Account removed successfully'); }} className="w-full text-left px-3 py-2 text-sm font-bold text-rose-500 hover:bg-rose-500/10 rounded-md">Delete Account</button>
+                        <div className="relative group">
+                          <button className="text-foreground/50 hover:text-foreground bg-white/5 p-1 rounded">
+                            <MoreHorizontal size={16} />
+                          </button>
+                          <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 p-1">
+                            <button onClick={() => { setIsEditingUser(true); setEditUserForm(currentActiveUser); }} className="w-full text-left px-3 py-2 text-sm font-bold text-foreground hover:bg-white/5 rounded-md">Edit Account</button>
+                            <button onClick={() => { deleteUser(currentActiveUser.id); setIsUserModalOpen(false); showToast('User Deleted', 'Account removed successfully'); }} className="w-full text-left px-3 py-2 text-sm font-bold text-rose-500 hover:bg-rose-500/10 rounded-md">Delete Account</button>
+                          </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Passport Photo & Client Profile Header */}
+                    <div className="flex items-center gap-4 p-3.5 bg-background/50 rounded-xl border border-border">
+                      {currentActiveUser.profilePicture ? (
+                        <div className="relative group shrink-0">
+                          <img 
+                            src={currentActiveUser.profilePicture} 
+                            alt={currentActiveUser.name} 
+                            className="w-16 h-20 object-cover rounded-lg border-2 border-primary/50 shadow-md"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-16 h-20 bg-card rounded-lg border border-dashed border-border flex flex-col items-center justify-center text-foreground/40 shrink-0 text-center p-1">
+                          <ImageIcon size={18} className="mb-1 text-foreground/30" />
+                          <span className="text-[9px] leading-tight">No Passport Photo</span>
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold uppercase tracking-wider text-foreground/50 mb-0.5">Passport Photo / Identity</div>
+                        <p className="text-sm font-bold text-foreground truncate">{currentActiveUser.name}</p>
+                        <p className="text-xs text-foreground/60 truncate font-mono">{currentActiveUser.email}</p>
+                        <button
+                          type="button"
+                          onClick={() => { setIsEditingUser(true); setEditUserForm(currentActiveUser); }}
+                          className="mt-2 text-xs text-primary hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <Upload size={12} />
+                          <span>{currentActiveUser.profilePicture ? 'Update Passport Photo' : 'Upload Passport Photo'}</span>
+                        </button>
                       </div>
                     </div>
 

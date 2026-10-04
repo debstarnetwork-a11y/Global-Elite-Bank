@@ -205,7 +205,7 @@ export function Header({ onNavigateView, onToggleSidebar }: HeaderProps) {
   return (
     <>
       <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border bg-background sticky top-0 z-30">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <button 
             type="button"
             onClick={onToggleSidebar}
@@ -214,10 +214,23 @@ export function Header({ onNavigateView, onToggleSidebar }: HeaderProps) {
           >
             <Menu size={22} />
           </button>
-          <h1 className="text-base sm:text-lg font-semibold hidden md:block text-foreground">
-            {adminSettings?.websiteName || 'Global Elite Bank'} • Private Banking
-          </h1>
-          <div className="hidden sm:flex items-center space-x-2 bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-emerald-500/20">
+          <div className="flex items-center gap-2.5">
+            <img
+              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
+              alt="Bank Logo"
+              className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                if (!target.src.includes('postimg.cc')) {
+                  target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                }
+              }}
+            />
+            <h1 className="text-sm sm:text-base font-bold text-foreground tracking-tight">
+              {adminSettings?.websiteName || 'Global Elite Bank'} <span className="hidden sm:inline text-xs font-normal text-foreground/50">• Private Banking</span>
+            </h1>
+          </div>
+          <div className="hidden lg:flex items-center space-x-2 bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-emerald-500/20">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             <span>SEGREGATED VAULT SECURED</span>
           </div>

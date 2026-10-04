@@ -57,11 +57,14 @@ export function Sidebar({ currentView, setCurrentView, onLogout }: { currentView
     <div className="w-64 h-screen bg-background border-r border-border hidden md:flex flex-col sticky top-0 p-6 space-y-8">
       <div className="flex items-center space-x-3">
         <img
-          src={adminSettings?.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'}
+          src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
           alt="Bank Logo"
           className="w-10 h-10 object-contain"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+            const target = e.currentTarget as HTMLImageElement;
+            if (!target.src.includes('postimg.cc')) {
+              target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+            }
           }}
         />
         <div className="leading-tight">

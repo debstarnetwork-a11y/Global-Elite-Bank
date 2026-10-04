@@ -157,11 +157,14 @@ Global Elite Bank, Zurich, Switzerland`
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-xl">
         <div className="flex flex-col items-center justify-center mb-6">
           <img
-            src={adminSettings?.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'}
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
             alt="Global Elite Bank Logo"
             className="w-20 h-20 mb-3 object-contain"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              const target = e.currentTarget as HTMLImageElement;
+              if (!target.src.includes('postimg.cc')) {
+                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+              }
             }}
           />
         </div>
