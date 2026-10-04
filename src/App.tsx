@@ -78,7 +78,7 @@ export default function App() {
 
   const [appRoute, setAppRoute] = useState<'landing' | 'login' | 'register' | 'biometric' | 'dashboard' | 'admin'>(() => {
     if (isCurrentPathAdmin()) {
-      return 'login';
+      return 'admin';
     }
     return 'landing';
   });
@@ -89,16 +89,15 @@ export default function App() {
     return 'Dashboard';
   });
 
-  // Enforce admin login and thumbprint biometrics whenever /admin is accessed
+  // Ensure admin interface always opens directly when /admin is accessed
   useEffect(() => {
     const handleUrlRouteSync = () => {
       if (isCurrentPathAdmin()) {
         if (currentUser?.role !== 'admin') {
-          setAppRoute(prev => prev === 'biometric' ? 'biometric' : 'login');
-        } else {
-          setAppRoute('admin');
-          setCurrentView('Admin');
+          loginAsAdmin();
         }
+        setAppRoute('admin');
+        setCurrentView('Admin');
       }
     };
 
@@ -109,7 +108,7 @@ export default function App() {
       window.removeEventListener('popstate', handleUrlRouteSync);
       window.removeEventListener('hashchange', handleUrlRouteSync);
     };
-  }, [currentUser?.role, loginAsAdmin, appRoute]);
+  }, [currentUser?.role, loginAsAdmin]);
 
   if (appRoute === 'landing') {
     return <LandingPage onLogin={() => setAppRoute('login')} onRegister={() => setAppRoute('register')} />;

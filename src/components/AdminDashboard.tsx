@@ -39,21 +39,51 @@ export function AdminDashboard() {
     passportPhoto: ''
   });
 
+  const compressImageFile = (file: File, callback: (compressed: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const raw = e.target?.result as string;
+      if (!raw) return;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 400;
+        let w = img.width;
+        let h = img.height;
+        if (w > h) {
+          if (w > maxDim) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          }
+        } else {
+          if (h > maxDim) {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          callback(compressed);
+        } else {
+          callback(raw);
+        }
+      };
+      img.onerror = () => callback(raw);
+      img.src = raw;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handlePassportPhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('File too large', 'Please choose an image under 5MB.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        if (base64) {
-          setNewUserForm(prev => ({ ...prev, passportPhoto: base64 }));
-        }
-      };
-      reader.readAsDataURL(file);
+      compressImageFile(file, (compressed) => {
+        setNewUserForm(prev => ({ ...prev, passportPhoto: compressed }));
+      });
     }
   };
 
@@ -70,18 +100,9 @@ export function AdminDashboard() {
   const handleEditPassportPhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('File too large', 'Please choose an image under 5MB.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        if (base64) {
-          setEditUserForm(prev => ({ ...prev, profilePicture: base64 }));
-        }
-      };
-      reader.readAsDataURL(file);
+      compressImageFile(file, (compressed) => {
+        setEditUserForm(prev => ({ ...prev, profilePicture: compressed }));
+      });
     }
   };
 

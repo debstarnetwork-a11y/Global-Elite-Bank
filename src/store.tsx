@@ -1449,6 +1449,16 @@ export function BankProvider({ children }: { children: ReactNode }) {
                 (async () => {
                   try { await supabase.from('users').upsert(prepUser); } catch {}
                 })();
+              } else {
+                // If local user has updated profilePicture that cloud DB lacks, preserve and sync
+                if (lu.profilePicture && !existingInDb.profilePicture) {
+                  existingInDb.profilePicture = lu.profilePicture;
+                  (async () => {
+                    try {
+                      await supabase.from('users').update({ profile_picture: lu.profilePicture }).eq('id', existingInDb.id);
+                    } catch {}
+                  })();
+                }
               }
 
               // Check and migrate accounts for this user
@@ -1820,6 +1830,11 @@ export function BankProvider({ children }: { children: ReactNode }) {
         } catch (e) {}
 
         setUsers(mappedUsers);
+        setCurrentUser(prev => {
+          if (!prev) return prev;
+          const fresh = mappedUsers.find(u => u.id === prev.id || (u.email && prev.email && u.email.toLowerCase() === prev.email.toLowerCase()));
+          return fresh ? { ...prev, ...fresh, profilePicture: fresh.profilePicture || prev.profilePicture } : prev;
+        });
       } catch (err) {
         console.warn('Notice: Failed to load Supabase data, continuing with local cache:', err);
       } finally {
@@ -2419,11 +2434,26 @@ Your application for membership is currently being reviewed by our Membership Co
         }).catch(() => {});
       } catch (e) {}
 
+      // Direct upsert to Supabase to persist photo and all fields permanently
+      const userToSync = next.find(u => u.id === userId);
+      if (userToSync) {
+        const prep = prepareUserForSupabase(userToSync);
+        (async () => {
+          try {
+            await supabase.from('users').upsert(prep);
+          } catch (err) {
+            console.warn('Failed to upsert updated user in Supabase:', err);
+          }
+        })();
+      }
+
       return next;
     });
 
     setCurrentUser(prev => {
-      if (!prev || prev.id !== userId) return prev;
+      if (!prev) return prev;
+      const userMatches = prev.id === userId || (prev.email && updates.email && prev.email.toLowerCase() === updates.email.toLowerCase());
+      if (!userMatches) return prev;
       const rawPin = updates.pin || prev.pin;
       const sanitizedPin = rawPin ? sanitizePin(rawPin) : sanitizePin(prev.accounts?.[0]?.pin || '1234');
       const updatedAccounts = (updates.accounts || prev.accounts || []).map((a, idx) => {
@@ -2431,7 +2461,13 @@ Your application for membership is currently being reviewed by our Membership Co
         return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
       });
       const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts?.[0]?.pin || sanitizedPin);
-      const updated = { ...prev, ...updates, pin: resolvedPin, accounts: updatedAccounts };
+      const updated = { 
+        ...prev, 
+        ...updates, 
+        pin: resolvedPin, 
+        accounts: updatedAccounts,
+        profilePicture: updates.profilePicture !== undefined ? updates.profilePicture : prev.profilePicture
+      };
       try {
         window.localStorage.setItem('bank_currentUser', JSON.stringify(updated));
       } catch (e) {}
@@ -3145,8 +3181,26 @@ Global Elite Bank, Zurich, Switzerland`
 
   const updateUserProfilePicture = (url: string) => {
     if (!currentUser) return;
-    setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, profilePicture: url } : u));
-    setCurrentUser({ ...currentUser, profilePicture: url });
+    setUsers(prev => {
+      const next = prev.map(u => u.id === currentUser.id ? { ...u, profilePicture: url } : u);
+      try {
+        localStorage.setItem('bank_users', JSON.stringify(next));
+        localStorage.setItem('bank_users_backup', JSON.stringify(next));
+      } catch (e) {}
+      return next;
+    });
+    setCurrentUser(prev => prev ? { ...prev, profilePicture: url } : null);
+    try {
+      localStorage.setItem('bank_currentUser', JSON.stringify({ ...currentUser, profilePicture: url }));
+    } catch (e) {}
+    // Sync directly to Supabase
+    (async () => {
+      try {
+        await supabase.from('users').update({ profile_picture: url }).eq('id', currentUser.id);
+      } catch (err) {
+        console.warn('Failed to sync profile picture to Supabase:', err);
+      }
+    })();
   };
 
   const requestCryptoWithdrawal = (req: Omit<CryptoWithdrawalRequest, 'id' | 'requestDate' | 'status'>): { success: boolean; message: string; request?: CryptoWithdrawalRequest } => {
