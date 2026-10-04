@@ -438,6 +438,61 @@ app.post("/api/admin/save-settings", (req, res) => {
   }
 });
 
+const USERS_FILE = path.join(process.cwd(), ".data", "users.json");
+const APPLICATIONS_FILE = path.join(process.cwd(), ".data", "applications.json");
+
+app.get("/api/admin/users", (_req, res) => {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(USERS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
+      res.json({ success: true, users: data });
+      return;
+    }
+    res.json({ success: true, users: null });
+  } catch (err: any) {
+    res.json({ success: false, error: err?.message });
+  }
+});
+
+app.post("/api/admin/save-users", (req, res) => {
+  try {
+    ensureDataDir();
+    const users = req.body?.users || [];
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
+    res.json({ success: true, message: "Users saved permanently to server disk." });
+  } catch (err: any) {
+    console.error("[Users Disk Save Error]:", err?.message || err);
+    res.status(500).json({ success: false, error: err?.message || "Failed to save users to disk" });
+  }
+});
+
+app.get("/api/admin/applications", (_req, res) => {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(APPLICATIONS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(APPLICATIONS_FILE, "utf-8"));
+      res.json({ success: true, applications: data });
+      return;
+    }
+    res.json({ success: true, applications: null });
+  } catch (err: any) {
+    res.json({ success: false, error: err?.message });
+  }
+});
+
+app.post("/api/admin/save-applications", (req, res) => {
+  try {
+    ensureDataDir();
+    const applications = req.body?.applications || [];
+    fs.writeFileSync(APPLICATIONS_FILE, JSON.stringify(applications, null, 2), "utf-8");
+    res.json({ success: true, message: "Applications saved permanently to server disk." });
+  } catch (err: any) {
+    console.error("[Applications Disk Save Error]:", err?.message || err);
+    res.status(500).json({ success: false, error: err?.message || "Failed to save applications to disk" });
+  }
+});
+
 // Curated banking knowledge base fallback for reliable responses
 function getFallbackResponse(message: string, language: string = "en"): string {
   const lower = message.toLowerCase();

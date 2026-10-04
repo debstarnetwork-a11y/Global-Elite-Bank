@@ -684,6 +684,116 @@ const defaultAdmin: User = {
 
 export const INITIAL_DEMO_CLIENTS: User[] = [
   {
+    id: "c0e89123-1d92-4f32-8e21-938201948200",
+    name: "Emman Debelu",
+    email: "emmanueldebelu@gmail.com",
+    role: "user",
+    status: "active",
+    phone: "+1 (555) 789-0142",
+    country: "United States",
+    residentialAddress: "100 Wall Street, Penthouse 42, New York, NY 10005",
+    pin: "1234",
+    accountOpenedAt: "2026-09-05T12:00:00Z",
+    accounts: [
+      {
+        id: "a0b1c2d3-e4f5-4a6b-8c9d-0e1f2a3b4c5e",
+        accountNumber: "8492019482",
+        type: "Checking",
+        balance: 350000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH93000000008492019482",
+        pin: "1234",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      },
+      {
+        id: "a0b1c2d3-e4f5-4a6b-8c9d-0e1f2a3b4c5f",
+        accountNumber: "9281039481",
+        type: "Savings",
+        balance: 1200000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH93000000009281039481",
+        pin: "1234",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      }
+    ]
+  },
+  {
+    id: "user-sample-01",
+    name: "Alexander Wright",
+    email: "alexander.wright@eliteholdings.ch",
+    role: "user",
+    status: "active",
+    phone: "+41 22 819 4000",
+    country: "Switzerland",
+    residentialAddress: "Quai du Mont-Blanc 19, 1201 Genève, Switzerland",
+    pin: "8491",
+    accountOpenedAt: "2026-08-20T10:00:00Z",
+    accounts: [
+      {
+        id: "acc-alex-001",
+        accountNumber: "CH93 0000 0000 8821",
+        type: "Checking",
+        balance: 785000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH930000000088219482",
+        pin: "8491",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      }
+    ]
+  },
+  {
+    id: "user-sample-02",
+    name: "Sophia Martinez",
+    email: "sophia.martinez@genevatrust.ch",
+    role: "user",
+    status: "active",
+    phone: "+41 22 718 2000",
+    country: "Switzerland",
+    residentialAddress: "Rue du Rhône 48, 1204 Genève, Switzerland",
+    pin: "1092",
+    accountOpenedAt: "2026-08-25T14:30:00Z",
+    accounts: [
+      {
+        id: "acc-sophia-001",
+        accountNumber: "CH93 0000 0000 4419",
+        type: "Checking",
+        balance: 520000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH930000000044198821",
+        pin: "1092",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      }
+    ]
+  },
+  {
     id: "c1a93821-4d92-4f32-8e21-938201948201",
     name: "Michael Vance",
     email: "michael.vance@eliteclients.com",
@@ -759,6 +869,23 @@ export const INITIAL_DEMO_CLIENTS: User[] = [
         }
       }
     ]
+  }
+];
+
+export const INITIAL_USER_APPLICATIONS: UserApplication[] = [
+  {
+    id: "app-emman-debelu",
+    name: "Emman Debelu",
+    email: "emmanueldebelu@gmail.com",
+    mobile: "+1 (555) 789-0142",
+    country: "United States",
+    nationality: "American",
+    dob: "1988-04-15",
+    zipCode: "10005",
+    occupation: "Managing Director & Venture Partner",
+    residentialAddress: "100 Wall Street, Penthouse 42, New York, NY 10005",
+    date: "2026-09-05T12:00:00Z",
+    status: "approved"
   }
 ];
 
@@ -985,10 +1112,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
     try {
       const local = getInitialState<User[]>('bank_users', []);
       if (Array.isArray(local) && local.length > 0) {
-        if (!local.some(u => u.role === 'admin' || u.email?.toLowerCase() === 'mizbryo@gmail.com')) {
-          return [defaultAdmin, ...local];
+        const existingEmails = new Set(local.map(u => (u.email || '').trim().toLowerCase()));
+        const missingClients = INITIAL_DEMO_CLIENTS.filter(d => !existingEmails.has(d.email.trim().toLowerCase()));
+        let merged = missingClients.length > 0 ? [...local, ...missingClients] : local;
+        if (!merged.some(u => u.role === 'admin' || u.email?.toLowerCase() === 'mizbryo@gmail.com')) {
+          merged = [defaultAdmin, ...merged];
         }
-        return local;
+        return merged;
       }
     } catch {}
     return [defaultAdmin, ...INITIAL_DEMO_CLIENTS];
@@ -1007,9 +1137,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
   const [loanApplications, setLoanApplications] = useState<LoanApplication[]>(() => 
     getInitialState('bank_loanApplications', [])
   );
-  const [userApplications, setUserApplications] = useState<UserApplication[]>(() => 
-    getInitialState('bank_userApplications', [])
-  );
+  const [userApplications, setUserApplications] = useState<UserApplication[]>(() => {
+    const local = getInitialState<UserApplication[]>('bank_userApplications', []);
+    if (Array.isArray(local) && local.length > 0) {
+      const existingIds = new Set(local.map(a => a.id));
+      const missing = INITIAL_USER_APPLICATIONS.filter(a => !existingIds.has(a.id));
+      return missing.length > 0 ? [...local, ...missing] : local;
+    }
+    return INITIAL_USER_APPLICATIONS;
+  });
   const [grantApplications, setGrantApplications] = useState<GrantApplication[]>(() => 
     getInitialState('bank_grantApplications', [])
   );
@@ -1047,7 +1183,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadData() {
       try {
-        // Asynchronously check server-side disk storage for admin settings
+        // Asynchronously check server-side disk storage for admin settings, users, and applications
         fetch('/api/admin/settings')
           .then(res => res.json())
           .then(data => {
@@ -1059,6 +1195,42 @@ export function BankProvider({ children }: { children: ReactNode }) {
                   window.localStorage.setItem('bank_adminSettings_backup', JSON.stringify(merged));
                 } catch (e) {}
                 return merged;
+              });
+            }
+          })
+          .catch(() => {});
+
+        fetch('/api/admin/users')
+          .then(res => res.json())
+          .then(data => {
+            if (data?.success && Array.isArray(data?.users) && data.users.length > 0) {
+              setUsers(prev => {
+                const existingEmails = new Set(prev.map(u => (u.email || '').trim().toLowerCase()));
+                const newUsers = data.users.filter((u: any) => !existingEmails.has((u.email || '').trim().toLowerCase()));
+                if (newUsers.length > 0) {
+                  const updated = [...prev, ...newUsers];
+                  try { window.localStorage.setItem('bank_users', JSON.stringify(updated)); } catch (e) {}
+                  return updated;
+                }
+                return prev;
+              });
+            }
+          })
+          .catch(() => {});
+
+        fetch('/api/admin/applications')
+          .then(res => res.json())
+          .then(data => {
+            if (data?.success && Array.isArray(data?.applications) && data.applications.length > 0) {
+              setUserApplications(prev => {
+                const existingIds = new Set(prev.map(a => a.id));
+                const newApps = data.applications.filter((a: any) => !existingIds.has(a.id));
+                if (newApps.length > 0) {
+                  const updated = [...prev, ...newApps];
+                  try { window.localStorage.setItem('bank_userApplications', JSON.stringify(updated)); } catch (e) {}
+                  return updated;
+                }
+                return prev;
               });
             }
           })
@@ -1448,7 +1620,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
 
           return {
             ...u,
-            role: u.role === 'admin' ? 'admin' : 'client',
+            role: u.role === 'admin' ? 'admin' : 'user',
             status: u.status || 'active',
             pin: finalPin,
             accounts: uAccounts,
@@ -2198,8 +2370,51 @@ Global Elite Bank, Zurich, Switzerland`
         }
       }, 300);
 
-      if (status === 'approved' && customData) {
-        adminCreateUser(customData);
+      if (status === 'approved') {
+        if (customData) {
+          adminCreateUser(customData);
+        } else {
+          // Check if user already exists in state
+          const existingUser = users.find(u => (u.email || '').trim().toLowerCase() === (app.email || '').trim().toLowerCase());
+          if (!existingUser) {
+            const accNum = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+            adminCreateUser({
+              name: app.name,
+              email: app.email,
+              password: app.password || 'BankPass2026#',
+              role: 'user',
+              status: 'active',
+              country: app.country || 'United States',
+              phone: app.mobile || '',
+              dob: app.dob || '',
+              nationality: app.nationality || '',
+              zipCode: app.zipCode || '',
+              occupation: app.occupation || '',
+              residentialAddress: app.residentialAddress || '',
+              pin: '1234',
+              accountOpenedAt: new Date().toISOString(),
+              accounts: [
+                {
+                  id: generateUUID(),
+                  type: 'Checking',
+                  accountNumber: accNum,
+                  iban: `CH9300000000${accNum}`,
+                  balance: 0,
+                  currency: 'USD',
+                  status: 'active',
+                  pin: '1234',
+                  codes: {
+                    swift: '0502261',
+                    cot: '9174906',
+                    tax: 'GEB67716',
+                    imf: '251112',
+                    aml: 'AML78377'
+                  }
+                }
+              ]
+            });
+          }
+        }
       }
     }
     
