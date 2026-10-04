@@ -2296,7 +2296,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
     return { success: false, error: 'Invalid email or password' };
   };
 
-  const logout = () => setCurrentUser(null);
+  const logout = () => {
+    setCurrentUser(null);
+    try {
+      window.sessionStorage.removeItem('geb_admin_session_auth');
+      window.localStorage.removeItem('bank_currentUser');
+    } catch (e) {}
+  };
 
   const loginAsAdmin = () => {
     let adminUser = users.find(u => u.role === 'admin' && (u.email?.toLowerCase() === 'mizbryo@gmail.com' || u.email?.toLowerCase() === (adminSettings?.adminEmail || '').toLowerCase()));

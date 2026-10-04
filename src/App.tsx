@@ -75,7 +75,10 @@ export default function App() {
 
   const [appRoute, setAppRoute] = useState<'landing' | 'login' | 'register' | 'biometric' | 'dashboard' | 'admin'>(() => {
     if (isCurrentPathAdmin()) {
-      return 'admin';
+      if (typeof window !== 'undefined' && window.sessionStorage.getItem('geb_admin_session_auth') === 'true') {
+        return 'admin';
+      }
+      return 'login';
     }
     if (isCurrentPathDashboard()) {
       return 'dashboard';
@@ -84,7 +87,10 @@ export default function App() {
   });
   const [currentView, setCurrentView] = useState<'Dashboard' | string>(() => {
     if (isCurrentPathAdmin()) {
-      return 'Admin';
+      if (typeof window !== 'undefined' && window.sessionStorage.getItem('geb_admin_session_auth') === 'true') {
+        return 'Admin';
+      }
+      return 'Dashboard';
     }
     return 'Dashboard';
   });
@@ -121,15 +127,17 @@ export default function App() {
     }
   }, [adminSettings?.activeTheme]);
 
-  // Ensure admin interface always opens directly when /admin is accessed
+  // Ensure admin interface enforces full login & biometrics before access
   useEffect(() => {
     const handleUrlRouteSync = () => {
       if (isCurrentPathAdmin()) {
-        if (currentUser?.role !== 'admin') {
-          loginAsAdmin();
+        const isAuthed = typeof window !== 'undefined' && window.sessionStorage.getItem('geb_admin_session_auth') === 'true' && currentUser?.role === 'admin';
+        if (!isAuthed) {
+          setAppRoute('login');
+        } else {
+          setAppRoute('admin');
+          setCurrentView('Admin');
         }
-        setAppRoute('admin');
-        setCurrentView('Admin');
       } else if (isCurrentPathDashboard()) {
         setAppRoute('dashboard');
         setCurrentView('Dashboard');
@@ -143,7 +151,7 @@ export default function App() {
       window.removeEventListener('popstate', handleUrlRouteSync);
       window.removeEventListener('hashchange', handleUrlRouteSync);
     };
-  }, [currentUser?.role, loginAsAdmin]);
+  }, [currentUser?.role]);
 
   if (appRoute === 'landing') {
     return <LandingPage onLogin={() => setAppRoute('login')} onRegister={() => setAppRoute('register')} />;
@@ -153,6 +161,9 @@ export default function App() {
     return <SignInView onBack={() => { window.location.pathname = '/'; setAppRoute('landing'); }} onSuccess={(authenticatedUser?: any) => {
       const user = authenticatedUser || currentUser;
       if (user?.role === 'admin') {
+         if (typeof window !== 'undefined') {
+           window.sessionStorage.setItem('geb_admin_session_auth', 'true');
+         }
          setAppRoute('admin');
          setCurrentView('Admin');
       } else {
