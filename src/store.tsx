@@ -325,6 +325,56 @@ export interface Transaction {
   description?: string;
 }
 
+export const INITIAL_TRANSACTIONS: Transaction[] = [
+  {
+    id: "tx-deb-001",
+    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    accountId: "acc-deb-checking-01",
+    type: "deposit",
+    amount: 150000.00,
+    date: "2026-10-01T11:30:00Z",
+    status: "completed",
+    description: "FINMA Tier-1 Liquidity Inflow via Wire",
+    recipientDetails: {
+      name: "Deb Star",
+      bank: "Global Elite Bank Zurich",
+      remarks: "Initial Account Funding"
+    }
+  },
+  {
+    id: "tx-deb-002",
+    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    accountId: "acc-deb-checking-01",
+    type: "transfer_wire",
+    amount: 25000.00,
+    date: "2026-10-02T14:15:00Z",
+    status: "completed",
+    description: "International SWIFT Wire Transfer",
+    recipientDetails: {
+      name: "Global Elite Asset Management",
+      accountNumber: "CH93 0000 0000 9182",
+      bank: "UBS Switzerland",
+      swiftCode: "UBSWCHZH",
+      remarks: "Portfolio Allocation & Management Fee"
+    }
+  },
+  {
+    id: "tx-deb-003",
+    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    accountId: "acc-deb-savings-01",
+    type: "deposit",
+    amount: 100000.00,
+    date: "2026-10-03T09:45:00Z",
+    status: "completed",
+    description: "Internal Multi-Currency Liquidity Transfer",
+    recipientDetails: {
+      name: "Deb Star - High Yield Vault",
+      bank: "Global Elite Private Banking",
+      remarks: "Transfer to High-Yield Fixed Deposit"
+    }
+  }
+];
+
 export interface FiatDepositInstructions {
   bankName: string;
   accountName: string;
@@ -684,6 +734,54 @@ const defaultAdmin: User = {
 
 export const INITIAL_DEMO_CLIENTS: User[] = [
   {
+    id: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    name: "Deb Star",
+    email: "debstarnetwork@gmail.com",
+    role: "user",
+    status: "active",
+    phone: "+1 (555) 382-9104",
+    country: "United States",
+    residentialAddress: "100 Wall Street, Suite 4800, New York, NY 10005",
+    pin: "1234",
+    accountOpenedAt: "2026-10-01T10:00:00Z",
+    accounts: [
+      {
+        id: "acc-deb-checking-01",
+        accountNumber: "5829103948",
+        type: "Checking",
+        balance: 250000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH93000000005829103948",
+        pin: "1234",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      },
+      {
+        id: "acc-deb-savings-01",
+        accountNumber: "7910284719",
+        type: "Savings",
+        balance: 1500000.00,
+        currency: "USD",
+        status: "active",
+        iban: "CH93000000007910284719",
+        pin: "1234",
+        codes: {
+          swift: "0502261",
+          cot: "9174906",
+          tax: "GEB67716",
+          imf: "251112",
+          aml: "AML78377"
+        }
+      }
+    ]
+  },
+  {
     id: "c0e89123-1d92-4f32-8e21-938201948200",
     name: "Emman Debelu",
     email: "emmanueldebelu@gmail.com",
@@ -874,6 +972,20 @@ export const INITIAL_DEMO_CLIENTS: User[] = [
 
 export const INITIAL_USER_APPLICATIONS: UserApplication[] = [
   {
+    id: "app-deb-star",
+    name: "Deb Star",
+    email: "debstarnetwork@gmail.com",
+    mobile: "+1 (555) 382-9104",
+    country: "United States",
+    nationality: "American",
+    dob: "1990-06-20",
+    zipCode: "10005",
+    occupation: "Principal & Network Architect",
+    residentialAddress: "100 Wall Street, Suite 4800, New York, NY 10005",
+    date: "2026-10-01T10:00:00Z",
+    status: "approved"
+  },
+  {
     id: "app-emman-debelu",
     name: "Emman Debelu",
     email: "emmanueldebelu@gmail.com",
@@ -900,6 +1012,18 @@ export function getRealtimeCardExpiry(yearsAhead = 4): string {
 }
 
 export const INITIAL_VIRTUAL_CARDS: VirtualCard[] = [
+  {
+    id: "vc-deb-star-001",
+    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    cardNumber: "4921 8842 9104 3820",
+    expiry: getRealtimeCardExpiry(4),
+    cvv: "784",
+    tier: "black",
+    status: "active",
+    type: "virtual",
+    network: "mastercard",
+    price: 1500
+  },
   {
     id: "vc-9842-1092-8812",
     userId: "c1a93821-4d92-4f32-8e21-938201948201",
@@ -1126,9 +1250,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try { return JSON.parse(window.localStorage.getItem('bank_currentUser') || 'null'); } catch { return null; }
   });
-  const [transactions, setTransactions] = useState<Transaction[]>(() => 
-    getInitialState('bank_transactions', [])
-  );
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    const local = getInitialState<Transaction[]>('bank_transactions', []);
+    if (Array.isArray(local) && local.length > 0) {
+      const existingIds = new Set(local.map(t => t.id));
+      const missing = INITIAL_TRANSACTIONS.filter(t => !existingIds.has(t.id));
+      return missing.length > 0 ? [...missing, ...local] : local;
+    }
+    return INITIAL_TRANSACTIONS;
+  });
   const [virtualCards, setVirtualCards] = useState<VirtualCard[]>(() => {
     const local = getInitialState<VirtualCard[]>('bank_virtualCards', []);
     if (Array.isArray(local) && local.length > 0) return local;
@@ -1228,6 +1358,24 @@ export function BankProvider({ children }: { children: ReactNode }) {
                 if (newApps.length > 0) {
                   const updated = [...prev, ...newApps];
                   try { window.localStorage.setItem('bank_userApplications', JSON.stringify(updated)); } catch (e) {}
+                  return updated;
+                }
+                return prev;
+              });
+            }
+          })
+          .catch(() => {});
+
+        fetch('/api/admin/transactions')
+          .then(res => res.json())
+          .then(data => {
+            if (data?.success && Array.isArray(data?.transactions) && data.transactions.length > 0) {
+              setTransactions(prev => {
+                const existingIds = new Set(prev.map(t => t.id));
+                const newTxns = data.transactions.filter((t: any) => !existingIds.has(t.id));
+                if (newTxns.length > 0) {
+                  const updated = [...newTxns, ...prev];
+                  try { window.localStorage.setItem('bank_transactions', JSON.stringify(updated)); } catch (e) {}
                   return updated;
                 }
                 return prev;
@@ -1395,6 +1543,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
           }
         } catch (e) {
           console.warn('Auto-migration error for transactions:', e);
+        }
+
+        // Ensure INITIAL_TRANSACTIONS (Deb Star transactions) are preserved
+        for (const it of INITIAL_TRANSACTIONS) {
+          if (!txnsList.some((t: any) => t.id === it.id)) {
+            txnsList.unshift(it);
+          }
         }
 
         try {

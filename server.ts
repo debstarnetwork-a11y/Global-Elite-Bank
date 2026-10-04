@@ -440,6 +440,33 @@ app.post("/api/admin/save-settings", (req, res) => {
 
 const USERS_FILE = path.join(process.cwd(), ".data", "users.json");
 const APPLICATIONS_FILE = path.join(process.cwd(), ".data", "applications.json");
+const TRANSACTIONS_FILE = path.join(process.cwd(), ".data", "transactions.json");
+
+app.get("/api/admin/transactions", (_req, res) => {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(TRANSACTIONS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TRANSACTIONS_FILE, "utf-8"));
+      res.json({ success: true, transactions: data });
+      return;
+    }
+    res.json({ success: true, transactions: null });
+  } catch (err: any) {
+    res.json({ success: false, error: err?.message });
+  }
+});
+
+app.post("/api/admin/save-transactions", (req, res) => {
+  try {
+    ensureDataDir();
+    const transactions = req.body?.transactions || [];
+    fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify(transactions, null, 2), "utf-8");
+    res.json({ success: true, message: "Transactions saved permanently to server disk." });
+  } catch (err: any) {
+    console.error("[Transactions Disk Save Error]:", err?.message || err);
+    res.status(500).json({ success: false, error: err?.message || "Failed to save transactions to disk" });
+  }
+});
 
 app.get("/api/admin/users", (_req, res) => {
   try {

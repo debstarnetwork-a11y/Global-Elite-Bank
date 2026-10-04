@@ -1,0 +1,50 @@
+[
+  {
+    "id": "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    "name": "Deb Star",
+    "email": "debstarnetwork@gmail.com",
+    "role": "user",
+    "status": "active",
+    "phone": "+1 (555) 382-9104",
+    "country": "United States",
+    "residentialAddress": "100 Wall Street, Suite 4800, New York, NY 10005",
+    "pin": "1234",
+    "accountOpenedAt": "2026-10-01T10:00:00Z",
+    "accounts": [
+      {
+        "id": "acc-deb-checking-01",
+        "accountNumber": "5829103948",
+        "type": "Checking",
+        "balance": 250000,
+        "currency": "USD",
+        "status": "active",
+        "iban": "CH93000000005829103948",
+        "pin": "1234",
+        "codes": {
+          "swift": "0502261",
+          "cot": "9174906",
+          "tax": "GEB67716",
+          "imf": "251112",
+          "aml": "AML78377"
+        }
+      },
+      {
+        "id": "acc-deb-savings-01",
+        "accountNumber": "7910284719",
+        "type": "Savings",
+        "balance": 1500000,
+        "currency": "USD",
+        "status": "active",
+        "iban": "CH93000000007910284719",
+        "pin": "1234",
+        "codes": {
+          "swift": "0502261",
+          "cot": "9174906",
+          "tax": "GEB67716",
+          "imf": "251112",
+          "aml": "AML78377"
+        }
+      }
+    ]
+  }
+]
