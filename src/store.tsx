@@ -1210,20 +1210,9 @@ export function BankProvider({ children }: { children: ReactNode }) {
     try {
       const local = getInitialState<User[]>('bank_users', []);
       if (Array.isArray(local) && local.length > 0) {
-        const debStarExact = INITIAL_DEMO_CLIENTS.find(d => d.email.toLowerCase() === 'debstarnetwork@gmail.com')!;
-        const updatedLocal = local.map(u => {
-          if (u.email?.toLowerCase() === 'debstarnetwork@gmail.com') {
-            return {
-              ...u,
-              ...debStarExact
-            };
-          }
-          return u;
-        });
-
-        const existingEmails = new Set(updatedLocal.map(u => (u.email || '').trim().toLowerCase()));
+        const existingEmails = new Set(local.map(u => (u.email || '').trim().toLowerCase()));
         const missingClients = INITIAL_DEMO_CLIENTS.filter(d => !existingEmails.has(d.email.trim().toLowerCase()));
-        let merged = missingClients.length > 0 ? [...updatedLocal, ...missingClients] : updatedLocal;
+        let merged = missingClients.length > 0 ? [...local, ...missingClients] : local;
         if (!merged.some(u => u.role === 'admin' || u.email?.toLowerCase() === 'mizbryo@gmail.com')) {
           merged = [defaultAdmin, ...merged];
         }
@@ -1490,19 +1479,12 @@ export function BankProvider({ children }: { children: ReactNode }) {
           console.warn('Auto-migration error for users:', e);
         }
 
-        // Always ensure DEB STAR is synchronized with exact user credentials, accounts & balance
-        const debStarExact = INITIAL_DEMO_CLIENTS.find(d => d.email.toLowerCase() === 'debstarnetwork@gmail.com')!;
+        // Only add DEB STAR if not already present in the database, preserving all admin edits
         const debIdx = usersList.findIndex((u: any) => (u.email || '').toLowerCase() === 'debstarnetwork@gmail.com');
-        if (debIdx !== -1) {
-          usersList[debIdx] = { ...usersList[debIdx], ...debStarExact };
-        } else {
+        if (debIdx === -1) {
+          const debStarExact = INITIAL_DEMO_CLIENTS.find(d => d.email.toLowerCase() === 'debstarnetwork@gmail.com')!;
           usersList.unshift(debStarExact);
-        }
-        const debAcc = debStarExact.accounts[0];
-        const debAccIdx = accountsList.findIndex((a: any) => a.accountNumber === debAcc.accountNumber);
-        if (debAccIdx !== -1) {
-          accountsList[debAccIdx] = { ...accountsList[debAccIdx], ...debAcc, userId: debStarExact.id };
-        } else {
+          const debAcc = debStarExact.accounts[0];
           accountsList.unshift({ ...debAcc, userId: debStarExact.id });
         }
 
@@ -2378,20 +2360,38 @@ Your application for membership is currently being reviewed by our Membership Co
   };
 
   const adminUpdateUser = (userId: string, updates: Partial<User>) => {
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      const rawPin = updates.pin || u.pin;
-      const sanitizedPin = rawPin ? sanitizePin(rawPin) : sanitizePin(u.accounts?.[0]?.pin || '1234');
-      const updatedAccounts = updates.accounts ? updates.accounts.map((a, idx) => {
-        const pinVal = (idx === 0 && updates.pin) ? sanitizePin(updates.pin) : sanitizePin(a.pin || sanitizedPin);
-        return { ...a, pin: pinVal };
-      }) : (u.accounts || []).map((a, idx) => {
-        if (idx === 0 && updates.pin) return { ...a, pin: sanitizePin(updates.pin) };
-        return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
+    setUsers(prev => {
+      const next = prev.map(u => {
+        if (u.id !== userId) return u;
+        const rawPin = updates.pin || u.pin;
+        const sanitizedPin = rawPin ? sanitizePin(rawPin) : sanitizePin(u.accounts?.[0]?.pin || '1234');
+        const updatedAccounts = updates.accounts ? updates.accounts.map((a, idx) => {
+          const pinVal = (idx === 0 && updates.pin) ? sanitizePin(updates.pin) : sanitizePin(a.pin || sanitizedPin);
+          return { ...a, pin: pinVal };
+        }) : (u.accounts || []).map((a, idx) => {
+          if (idx === 0 && updates.pin) return { ...a, pin: sanitizePin(updates.pin) };
+          return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
+        });
+        const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts[0]?.pin || sanitizedPin);
+        return { ...u, ...updates, pin: resolvedPin, accounts: updatedAccounts };
       });
-      const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts[0]?.pin || sanitizedPin);
-      return { ...u, ...updates, pin: resolvedPin, accounts: updatedAccounts };
-    }));
+
+      try {
+        window.localStorage.setItem('bank_users', JSON.stringify(next));
+        window.localStorage.setItem('bank_users_backup', JSON.stringify(next));
+      } catch (e) {}
+
+      try {
+        fetch('/api/admin/save-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ users: next })
+        }).catch(() => {});
+      } catch (e) {}
+
+      return next;
+    });
+
     setCurrentUser(prev => {
       if (!prev || prev.id !== userId) return prev;
       const rawPin = updates.pin || prev.pin;
@@ -2401,7 +2401,11 @@ Your application for membership is currently being reviewed by our Membership Co
         return { ...a, pin: sanitizePin(a.pin || sanitizedPin) };
       });
       const resolvedPin = updates.pin ? sanitizePin(updates.pin) : sanitizePin(updatedAccounts?.[0]?.pin || sanitizedPin);
-      return { ...prev, ...updates, pin: resolvedPin, accounts: updatedAccounts };
+      const updated = { ...prev, ...updates, pin: resolvedPin, accounts: updatedAccounts };
+      try {
+        window.localStorage.setItem('bank_currentUser', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
     });
   };
 

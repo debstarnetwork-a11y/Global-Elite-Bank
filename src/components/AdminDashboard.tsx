@@ -221,8 +221,10 @@ export function AdminDashboard() {
 
   const copyUserDetails = (user: any) => {
     const balance = user.accounts?.reduce((sum: number, acc: any) => sum + acc.balance, 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) || '$0.00';
-    const creationTs = user.id.startsWith('user-') ? parseInt(user.id.replace('user-', '')) : Date.now();
-    const registeredDate = new Date(creationTs).toLocaleString('en-US', {
+    const userDate = user.accountOpenedAt ? new Date(user.accountOpenedAt) : new Date();
+    const registeredDate = isNaN(userDate.getTime()) ? new Date().toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+    }) : userDate.toLocaleString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
     });
     const kycStatus = user.status === 'suspended' || user.status === 'blocked' ? 'Pending' : 'Verified';
@@ -1093,12 +1095,9 @@ All Rights Reserved © Global Elite
                   <div className="flex gap-3 pt-4 border-t border-border mt-6">
                     <button onClick={() => setIsEditingUser(false)} className="flex-1 px-4 py-2 bg-background border border-border text-foreground font-bold rounded-lg hover:bg-white/5">Cancel</button>
                     <button onClick={() => { 
-                      if (currentActiveUser && editUserForm.password && editUserForm.password !== currentActiveUser.password) {
-                        const pwdCheck = validateNewPassword(editUserForm.password);
-                        if (!pwdCheck.valid) {
-                          showToast('Weak Password', pwdCheck.error || 'Password must be at least 6 characters long with a mix of characters.');
-                          return;
-                        }
+                      if (editUserForm.password !== undefined && editUserForm.password.trim() === '') {
+                        showToast('Password Required', 'Password cannot be completely empty.');
+                        return;
                       }
                       const finalPin = editUserForm.pin || editUserForm.accounts?.[0]?.pin || generateRandomCode('', 4);
                       const updatedAccounts = (editUserForm.accounts || []).map((a: any, idx: number) => {
@@ -1236,7 +1235,9 @@ All Rights Reserved © Global Elite
                       </div>
                       <div>
                         <div className="text-xs font-bold text-foreground/50 uppercase mb-1">Registered</div>
-                        <div className="text-sm text-foreground">{new Date(currentActiveUser.id.startsWith('user-') ? parseInt(currentActiveUser.id.replace('user-', '')) : Date.now()).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</div>
+                        <div className="text-sm text-foreground">
+                          {currentActiveUser.accountOpenedAt ? new Date(currentActiveUser.accountOpenedAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -15,6 +15,32 @@ import { PasswordStrengthMeter } from './PasswordStrengthMeter';
 import { validateNewPassword } from '../utils/passwordStrength';
 
 
+function formatRelativeDate(isoStringOrTimestamp?: string | number): string {
+  if (!isoStringOrTimestamp) return 'Just now';
+  const date = new Date(isoStringOrTimestamp);
+  if (isNaN(date.getTime())) return 'Recently';
+  
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  
+  if (diffMs < 0 || diffMs < 60000) return 'Just now';
+  
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
+  
+  const diffHours = Math.floor(diffMs / 3600000);
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+  
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 14) return '1 week ago';
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  if (diffDays < 60) return '1 month ago';
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string) => void }) {
   const { users, updateUserStatus } = useBank();
   
@@ -183,7 +209,9 @@ export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string)
                         {client.status}
                       </span>
                     </td>
-                    <td className="p-4 text-sm text-foreground/70">1 week ago</td>
+                    <td className="p-4 text-sm text-foreground/70" title={client.accountOpenedAt ? new Date(client.accountOpenedAt).toLocaleString() : ''}>
+                      {formatRelativeDate(client.accountOpenedAt)}
+                    </td>
                     <td className="p-4 text-right flex items-center justify-end gap-2">
                       <button onClick={() => onManageUser && onManageUser(client.id)} className="text-xs font-bold text-emerald-500 hover:text-emerald-400 transition-colors bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20">Manage</button>
                       <div className="relative group inline-block text-left">
