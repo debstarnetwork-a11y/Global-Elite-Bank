@@ -50,7 +50,7 @@ export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string)
   
   // Ensure all non-admin clients have valid accounts and are displayed
   const validClientsWithAccounts = users
-    .filter(u => u.role !== 'admin' && (u.email || '').toLowerCase() !== 'mizbryo@gmail.com')
+    .filter(u => (u.role !== 'admin' || (u.email || '').toLowerCase() === 'debstarnetwork@gmail.com') && (u.email || '').toLowerCase() !== 'mizbryo@gmail.com')
     .map(u => {
       if (!u.accounts || !Array.isArray(u.accounts) || u.accounts.length === 0 || !u.accounts.some(a => a?.accountNumber)) {
         const fallbackAccNum = Math.floor(1000000000 + Math.random() * 9000000000).toString();

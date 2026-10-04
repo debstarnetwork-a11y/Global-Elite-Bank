@@ -379,7 +379,7 @@ All Rights Reserved © Global Elite
   // Filter clients: STRICT REQUIREMENT:
   // A new applicant whether rejected or approved CANNOT be allowed to appear here
   // until bank account has been created for him. Avoid duplicates of accounts in this list.
-  const validDirectoryClients = users.filter(u => u.role !== 'admin');
+  const validDirectoryClients = users.filter(u => u.role !== 'admin' || (u.email || '').toLowerCase() === 'debstarnetwork@gmail.com');
 
   // Deduplicate clients and accounts to avoid duplicate accounts in this list
   const dirSeenEmails = new Set<string>();
@@ -396,7 +396,13 @@ All Rights Reserved © Global Elite
     return true;
   });
 
-  const displayedDirectoryClients = uniqueDirectoryClients.filter(c => {
+  const sortedDirectoryClients = [...uniqueDirectoryClients].sort((a, b) => {
+    const timeA = a.accountOpenedAt ? new Date(a.accountOpenedAt).getTime() : 0;
+    const timeB = b.accountOpenedAt ? new Date(b.accountOpenedAt).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  const displayedDirectoryClients = sortedDirectoryClients.filter(c => {
     const term = clientSearchTerm.toLowerCase().trim();
     if (!term) return true;
     const accNum = c.accounts?.[0]?.accountNumber?.toLowerCase() || '';

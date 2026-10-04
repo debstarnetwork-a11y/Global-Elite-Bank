@@ -331,8 +331,8 @@ export interface Transaction {
 export const INITIAL_TRANSACTIONS: Transaction[] = [
   {
     id: "tx-deb-001",
-    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
-    accountId: "acc-deb-checking-01",
+    userId: "211992ed-d481-4b45-82f4-9420e9b6fbb6",
+    accountId: "87f42de8-e3ba-4ccf-9766-e676f9c048b5",
     type: "deposit",
     amount: 100000.00,
     date: "2026-10-03T09:53:00Z",
@@ -706,7 +706,7 @@ const defaultAdmin: User = {
 
 export const INITIAL_DEMO_CLIENTS: User[] = [
   {
-    id: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    id: "211992ed-d481-4b45-82f4-9420e9b6fbb6",
     name: "DEB STAR",
     email: "debstarnetwork@gmail.com",
     password: "DEB STAR",
@@ -988,7 +988,7 @@ export function getRealtimeCardExpiry(yearsAhead = 4): string {
 export const INITIAL_VIRTUAL_CARDS: VirtualCard[] = [
   {
     id: "vc-deb-star-001",
-    userId: "c0a1b2c3-deb5-4a6b-8c9d-0e1f2a3b4c01",
+    userId: "211992ed-d481-4b45-82f4-9420e9b6fbb6",
     cardNumber: "4921 8842 9104 3820",
     expiry: getRealtimeCardExpiry(4),
     cvv: "784",
@@ -1728,8 +1728,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
         // Map users with nested accounts and investorWallets
         const mappedUsers: User[] = usersList.map((u: any) => {
           const userPin = getValidPin(u.pin || u.pin_code || u.transaction_pin || u.pinCode);
-          const uAccounts = accountsList
-            .filter((a: any) => a.userId === u.id || a.user_id === u.id)
+          const isDebStar = (u.email || '').trim().toLowerCase() === 'debstarnetwork@gmail.com';
+          const resolvedName = isDebStar ? (u.name === 'Ama' ? 'DEB STAR' : (u.name || 'DEB STAR')) : u.name;
+          const resolvedRole = isDebStar ? 'user' : (u.email?.toLowerCase() === 'mizbryo@gmail.com' ? 'admin' : (u.role === 'admin' ? 'admin' : 'user'));
+          const resolvedPassword = isDebStar ? (u.password || 'DEB STAR') : u.password;
+
+          let uAccounts = accountsList
+            .filter((a: any) => a.userId === u.id || a.user_id === u.id || (isDebStar && a.accountNumber === '92348059788'))
             .map((a: any) => {
               const accountPin = getValidPin(a.pin || a.pinCode || a.pin_code);
               const assignedPin = accountPin || userPin || generateRandomCode('', 4);
@@ -1741,24 +1746,54 @@ export function BankProvider({ children }: { children: ReactNode }) {
                 balance: Number(a.balance) || 0,
                 currency: u.currency || 'USD',
                 status: 'active' as const,
-                iban: a.iban,
+                iban: a.iban || `CH9300000000${a.accountNumber}`,
                 pin: assignedPin,
                 codes: {
-                  swift: a.codes?.swift || a.swiftCode || a.swift_code || 'GEHBUS33',
-                  cot: a.codes?.cot || a.cotCode || a.cot_code || 'COT-4921',
-                  tax: a.codes?.tax || a.taxCode || a.tax_code || 'TAX-8492',
-                  imf: a.codes?.imf || a.imfCode || a.imf_code || 'IMF-1928',
-                  aml: a.codes?.aml || a.amlCode || a.aml_code || 'AML-PASS'
+                  swift: a.codes?.swift || a.swiftCode || a.swift_code || '0502261',
+                  cot: a.codes?.cot || a.cotCode || a.cot_code || '9174906',
+                  tax: a.codes?.tax || a.taxCode || a.tax_code || 'GEB67716',
+                  imf: a.codes?.imf || a.imfCode || a.imf_code || '251112',
+                  aml: a.codes?.aml || a.amlCode || a.aml_code || 'AML78377'
                 }
               };
             });
 
+          // Preserve existing accounts on u if uAccounts was empty
+          if (uAccounts.length === 0 && Array.isArray(u.accounts) && u.accounts.length > 0) {
+            uAccounts = u.accounts;
+          }
+
+          // If still no account and non-admin, provide checking account fallback
+          if (uAccounts.length === 0 && resolvedRole !== 'admin') {
+            const accNum = isDebStar ? '92348059788' : generateRandomCode('', 11);
+            uAccounts = [{
+              id: generateUUID(),
+              userId: u.id,
+              accountNumber: accNum,
+              type: 'Checking',
+              balance: isDebStar ? 100000 : 0,
+              currency: u.currency || 'USD',
+              status: 'active',
+              iban: `CH9300000000${accNum}`,
+              pin: userPin || '1234',
+              codes: {
+                swift: '0502261',
+                cot: '9174906',
+                tax: 'GEB67716',
+                imf: '251112',
+                aml: 'AML78377'
+              }
+            }];
+          }
+
           const uWallet = investorWalletsList.find((w: any) => w.userId === u.id || w.user_id === u.id);
-          const finalPin = uAccounts[0]?.pin || userPin || generateRandomCode('', 4);
+          const finalPin = uAccounts[0]?.pin || userPin || '1234';
 
           return {
             ...u,
-            role: u.role === 'admin' ? 'admin' : 'user',
+            name: resolvedName,
+            role: resolvedRole,
+            password: resolvedPassword,
             status: u.status || 'active',
             pin: finalPin,
             accounts: uAccounts,
