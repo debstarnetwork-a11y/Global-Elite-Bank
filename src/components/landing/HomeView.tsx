@@ -11,9 +11,13 @@ export function HomeView({ onRegister, onNavigate }: { onRegister: () => void, o
     <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden flex items-center min-h-[85vh]">
-        <div className="absolute inset-0 z-0">
-          <img src="https://i.postimg.cc/nLYQ92QQ/Bank-building.png" alt="Bank-building" className="w-full h-full object-cover opacity-40 mix-blend-luminosity" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1a0b2e]/60 to-[#1a0b2e]"></div>
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img 
+            src="https://i.postimg.cc/FHYgk9s8/Elite-Digital-Headquarters-at-Night.png" 
+            alt="Elite Digital Headquarters at Night" 
+            className="w-full h-full object-cover opacity-50" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1a0b2e]/70 to-[#1a0b2e]"></div>
         </div>
 
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
