@@ -220,7 +220,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
           </div>
           
           <div className="pt-8 pb-28 md:pb-12 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-foreground/50 text-center md:text-left">
-             <p className="max-w-2xl">© 2026 {adminSettings?.websiteName || 'Elite Digital Finance'}. All rights reserved. Elite Digital Finance is a private financial institution headquartered in Switzerland. All digital finance services are subject to membership approval and applicable regulatory requirements.</p>
+             <p className="max-w-2xl">© 2026 Elite Digital. All rights reserved.</p>
              <div className="flex items-center justify-center gap-3 w-full md:w-auto md:pr-48">
                <a 
                  id="footer-social-facebook"
