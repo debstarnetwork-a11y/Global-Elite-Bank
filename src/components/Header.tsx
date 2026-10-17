@@ -216,7 +216,7 @@ export function Header({ onNavigateView, onToggleSidebar }: HeaderProps) {
           </button>
           <div className="flex items-center gap-3">
             <img
-              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+              src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
               alt="Elite Digital Finance"
               className="h-9 sm:h-11 w-auto max-w-[210px] object-contain drop-shadow-sm"
               onError={(e) => {

@@ -57,7 +57,7 @@ export function Sidebar({ currentView, setCurrentView, onLogout }: { currentView
     <div className="w-64 h-screen bg-background border-r border-border hidden md:flex flex-col sticky top-0 p-6 space-y-8">
       <div className="flex items-center">
         <img
-          src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+          src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
           alt="Elite Digital Finance"
           className="h-11 w-auto max-w-[190px] object-contain drop-shadow-sm"
           onError={(e) => {

@@ -440,7 +440,7 @@ All Rights Reserved © Elite Digital Finance
       <div className="w-64 bg-card border-r border-border overflow-y-auto flex-col h-full shrink-0 hidden lg:flex">
         <div className="p-5 border-b border-border flex items-center justify-between">
           <img
-            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+            src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
             alt="Elite Digital Finance"
             className="h-9 w-auto max-w-[150px] object-contain drop-shadow-sm"
             onError={(e) => {
@@ -463,7 +463,7 @@ All Rights Reserved © Elite Digital Finance
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
-                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+                  src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
                   alt="Elite Digital Finance"
                   className="h-9 w-auto max-w-[150px] object-contain drop-shadow-sm"
                   onError={(e) => {

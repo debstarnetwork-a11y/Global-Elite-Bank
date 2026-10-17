@@ -633,7 +633,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
           >
             {/* Background Security Watermark */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-              <span className="text-9xl font-black rotate-[-30deg]">GLOBAL ELITE</span>
+              <span className="text-9xl font-black rotate-[-30deg]">ELITE DIGITAL</span>
             </div>
 
             {/* Header / Brand */}
@@ -642,13 +642,13 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
               className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b relative z-10"
             >
               <div className="flex items-center gap-3">
-                {adminSettings?.logoUrl ? (
-                  <img src={adminSettings.logoUrl} crossOrigin="anonymous" alt="Bank Logo" className="w-11 h-11 object-contain" />
-                ) : (
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-amber-500/20">
-                    GE
-                  </div>
-                )}
+                <img 
+                  src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+                  crossOrigin="anonymous" 
+                  alt="Elite Digital Finance" 
+                  className="h-10 w-auto max-w-[160px] object-contain drop-shadow" 
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'; }}
+                />
                 <div>
                   <h3 className="text-lg font-black tracking-wider uppercase text-white">
                     {adminSettings?.websiteName || 'Elite Digital Finance'}

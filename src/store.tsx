@@ -586,8 +586,8 @@ export const DEFAULT_INITIAL_ADMIN_SETTINGS: AdminSettings = {
   captchaSiteKey: "",
   activeTheme: "dark",
 
-  logoUrl: '/logo.png',
-  websiteLogo: '/logo.png',
+  logoUrl: 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png',
+  websiteLogo: 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png',
   adminEmail: 'mizbryo@gmail.com',
   adminPassword: '12345',
   contactEmail: 'info@digitalglobalelite.com',
@@ -603,7 +603,7 @@ export const DEFAULT_INITIAL_ADMIN_SETTINGS: AdminSettings = {
   timezone: 'Pacific/Wallis',
   installationType: 'Main-Domain',
   smsEnabled: true,
-  faviconUrl: '/logo.png',
+  faviconUrl: 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png',
   paymentMethods: [
     { id: '1', name: 'Credit Card', type: 'currency', usedFor: 'both', status: 'enabled' },
     { id: '2', name: 'BUSD', type: 'crypto', usedFor: 'withdrawal', status: 'disabled' },
@@ -1278,15 +1278,27 @@ export function BankProvider({ children }: { children: ReactNode }) {
     timestamp?: string;
   } | null>(null);
 
-  const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => 
-    getInitialState<AdminSettings>('bank_adminSettings', DEFAULT_INITIAL_ADMIN_SETTINGS)
-  );
+  const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
+    const initial = getInitialState<AdminSettings>('bank_adminSettings', DEFAULT_INITIAL_ADMIN_SETTINGS);
+    const validLogo = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
+    if (!initial.logoUrl || initial.logoUrl === '/logo.png' || initial.logoUrl.includes('ibb.co') || initial.logoUrl.includes('GEB') || initial.logoUrl.includes('vBZjpPr4') || !initial.logoUrl.includes('Elite-Digital')) {
+      initial.logoUrl = validLogo;
+      initial.websiteLogo = validLogo;
+      initial.faviconUrl = validLogo;
+      try {
+        window.localStorage.setItem('bank_adminSettings', JSON.stringify(initial));
+        window.localStorage.setItem('bank_adminSettings_backup', JSON.stringify(initial));
+      } catch (e) {}
+    }
+    return initial;
+  });
 
   const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
     async function loadData() {
       try {
+        const validLogo = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
         // Asynchronously check server-side disk storage for admin settings, users, and applications
         fetch('/api/admin/settings')
           .then(res => res.json())
@@ -1294,6 +1306,11 @@ export function BankProvider({ children }: { children: ReactNode }) {
             if (data?.success && data?.settings) {
               setAdminSettings(prev => {
                 const merged = { ...prev, ...data.settings };
+                if (!merged.logoUrl || merged.logoUrl === '/logo.png' || merged.logoUrl.includes('ibb.co') || merged.logoUrl.includes('GEB') || merged.logoUrl.includes('vBZjpPr4') || !merged.logoUrl.includes('Elite-Digital')) {
+                  merged.logoUrl = validLogo;
+                  merged.websiteLogo = validLogo;
+                  merged.faviconUrl = validLogo;
+                }
                 try {
                   window.localStorage.setItem('bank_adminSettings', JSON.stringify(merged));
                   window.localStorage.setItem('bank_adminSettings_backup', JSON.stringify(merged));

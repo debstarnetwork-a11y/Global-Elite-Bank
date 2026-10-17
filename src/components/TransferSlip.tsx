@@ -344,7 +344,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
           <div className="slip-header flex justify-between items-start pb-6 relative z-10">
             <div className="w-1/3">
               <img 
-                src={transaction.logoUrl || 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+                src={(transaction.logoUrl && transaction.logoUrl.includes('Elite-Digital')) ? transaction.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
                 alt="Elite Digital Finance" 
                 className="h-12 w-auto max-w-[200px] object-contain mb-2" 
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'; }} 

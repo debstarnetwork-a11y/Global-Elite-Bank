@@ -3,6 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <script>
+      try {
+        ['bank_adminSettings', 'bank_adminSettings_backup', 'geb_admin_settings_v3'].forEach(function(k) {
+          var s = localStorage.getItem(k);
+          if (s && (s.indexOf('ibb.co') !== -1 || s.indexOf('GEB') !== -1 || s.indexOf('vBZjpPr4') !== -1 || s.indexOf('Elite-Digital-Gold-Globe-Logo') === -1)) {
+            var p = JSON.parse(s);
+            p.logoUrl = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
+            p.websiteLogo = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
+            p.faviconUrl = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
+            localStorage.setItem(k, JSON.stringify(p));
+          }
+        });
+      } catch(e) {}
       // Defensive accessor shim to prevent "Cannot set property fetch of #<Window> which has only a getter"
       (function() {
         try {

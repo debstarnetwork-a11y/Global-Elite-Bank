@@ -157,7 +157,7 @@ Elite Digital Finance, Zurich, Switzerland`
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-xl">
         <div className="flex flex-col items-center justify-center mb-6">
           <img
-            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+            src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
             alt="Elite Digital Finance"
             className="h-16 sm:h-20 w-auto max-w-[260px] mb-3 object-contain drop-shadow-sm"
             onError={(e) => {

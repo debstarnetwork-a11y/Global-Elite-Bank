@@ -49,7 +49,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
           {/* Logo & Bank Name */}
           <button onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} className="flex items-center shrink-0 text-left py-1">
             <img 
-              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+              src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
               alt="Elite Digital Finance" 
               className="h-10 sm:h-12 md:h-14 w-auto max-w-[240px] sm:max-w-[300px] object-contain shrink-0 drop-shadow-sm" 
               onError={(e) => { 
@@ -154,7 +154,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
             <div className="md:col-span-1">
               <div className="mb-6">
                 <img 
-                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+                  src={(adminSettings?.logoUrl && adminSettings.logoUrl.includes('Elite-Digital')) ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
                   alt="Elite Digital Finance" 
                   className="h-10 sm:h-12 w-auto max-w-[220px] object-contain drop-shadow-sm" 
                   onError={(e) => { 
