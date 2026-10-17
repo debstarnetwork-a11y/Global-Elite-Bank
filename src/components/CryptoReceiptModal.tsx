@@ -75,7 +75,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
     ? 'GEB Institutional Cold Storage Vault (Zurich, Switzerland)' 
     : (withdrawal as CryptoWithdrawalRequest).walletAddress;
   const networkName = isTrade ? 'Proprietary Clearing Ledger' : ((withdrawal as CryptoWithdrawalRequest).network || 'Blockchain Mainnet');
-  const bankTitle = adminSettings?.websiteName || 'Global Elite Bank';
+  const bankTitle = adminSettings?.websiteName || 'Elite Digital Finance';
 
   // Fallback direct vector jsPDF renderer (guarantees PDF receipt even if canvas fails)
   const renderDirectPdf = (pdf: jsPDF) => {
@@ -186,7 +186,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
     y += 28;
     pdf.setTextColor(100, 116, 139);
     pdf.setFontSize(7);
-    pdf.text(`Cryptographically Sealed by Global Elite Bank Digital Asset Vault • Authentication: ${receiptNo}`, 15, y);
+    pdf.text(`Cryptographically Sealed by Elite Digital Finance Digital Asset Vault • Authentication: ${receiptNo}`, 15, y);
     pdf.text(`System ID: ${activeItem.id} • SHA-256 Validated • Retain for institutional tax and audit records.`, 15, y + 4);
   };
 
@@ -351,7 +351,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
     curY += 155;
     ctx.fillStyle = '#64748b';
     ctx.font = '14px sans-serif';
-    ctx.fillText(`Cryptographically Sealed by Global Elite Bank Digital Asset Vault • Authentication: ${receiptNo}`, 70, curY);
+    ctx.fillText(`Cryptographically Sealed by Elite Digital Finance Digital Asset Vault • Authentication: ${receiptNo}`, 70, curY);
     ctx.fillText(`System ID: ${activeItem.id} • SHA-256 Validated • Retain for institutional tax and audit records.`, 70, curY + 26);
 
     return canvas;
@@ -651,7 +651,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
                 )}
                 <div>
                   <h3 className="text-lg font-black tracking-wider uppercase text-white">
-                    {adminSettings?.websiteName || 'Global Elite Bank'}
+                    {adminSettings?.websiteName || 'Elite Digital Finance'}
                   </h3>
                   <p className="text-[11px] text-white/50 tracking-widest uppercase">
                     {isTrade ? 'Institutional Digital Asset Trading & Settlement Desk' : 'Digital Asset Custody & Settlement Directorate'}
@@ -833,7 +833,7 @@ export function CryptoReceiptModal({ withdrawal, tradeOrder, onClose }: CryptoRe
             >
               <div className="flex items-center gap-2">
                 <Lock size={12} className="text-emerald-400" />
-                <span>Cryptographically signed by Global Elite Asset Vault</span>
+                <span>Cryptographically signed by Elite Digital Asset Vault</span>
               </div>
               <div>
                 Ref: {activeItem.id} • SHA-256 Validated

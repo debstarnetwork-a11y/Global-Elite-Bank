@@ -47,19 +47,16 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
         <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-accent via-accent to-accent group-hover:from-[#1e3a8a] group-hover:via-accent group-hover:to-secondary group-active:from-[#1e3a8a] group-active:via-accent group-active:to-secondary transition-all duration-300"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative z-10">
           {/* Logo & Bank Name */}
-          <button onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} className="flex items-center gap-2 sm:gap-3 shrink-0 text-left">
+          <button onClick={() => { setCurrentView('home'); setIsMobileMenuOpen(false); }} className="flex items-center shrink-0 text-left py-1">
             <img 
-              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'} 
-              alt="GEB Logo" 
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0" 
+              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+              alt="Elite Digital Finance" 
+              className="h-10 sm:h-12 md:h-14 w-auto max-w-[240px] sm:max-w-[300px] object-contain shrink-0 drop-shadow-sm" 
               onError={(e) => { 
                 const target = e.currentTarget as HTMLImageElement;
-                if (!target.src.includes('postimg.cc')) {
-                  target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-                }
+                target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
               }} 
             />
-            <span className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight whitespace-nowrap">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
           </button>
           
           {/* Desktop Navigation Links */}
@@ -155,22 +152,19 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-1">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="mb-6">
                 <img 
-                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'} 
-                  alt="GEB Logo" 
-                  className="w-8 h-8 object-contain" 
+                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+                  alt="Elite Digital Finance" 
+                  className="h-10 sm:h-12 w-auto max-w-[220px] object-contain drop-shadow-sm" 
                   onError={(e) => { 
                     const target = e.currentTarget as HTMLImageElement;
-                    if (!target.src.includes('postimg.cc')) {
-                      target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-                    }
+                    target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
                   }} 
                 />
-                <span className="text-lg font-bold text-foreground tracking-tight">{adminSettings?.websiteName || 'Global Elite Bank'}</span>
               </div>
               <p className="text-sm text-foreground/60 leading-relaxed mb-6">
-                {t('footerDescription', 'Global Elite Bank is a private financial institution serving an exclusive community of high-net-worth individuals and businesses. Membership is by application and approval only.')}
+                {t('footerDescription', 'Elite Digital Finance is a premier private financial institution serving an exclusive community of high-net-worth individuals and businesses. Membership is by application and approval only.')}
               </p>
             </div>
             
@@ -197,7 +191,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
             
             <div>
               <h4 className="font-bold text-foreground mb-6">{t('newsletterSignup', 'Newsletter Signup')}</h4>
-              <p className="text-sm text-foreground/70 mb-4">{t('newsletterDesc', 'Subscribe to receive exclusive insights, financial briefings, and updates from Global Elite Bank.')}</p>
+              <p className="text-sm text-foreground/70 mb-4">{t('newsletterDesc', 'Subscribe to receive exclusive insights, financial briefings, and updates from Elite Digital Finance.')}</p>
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                 <input 
                   type="email" 
@@ -208,7 +202,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
                   required
                 />
                 <button 
-                  type="submit"
+                  type="submit" 
                   className="bg-primary text-white font-bold px-4 py-3 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap min-h-[44px] w-full sm:w-auto"
                 >
                   {isSubscribed ? t('subscribed', 'Subscribed ✓') : t('subscribe', 'Subscribe')}
@@ -226,7 +220,7 @@ export function LandingPage({ onLogin, onRegister }: { onLogin: () => void, onRe
           </div>
           
           <div className="pt-8 pb-28 md:pb-12 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-foreground/50 text-center md:text-left">
-             <p className="max-w-2xl">© 2026 {adminSettings?.websiteName || 'Global Elite Bank'}. All rights reserved. Global Elite Bank is a private financial institution headquartered in Switzerland. All banking services are subject to membership approval and applicable regulatory requirements.</p>
+             <p className="max-w-2xl">© 2026 {adminSettings?.websiteName || 'Elite Digital Finance'}. All rights reserved. Elite Digital Finance is a private financial institution headquartered in Switzerland. All digital finance services are subject to membership approval and applicable regulatory requirements.</p>
              <div className="flex items-center justify-center gap-3 w-full md:w-auto md:pr-48">
                <a 
                  id="footer-social-facebook"

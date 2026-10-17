@@ -38,16 +38,14 @@ export function BiometricLogin({ onLogin, onBack, user }: { onLogin: () => void;
 
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-2xl flex flex-col items-center">
         {/* Logo */}
-        <div className="flex flex-col items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center mb-5">
           <img
-            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-            alt="Global Elite Bank Logo"
-            className="w-16 h-16 object-contain"
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+            alt="Elite Digital Finance"
+            className="h-14 sm:h-16 w-auto max-w-[240px] object-contain drop-shadow-sm"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
-              if (!target.src.includes('postimg.cc')) {
-                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-              }
+              target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
             }}
           />
         </div>

@@ -206,10 +206,10 @@ export function prepareAdminSettingsForSupabase(settings: any) {
   // Prevent sending multi-megabyte base64 data URIs over REST to Supabase
   const safeLogoUrl = typeof settings.logoUrl === 'string' && settings.logoUrl.startsWith('http') && !settings.logoUrl.includes('ibb.co')
     ? settings.logoUrl
-    : 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+    : 'https://i.postimg.cc/28p2dNh6/Elite-Digital-Finance-Emblem-1.png';
   const safeFaviconUrl = typeof settings.faviconUrl === 'string' && settings.faviconUrl.startsWith('http') && !settings.faviconUrl.includes('ibb.co')
     ? settings.faviconUrl
-    : 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+    : 'https://i.postimg.cc/28p2dNh6/Elite-Digital-Finance-Emblem-1.png';
 
   return {
     id: settings.id || '7d5b70a5-be4c-489c-b538-a069eaf348a8',
@@ -245,7 +245,7 @@ export function prepareAdminSettingsForSupabase(settings: any) {
     smtp_pass: settings.smtpPass || '',
     smtp_secure: settings.smtpSecure ?? (Number(settings.smtpPort || 465) === 465),
     email_from: settings.emailFrom || 'info@digitalglobalelite.com',
-    email_from_name: settings.emailFromName || 'Global Elite Bank',
+    email_from_name: settings.emailFromName || 'Elite Digital Finance',
     google_client_id: settings.googleClientId || '',
     google_client_secret: settings.googleClientSecret || '',
     google_redirect_url: settings.googleRedirectUrl || '',

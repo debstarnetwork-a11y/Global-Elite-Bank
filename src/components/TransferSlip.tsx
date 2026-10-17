@@ -190,7 +190,7 @@ function generateHash(reference: string): string {
 }
 
 const defaultTransaction: TransactionDetails = {
-  reference: "GEB-2024-X892M",
+  reference: "EDF-2026-X892M",
   date: new Date().toISOString(),
   rawDate: new Date().toISOString(),
   type: "TRANSACTION",
@@ -198,7 +198,7 @@ const defaultTransaction: TransactionDetails = {
   sender: {
     name: "Client Name",
     account: "**** **** **** 8888",
-    bank: 'Global Elite Bank',
+    bank: 'Elite Digital Finance',
     iban: "CH93 **** **** **** 8888",
     country: "Switzerland",
   },
@@ -228,14 +228,14 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
     sender: {
       name: currentUser.name,
       account: maskAccountNumber(currentUser.accounts[0]?.accountNumber || ''),
-      bank: adminSettings?.websiteName || 'Global Elite Bank',
+      bank: adminSettings?.websiteName || 'Elite Digital Finance',
       iban: maskAccountNumber(currentUser.accounts[0]?.iban || ''),
       country: "Switzerland"
     },
     recipient: {
       name: latestTx.recipientDetails?.name || 'Verified Beneficiary',
       account: maskAccountNumber(latestTx.recipientDetails?.account || ''),
-      bank: latestTx.recipientDetails?.bank || adminSettings?.websiteName || 'Global Elite Bank',
+      bank: latestTx.recipientDetails?.bank || adminSettings?.websiteName || 'Elite Digital Finance',
       country: latestTx.recipientDetails?.country || 'Switzerland',
       remarks: latestTx.recipientDetails?.remarks || ''
     },
@@ -267,7 +267,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
   const { transactionNo, sessionId, senderIban } = useMemo(() => {
     return {
       transactionNo: Math.floor(1000000000 + Math.random() * 9000000000).toString(),
-      sessionId: `GEB-${Math.floor(10000000 + Math.random() * 90000000).toString()}`,
+      sessionId: `EDF-${Math.floor(10000000 + Math.random() * 90000000).toString()}`,
       senderIban: Math.floor(100000000 + Math.random() * 900000000).toString()
     };
   }, []);
@@ -287,7 +287,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
         pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`GEB_Transaction_${transactionNo}.pdf`);
+        pdf.save(`EDF_Transaction_${transactionNo}.pdf`);
       } catch (error) {
         console.error('Failed to generate PDF:', error);
       }
@@ -305,7 +305,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
         });
         const link = document.createElement('a');
         link.href = image;
-        link.download = `GEB_Transaction_${transactionNo}.png`;
+        link.download = `EDF_Transaction_${transactionNo}.png`;
         link.click();
       } catch (error) {
         console.error('Failed to generate image:', error);
@@ -343,13 +343,13 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
           
           <div className="slip-header flex justify-between items-start pb-6 relative z-10">
             <div className="w-1/3">
-              {transaction.logoUrl ? (
-                <img src={transaction.logoUrl} alt="Bank Logo" className="h-10 object-contain mb-2" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'; }} />
-              ) : (
-                <img src="https://i.postimg.cc/vBZjpPr4/GEB-logo.png" alt="GEB Logo" className="w-12 h-12 object-contain mb-2" />
-              )}
-              <p className="mt-2 text-sm font-bold text-[#166534]">GLOBAL ELITE BANK</p>
-              <p className="text-xs text-[#4b5563]">International Banking Excellence</p>
+              <img 
+                src={transaction.logoUrl || 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
+                alt="Elite Digital Finance" 
+                className="h-12 w-auto max-w-[200px] object-contain mb-2" 
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'; }} 
+              />
+              <p className="mt-1 text-xs text-[#4b5563] font-medium">Digital Finance & Wealth Management</p>
             </div>
             
             <div className="w-1/3 text-center flex flex-col items-center justify-center">
@@ -386,7 +386,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
               <div className="space-y-2 text-sm">
                 <p><span className="font-semibold text-[#4b5563] inline-block w-20">Name:</span> {transaction.sender.name}</p>
                 <p><span className="font-semibold text-[#4b5563] inline-block w-20">Account:</span> {maskAccountNumber(transaction.sender.account)}</p>
-                <p><span className="font-semibold text-[#4b5563] inline-block w-20">Bank:</span> {transaction.sender.bank || adminSettings?.websiteName || 'Global Elite Bank'}</p>
+                <p><span className="font-semibold text-[#4b5563] inline-block w-20">Bank:</span> {transaction.sender.bank || adminSettings?.websiteName || 'Elite Digital Finance'}</p>
                 <p><span className="font-semibold text-[#4b5563] inline-block w-20">IBAN:</span> {maskAccountNumber(transaction.sender.iban || ('CH93' + senderIban))}</p>
               </div>
             </div>
@@ -430,7 +430,7 @@ export function TransferSlip({ transaction: propTransaction, onClose }: Transfer
               </div>
               <div className="slip-stamp border-[3px] border-[#15803d] rounded-full w-24 h-24 flex flex-col items-center justify-center text-[#15803d] rotate-[-15deg]" style={{ opacity: 0.8 }}>
                 <span className="font-black text-sm tracking-wider">VERIFIED</span>
-                <span className="text-[8px] font-bold mt-0.5">GEB SECURE</span>
+                <span className="text-[8px] font-bold mt-0.5">EDF SECURE</span>
               </div>
             </div>
           </div>

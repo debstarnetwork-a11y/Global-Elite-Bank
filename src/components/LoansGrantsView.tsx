@@ -66,7 +66,7 @@ export function LoansGrantsView() {
             <div className="text-left flex-1">
               <h2 className="text-xl font-bold text-foreground mb-2 font-serif">Eligibility Requirements Not Met</h2>
               <p className="text-foreground/70 text-sm mb-4">
-                To unlock the Global Elite Credit & Grants portal, clients must maintain a minimum cumulative investment portfolio of <strong className="text-foreground font-mono">${ELIGIBILITY_THRESHOLD.toLocaleString()}</strong> in institutional stakes.
+                To unlock the Elite Digital Credit & Grants portal, clients must maintain a minimum cumulative investment portfolio of <strong className="text-foreground font-mono">${ELIGIBILITY_THRESHOLD.toLocaleString()}</strong> in institutional stakes.
               </p>
               
               <div className="bg-background rounded-xl p-4 border border-border relative overflow-hidden">

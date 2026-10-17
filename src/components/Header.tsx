@@ -214,21 +214,16 @@ export function Header({ onNavigateView, onToggleSidebar }: HeaderProps) {
           >
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <img
-              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-              alt="Bank Logo"
-              className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+              src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+              alt="Elite Digital Finance"
+              className="h-9 sm:h-11 w-auto max-w-[210px] object-contain drop-shadow-sm"
               onError={(e) => {
                 const target = e.currentTarget as HTMLImageElement;
-                if (!target.src.includes('postimg.cc')) {
-                  target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-                }
+                target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
               }}
             />
-            <h1 className="text-sm sm:text-base font-bold text-foreground tracking-tight">
-              {adminSettings?.websiteName || 'Global Elite Bank'} <span className="hidden sm:inline text-xs font-normal text-foreground/50">• Private Banking</span>
-            </h1>
           </div>
           <div className="hidden lg:flex items-center space-x-2 bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-emerald-500/20">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>

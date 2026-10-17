@@ -15,8 +15,8 @@ export function CardsView() {
     { id: 'standard', name: 'Standard', network: 'visa', price: 500, color: 'from-blue-700 via-blue-600 to-blue-500', textColor: 'text-white' },
     { id: 'gold', name: 'Gold', network: 'mastercard', price: 1000, color: 'from-yellow-500 via-yellow-400 to-yellow-300', textColor: 'text-gray-900' },
     { id: 'platinum', name: 'Platinum', network: 'visa', price: 2500, color: 'from-gray-300 via-gray-200 to-gray-100', textColor: 'text-gray-900' },
-    { id: 'black', name: 'Global Elite Black (Mastercard)', network: 'mastercard', price: 5000, color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' },
-    { id: 'black_visa', name: 'Global Elite Black (Visa)', network: 'visa', price: 5000, color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' }
+    { id: 'black', name: 'Elite Digital Black (Mastercard)', network: 'mastercard', price: 5000, color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' },
+    { id: 'black_visa', name: 'Elite Digital Black (Visa)', network: 'visa', price: 5000, color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' }
   ];
 
   const renderNetworkLogo = (network: string, textColor: string) => {
@@ -141,13 +141,13 @@ export function CardsView() {
                   </div>
 
                   <div className="flex justify-between items-start relative z-10">
-                    <div className="flex items-center gap-3">
-                      {adminSettings?.websiteLogo ? (
-                        <img src={adminSettings.websiteLogo} alt="Bank Logo" className={`h-8 object-contain ${tier.textColor === 'text-white' ? 'brightness-0 invert' : ''}`} crossOrigin="anonymous" />
-                      ) : null}
-                      <div className="font-bold text-xl tracking-tighter">
-                        GEB <span className="font-light opacity-50 text-xs tracking-normal block -mt-1">GLOBAL ELITE BANK</span>
-                      </div>
+                    <div className="flex items-center">
+                      <img
+                        src="https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png"
+                        alt="Elite Digital Finance"
+                        className="h-8 sm:h-9 w-auto max-w-[140px] object-contain drop-shadow"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
+                      />
                     </div>
                     <Wifi className="opacity-80 rotate-90" size={24} />
                   </div>

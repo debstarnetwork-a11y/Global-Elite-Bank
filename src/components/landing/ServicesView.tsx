@@ -13,7 +13,7 @@ export function ServicesView({ onRegister, onNavigate }: { onRegister: () => voi
             Private Banking Services, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent hover:from-[#1e3a8a] hover:via-accent hover:to-secondary active:from-[#1e3a8a] active:via-accent active:to-secondary cursor-pointer transition-all duration-300">Perfected</span>
           </h1>
           <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed mb-6">
-            As a member of Global Elite Bank, you gain access to a comprehensive suite of financial services — each delivered with the discretion, precision, and global reach befitting your status.
+            As a member of Elite Digital Finance, you gain access to a comprehensive suite of financial services — each delivered with the discretion, precision, and global reach befitting your status.
           </p>
           <div className="inline-block bg-primary/10 border border-primary/20 text-primary text-sm font-medium px-4 py-2 rounded-lg">
             Note: All services are available exclusively to approved members. To request access, please submit a membership application.

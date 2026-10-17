@@ -26,7 +26,7 @@ export function PrivacyPolicy({ onClose }: { onClose: () => void }) {
         <div className="space-y-6 text-foreground/80 leading-relaxed max-h-[65vh] overflow-y-auto pr-4 custom-scrollbar text-sm md:text-base">
           <section>
             <h3 className="text-xl font-bold text-foreground mb-3">1. Information We Collect</h3>
-            <p className="mb-2">Global Elite collects information to provide better services to our customers. We collect information in the following ways:</p>
+            <p className="mb-2">Elite Digital Finance collects information to provide better services to our customers. We collect information in the following ways:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>Personal Information:</strong> Name, address, phone number, email address, Social Security number, and other identifying information</li>
               <li><strong>Financial Information:</strong> Account balances, payment history, credit information, and transaction details</li>
@@ -164,7 +164,7 @@ export function TermsOfService({ onClose }: { onClose: () => void }) {
           
           <section>
             <h3 className="text-xl font-bold text-foreground mb-3">4. Limitation of Liability</h3>
-            <p>In no event shall Global Elite, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the services.</p>
+            <p>In no event shall Elite Digital Finance, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the services.</p>
           </section>
         </div>
 
@@ -207,12 +207,12 @@ export function LegalDisclosure({ onClose }: { onClose: () => void }) {
         <div className="space-y-6 text-foreground/80 leading-relaxed max-h-[65vh] overflow-y-auto pr-4 custom-scrollbar text-sm md:text-base">
           <section>
             <h3 className="text-xl font-bold text-foreground mb-3">Company Information</h3>
-            <p>Global Elite Bank Ltd.<br />Route de Saint-Julien 114<br />1228 Plan-les-Ouates, Switzerland<br />Registration Number: CHE-123.456.789<br />Regulated by the Swiss Financial Market Supervisory Authority (FINMA).</p>
+            <p>Elite Digital Finance Ltd.<br />Route de Saint-Julien 114<br />1228 Plan-les-Ouates, Switzerland<br />Registration Number: CHE-123.456.789<br />Regulated by the Swiss Financial Market Supervisory Authority (FINMA).</p>
           </section>
           
           <section>
             <h3 className="text-xl font-bold text-foreground mb-3">Regulatory Status</h3>
-            <p>Global Elite Bank is authorized and regulated by FINMA. We are a member of the Swiss Bankers Association (SBA) and a signatory to the Agreement on the Swiss banks' code of conduct with regard to the exercise of due diligence (CDB).</p>
+            <p>Elite Digital Finance is authorized and regulated by FINMA. We are a member of the Swiss Bankers Association (SBA) and a signatory to the Agreement on the Swiss banks' code of conduct with regard to the exercise of due diligence (CDB).</p>
           </section>
           
           <section>

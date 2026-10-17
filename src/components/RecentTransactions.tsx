@@ -97,13 +97,13 @@ export function RecentTransactions() {
             sender: {
               name: currentUser.name,
               account: currentUser.accounts[0]?.accountNumber || '',
-              bank: adminSettings?.websiteName || 'Global Elite Bank',
+              bank: adminSettings?.websiteName || 'Elite Digital Finance',
               iban: currentUser.accounts[0]?.iban || ''
             },
             recipient: {
               name: selectedTx.recipientDetails?.name || 'Verified Beneficiary',
               account: selectedTx.recipientDetails?.account || '',
-              bank: selectedTx.recipientDetails?.bank || adminSettings?.websiteName || 'Global Elite Bank',
+              bank: selectedTx.recipientDetails?.bank || adminSettings?.websiteName || 'Elite Digital Finance',
               country: selectedTx.recipientDetails?.country || ''
             },
             amount: selectedTx.amount,

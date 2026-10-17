@@ -97,7 +97,7 @@ export function QuickActions({ setCurrentView }: { setCurrentView?: (v: string) 
                 </div>
                 <div>
                   <p className="font-bold text-sm text-foreground">Internal Transfer</p>
-                  <p className="text-xs text-foreground/50">Between Global Elite accounts</p>
+                  <p className="text-xs text-foreground/50">Between Elite Digital accounts</p>
                 </div>
               </button>
             </div>

@@ -28,7 +28,7 @@ export function HomeView({ onRegister, onNavigate }: { onRegister: () => void, o
           </h1>
           
           <p className="text-lg md:text-xl text-foreground/80 mb-12 max-w-3xl mx-auto leading-relaxed">
-            {t('heroSubtitle', 'Global Elite Bank is not for everyone. It is for those who demand excellence, expect privacy, and operate on a global scale. Membership is by application and approval only.')}
+            {t('heroSubtitle', 'Elite Digital Finance is not for everyone. It is for those who demand excellence, expect privacy, and operate on a global scale. Membership is by application and approval only.')}
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
@@ -70,13 +70,13 @@ export function HomeView({ onRegister, onNavigate }: { onRegister: () => void, o
         </div>
       </section>
 
-      {/* The Global Elite Standard */}
+      {/* The Elite Digital Standard */}
       <section className="py-24 px-6 bg-background relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent hover:from-[#1e3a8a] hover:via-accent hover:to-secondary active:from-[#1e3a8a] active:via-accent active:to-secondary cursor-pointer transition-all duration-300 mb-6">{t('globalEliteStandard', 'The Global Elite Standard')}</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent hover:from-[#1e3a8a] hover:via-accent hover:to-secondary active:from-[#1e3a8a] active:via-accent active:to-secondary cursor-pointer transition-all duration-300 mb-6">{t('globalEliteStandard', 'The Elite Digital Standard')}</h2>
             <p className="text-foreground/60 max-w-3xl mx-auto text-lg leading-relaxed">
-              {t('globalEliteDesc', 'Global Elite Bank is a private financial institution serving an exclusive community of high-net-worth individuals, business leaders, and global citizens. We do not offer open enrollment. Every member is carefully vetted to ensure the integrity of our network.')}
+              {t('globalEliteDesc', 'Elite Digital Finance is a private financial institution serving an exclusive community of high-net-worth individuals, business leaders, and global citizens. We do not offer open enrollment. Every member is carefully vetted to ensure the integrity of our network.')}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

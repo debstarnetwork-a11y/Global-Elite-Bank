@@ -119,7 +119,7 @@ const handleNext = () => {
 
     sendMockEmail({
       to: currentUser.email,
-      subject: `🔒 Transaction OTP Code: ${code} - Global Elite Bank`,
+      subject: `🔒 Transaction OTP Code: ${code} - Elite Digital Finance`,
       body: `Dear ${currentUser.name},
 
 You have initiated a ${type?.toUpperCase()} transfer of $${Number(amount).toLocaleString()} to ${recipient.name} (Account: ${recipient.account}${recipient.bank ? `, Bank: ${recipient.bank}` : ''}).
@@ -130,11 +130,11 @@ Your One-Time Password (OTP) authorization code is:
 
 This code is valid for 10 minutes. Enter this code on the transfer confirmation screen to authorize and complete this transaction.
 
-If you did not initiate this transaction, please notify Global Elite Bank Fraud Support immediately.
+If you did not initiate this transaction, please notify Elite Digital Finance Fraud Support immediately.
 
 Warm regards,
 Private Banking Security & Fraud Department
-Global Elite Bank, Zurich, Switzerland`
+Elite Digital Finance, Zurich, Switzerland`
     });
   };
 

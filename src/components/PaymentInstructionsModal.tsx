@@ -291,7 +291,7 @@ export function PaymentInstructionsModal({ isOpen, onClose, isNewAccountNotice =
                   <div>
                     <p className="text-[10px] text-foreground/50 uppercase font-bold tracking-widest">Bank Name</p>
                     <p className="text-sm font-bold mt-1 text-foreground font-mono">
-                      {adminSettings?.fiatDepositInstructions?.bankName || 'Global Elite Partner Bank (US)'}
+                      {adminSettings?.fiatDepositInstructions?.bankName || 'Elite Digital Partner Clearing (US)'}
                     </p>
                   </div>
 
@@ -316,11 +316,11 @@ export function PaymentInstructionsModal({ isOpen, onClose, isNewAccountNotice =
                     <p className="text-[10px] text-foreground/50 uppercase font-bold tracking-widest">Account Name (Beneficiary)</p>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-sm font-bold text-foreground font-mono">
-                        {adminSettings?.fiatDepositInstructions?.accountName || 'Global Elite Holdings LLC'}
+                        {adminSettings?.fiatDepositInstructions?.accountName || 'Elite Digital Holdings LLC'}
                       </p>
                       <button 
                         type="button"
-                        onClick={() => copyToClipboard(adminSettings?.fiatDepositInstructions?.accountName || 'Global Elite Holdings LLC', 'fiat-acc-name')} 
+                        onClick={() => copyToClipboard(adminSettings?.fiatDepositInstructions?.accountName || 'Elite Digital Holdings LLC', 'fiat-acc-name')} 
                         className="text-foreground/50 hover:text-primary p-1 rounded transition-colors"
                         title="Copy Account Name"
                       >
@@ -881,7 +881,7 @@ export function PaymentInstructionsModal({ isOpen, onClose, isNewAccountNotice =
               <div className="bg-background border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-foreground">
-                    {adminSettings?.eWalletInstructions?.providerName || 'Global Elite Official PayPal'}
+                    {adminSettings?.eWalletInstructions?.providerName || 'Elite Digital Official Settlement'}
                   </p>
                   <p className="text-xs text-foreground/60 font-mono">
                     {adminSettings?.eWalletInstructions?.accountEmail || 'deposits@digitalglobalelite.com'}
@@ -925,7 +925,7 @@ export function PaymentInstructionsModal({ isOpen, onClose, isNewAccountNotice =
                   </div>
                   <h4 className="text-base font-bold text-white pt-1">Fund Your Account via Apple Gift Cards</h4>
                   <p className="text-xs text-white/70 leading-relaxed">
-                    Purchase an official Apple Gift Card online with your debit/credit card, or redeem your 16-character code to instantly fund your Global Elite Bank account.
+                    Purchase an official Apple Gift Card online with your debit/credit card, or redeem your 16-character code to instantly fund your Elite Digital Finance account.
                   </p>
                 </div>
 

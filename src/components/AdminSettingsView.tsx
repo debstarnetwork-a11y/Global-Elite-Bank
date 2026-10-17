@@ -24,7 +24,7 @@ export function AdminSettingsView() {
     referencePlaceholder: ''
   });
   const [eWalletForm, setEWalletForm] = useState(adminSettings.eWalletInstructions || {
-    providerName: 'Global Elite Official PayPal',
+    providerName: 'Elite Digital Official Settlement',
     accountEmail: 'deposits@digitalglobalelite.com'
   });
   const [walletSaving, setWalletSaving] = useState(false);
@@ -90,8 +90,8 @@ export function AdminSettingsView() {
           pass,
           secure: adminSettings.smtpSecure !== undefined ? adminSettings.smtpSecure : (port === 465),
           testRecipient,
-          logoUrl: adminSettings.logoUrl || 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png',
-          websiteName: adminSettings.websiteName || 'Global Elite Bank'
+          logoUrl: adminSettings.logoUrl || 'https://i.postimg.cc/28p2dNh6/Elite-Digital-Finance-Emblem-1.png',
+          websiteName: adminSettings.websiteName || 'Elite Digital Finance'
         })
       });
       const data = await res.json();
@@ -500,7 +500,7 @@ export function AdminSettingsView() {
                       smtpPort: 465,
                       smtpUser: 'info@digitalglobalelite.com',
                       emailFrom: 'info@digitalglobalelite.com',
-                      emailFromName: 'Global Elite Bank'
+                      emailFromName: 'Elite Digital Finance'
                     });
                   }}
                   className="px-3 py-1 rounded-lg text-xs font-bold bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-all cursor-pointer"
@@ -515,7 +515,7 @@ export function AdminSettingsView() {
                       smtpPort: 465,
                       smtpUser: adminSettings.emailFrom || 'info@digitalglobalelite.com',
                       emailFrom: adminSettings.emailFrom || 'info@digitalglobalelite.com',
-                      emailFromName: 'Global Elite Bank'
+                      emailFromName: 'Elite Digital Finance'
                     });
                   }}
                   className="px-3 py-1 rounded-lg text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 transition-all cursor-pointer"
@@ -541,7 +541,7 @@ export function AdminSettingsView() {
                     type="text" 
                     value={adminSettings.emailFromName || ''} 
                     onChange={e => updateAdminSettings({ emailFromName: e.target.value })} 
-                    placeholder="e.g. Global Elite Bank"
+                    placeholder="e.g. Elite Digital Finance"
                     className="w-full bg-background border border-border rounded-xl p-2.5 text-xs focus:border-primary outline-none text-foreground" 
                   />
                 </div>
@@ -780,7 +780,7 @@ export function AdminSettingsView() {
                   value={fiatDepositForm.bankName} 
                   onChange={e => setFiatDepositForm({...fiatDepositForm, bankName: e.target.value})} 
                   className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-colors font-mono"
-                  placeholder="e.g. Global Elite Partner Bank (US)"
+                  placeholder="e.g. Elite Digital Partner Clearing (US)"
                 />
               </div>
               <div className="space-y-1.5">
@@ -790,7 +790,7 @@ export function AdminSettingsView() {
                   value={fiatDepositForm.accountName} 
                   onChange={e => setFiatDepositForm({...fiatDepositForm, accountName: e.target.value})} 
                   className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-colors font-mono"
-                  placeholder="e.g. Global Elite Holdings LLC"
+                  placeholder="e.g. Elite Digital Holdings LLC"
                 />
               </div>
               <div className="space-y-1.5">
@@ -887,7 +887,7 @@ export function AdminSettingsView() {
                   value={eWalletForm.providerName} 
                   onChange={e => setEWalletForm({...eWalletForm, providerName: e.target.value})} 
                   className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-colors font-mono"
-                  placeholder="e.g. Global Elite Official PayPal"
+                  placeholder="e.g. Elite Digital Official Settlement"
                 />
               </div>
               <div className="space-y-1.5">
@@ -1534,7 +1534,7 @@ export function AdminSettingsView() {
 
               {walletSaved && (
                 <span className="text-xs font-bold text-emerald-500 flex items-center gap-1.5 animate-in fade-in">
-                  <CheckCircle size={14} /> Saved & Synced Across Global Elite System
+                  <CheckCircle size={14} /> Saved & Synced Across Elite Digital System
                 </span>
               )}
             </div>

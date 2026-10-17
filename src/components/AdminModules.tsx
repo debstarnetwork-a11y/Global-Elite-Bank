@@ -124,7 +124,7 @@ export function AdminManageUsers({ onManageUser }: { onManageUser?: (id: string)
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-foreground">Global Elite users' information</h2>
+        <h2 className="text-2xl font-bold text-foreground">Elite Digital users' information</h2>
       </div>
       
       <div className="bg-card border border-border rounded-xl p-6 mb-6">
@@ -1002,7 +1002,7 @@ export function AdminVirtualCards({ filter }: { filter?: 'all' | 'pending' }) {
           filter: (node) => !(node instanceof HTMLLinkElement && node.rel === 'stylesheet')
         });
         const link = document.createElement('a');
-        link.download = `GEB_Card_${cardholderName.replace(/\s+/g, '_')}.png`;
+        link.download = `EDF_Card_${cardholderName.replace(/\s+/g, '_')}.png`;
         link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
@@ -1018,8 +1018,8 @@ export function AdminVirtualCards({ filter }: { filter?: 'all' | 'pending' }) {
     { id: 'standard', name: 'Standard', network: 'visa', color: 'from-blue-700 via-blue-600 to-blue-500', textColor: 'text-white' },
     { id: 'gold', name: 'Gold', network: 'mastercard', color: 'from-yellow-500 via-yellow-400 to-yellow-300', textColor: 'text-gray-900' },
     { id: 'platinum', name: 'Platinum', network: 'visa', color: 'from-gray-300 via-gray-200 to-gray-100', textColor: 'text-gray-900' },
-    { id: 'black', name: 'Global Elite Black (Mastercard)', network: 'mastercard', color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' },
-    { id: 'black_visa', name: 'Global Elite Black (Visa)', network: 'visa', color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' }
+    { id: 'black', name: 'Elite Digital Black (Mastercard)', network: 'mastercard', color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' },
+    { id: 'black_visa', name: 'Elite Digital Black (Visa)', network: 'visa', color: 'from-gray-900 via-gray-800 to-black', textColor: 'text-white' }
   ];
 
   const renderNetworkLogo = (network: string, textColor: string) => {
@@ -1187,13 +1187,13 @@ export function AdminVirtualCards({ filter }: { filter?: 'all' | 'pending' }) {
               </div>
               
               <div className="flex justify-between items-start relative z-10">
-                <div className="flex items-center gap-3">
-                  {adminSettings?.websiteLogo ? (
-                    <img src={adminSettings.websiteLogo} alt="Bank Logo" className={`h-8 object-contain ${selectedCard.tierInfo.textColor === 'text-white' ? 'brightness-0 invert' : ''}`} crossOrigin="anonymous" />
-                  ) : null}
-                  <div className="font-bold text-xl tracking-tighter">
-                    GEB <span className="font-light opacity-50 text-xs tracking-normal block -mt-1">GLOBAL ELITE BANK</span>
-                  </div>
+                <div className="flex items-center">
+                  <img
+                    src="https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png"
+                    alt="Elite Digital Finance"
+                    className="h-8 sm:h-9 w-auto max-w-[140px] object-contain drop-shadow"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
+                  />
                 </div>
                 <Wifi className="opacity-80 rotate-90" size={24} />
               </div>
@@ -2010,7 +2010,7 @@ export function AdminEmailServices() {
                 name="homeStaffHeading"
                 value={formData.homeStaffHeading || ''}
                 onChange={handleChange}
-                placeholder="Global Elite Bank Leadership & Staff"
+                placeholder="Elite Digital Finance Leadership & Staff"
                 className="w-full bg-card border border-border rounded-lg p-2.5 text-sm text-foreground focus:border-primary outline-none"
               />
             </div>
@@ -2297,20 +2297,20 @@ export function AdminContactInquiries() {
   const handleOpenReply = (inq: ContactInquiry) => {
     setActiveDropdownId(null);
     setReplyingInquiry(inq);
-    setReplySubject(`Re: Inquiry regarding Private Wealth & Banking Services - Global Elite Bank`);
+    setReplySubject(`Re: Inquiry regarding Private Wealth & Banking Services - Elite Digital Finance`);
     setReplyMessage(`Dear ${inq.name},
 
-Thank you for contacting Global Elite Bank regarding private client solutions.
+Thank you for contacting Elite Digital Finance regarding private client solutions.
 
 We have received and reviewed your inquiry. Our Senior Private Banking Directorate specializes in bespoke wealth structuring, multi-currency accounts, and institutional transfer clearance.
 
-We would be pleased to schedule an introductory conference or private phone consultation to discuss how Global Elite Bank can best serve your requirements.
+We would be pleased to schedule an introductory conference or private phone consultation to discuss how Elite Digital Finance can best serve your requirements.
 
 Please let us know your preferred date and time, or reply directly to this correspondence.
 
 Warm regards,
 Admissions & Client Advisory Desk
-Global Elite Bank, Zurich, Switzerland`);
+Elite Digital Finance, Zurich, Switzerland`);
   };
 
   const handleSendReply = () => {
@@ -3482,7 +3482,7 @@ export function AdminInvestors() {
           <div>
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
               <Wallet className="text-primary" size={20} />
-              Global Elite Bank Broker Crypto Wallets
+              Elite Digital Finance Broker Crypto Wallets
             </h3>
             <p className="text-sm text-foreground/60 mt-0.5">Configure official cryptocurrency deposit addresses (BTC, ETH, USDT, SOL). QR codes are generated dynamically and displayed across client investor portals.</p>
           </div>

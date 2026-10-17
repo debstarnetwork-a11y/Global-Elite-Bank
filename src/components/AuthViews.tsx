@@ -50,10 +50,10 @@ export function SignInView({ onBack, onSuccess }: { onBack: () => void, onSucces
     setTimeout(() => {
       sendMockEmail({
         to: forgotEmail.trim(),
-        subject: "🔐 Secure Password Reset Code - Global Elite Bank",
+        subject: "🔐 Secure Password Reset Code - Elite Digital Finance",
         body: `Dear ${targetUser.name},
 
-A password reset request has been initiated for your Global Elite Bank account (${forgotEmail.trim()}).
+A password reset request has been initiated for your Elite Digital Finance account (${forgotEmail.trim()}).
 
 Your 6-Digit Password Reset Verification Code is:
 
@@ -61,11 +61,11 @@ Your 6-Digit Password Reset Verification Code is:
 
 This code is valid for 15 minutes. Enter this code on the password reset screen along with your desired new password.
 
-If you did not initiate this request, please contact Global Elite Bank Security Operations Center immediately.
+If you did not initiate this request, please contact Elite Digital Finance Security Operations Center immediately.
 
 Warm regards,
 Private Banking Security & Identity Directorate
-Global Elite Bank, Zurich, Switzerland`
+Elite Digital Finance, Zurich, Switzerland`
       });
       setIsSendingCode(false);
       setForgotStep('verify');
@@ -97,16 +97,16 @@ Global Elite Bank, Zurich, Switzerland`
       adminUpdateUser(targetUser.id, { password: newPassword });
       sendMockEmail({
         to: forgotEmail.trim(),
-        subject: "✅ Password Updated Successfully - Global Elite Bank",
+        subject: "✅ Password Updated Successfully - Elite Digital Finance",
         body: `Dear ${targetUser.name},
 
-Your Global Elite Bank account password has been successfully updated.
+Your Elite Digital Finance account password has been successfully updated.
 
 You may now log in to the private banking portal using your new credentials.
 
 Warm regards,
 Private Banking Security Directorate
-Global Elite Bank, Zurich, Switzerland`
+Elite Digital Finance, Zurich, Switzerland`
       });
     }
 
@@ -157,14 +157,12 @@ Global Elite Bank, Zurich, Switzerland`
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative z-10 shadow-xl">
         <div className="flex flex-col items-center justify-center mb-6">
           <img
-            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-            alt="Global Elite Bank Logo"
-            className="w-20 h-20 mb-3 object-contain"
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+            alt="Elite Digital Finance"
+            className="h-16 sm:h-20 w-auto max-w-[260px] mb-3 object-contain drop-shadow-sm"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
-              if (!target.src.includes('postimg.cc')) {
-                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-              }
+              target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
             }}
           />
         </div>
@@ -867,14 +865,14 @@ export function SignUpView({ onBack, onSuccess }: { onBack: () => void, onSucces
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input type="checkbox" required checked={declaration} onChange={e => setDeclaration(e.target.checked)} className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-background" />
                 <span className="text-sm text-foreground/70 leading-relaxed group-hover:text-foreground transition-colors">
-                  I confirm that the information provided in this application is true and accurate. I understand that Global Elite Bank may verify the information provided and that any false or misleading statements may result in rejection or termination of membership.
+                  I confirm that the information provided in this application is true and accurate. I understand that Elite Digital Finance may verify the information provided and that any false or misleading statements may result in rejection or termination of membership.
                 </span>
               </label>
 
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input type="checkbox" required checked={privacyConsent} onChange={e => setPrivacyConsent(e.target.checked)} className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-background" />
                 <span className="text-sm text-foreground/70 leading-relaxed group-hover:text-foreground transition-colors">
-                  I consent to Global Elite Bank processing my personal data for the purposes of assessing this application in accordance with the Privacy Policy.
+                  I consent to Elite Digital Finance processing my personal data for the purposes of assessing this application in accordance with the Privacy Policy.
                 </span>
               </label>
             </div>

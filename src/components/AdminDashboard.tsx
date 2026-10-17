@@ -313,7 +313,7 @@ Nationality
 ${user.nationality || ''}
 Registered
 ${registeredDate}
-All Rights Reserved © Global Elite
+All Rights Reserved © Elite Digital Finance
  2026`;
     navigator.clipboard.writeText(details);
     showToast('Copied to Clipboard', 'User details have been copied');
@@ -438,19 +438,17 @@ All Rights Reserved © Global Elite
     <div className="flex h-screen bg-background text-foreground overflow-hidden w-full absolute inset-0 z-[100]">
       {/* Sidebar - Desktop */}
       <div className="w-64 bg-card border-r border-border overflow-y-auto flex-col h-full shrink-0 hidden lg:flex">
-        <div className="p-6 border-b border-border flex items-center gap-3">
+        <div className="p-5 border-b border-border flex items-center justify-between">
           <img
-            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-            alt="Bank Logo"
-            className="w-8 h-8 object-contain"
+            src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+            alt="Elite Digital Finance"
+            className="h-9 w-auto max-w-[150px] object-contain drop-shadow-sm"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
-              if (!target.src.includes('postimg.cc')) {
-                target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-              }
+              target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
             }}
           />
-          <h1 className="text-xl font-bold text-foreground">Admin</h1>
+          <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">Admin</span>
         </div>
         <div className="flex-1 py-4 flex flex-col px-3">
           {navItems.map(renderSidebarItem)}
@@ -465,17 +463,15 @@ All Rights Reserved © Global Elite
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
-                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-                  alt="Bank Logo"
-                  className="w-8 h-8 object-contain"
+                  src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+                  alt="Elite Digital Finance"
+                  className="h-9 w-auto max-w-[150px] object-contain drop-shadow-sm"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
-                    if (!target.src.includes('postimg.cc')) {
-                      target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-                    }
+                    target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
                   }}
                 />
-                <h1 className="text-xl font-bold text-foreground">Admin</h1>
+                <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">Admin</span>
               </div>
               <button onClick={() => setIsSidebarOpen(false)} className="text-foreground/50 hover:text-foreground">
                 <X size={20} />

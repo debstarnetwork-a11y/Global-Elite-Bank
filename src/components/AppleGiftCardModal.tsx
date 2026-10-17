@@ -241,7 +241,7 @@ export function AppleGiftCardModal({ isOpen, onClose, defaultTab = 'redeem' }: A
                     Buy Apple Gift Card Online
                   </h3>
                   <p className="text-xs sm:text-sm text-white/80 mt-2 leading-relaxed">
-                    No crypto? You can easily fund your Global Elite Bank account with an Apple Gift Card. 
+                    No crypto? You can easily fund your Elite Digital Finance account with an Apple Gift Card. 
                     Purchase a digital e-gift card from Apple Market using your debit/credit card or PayPal, receive the 16-character redemption code instantly by email, and redeem it below.
                   </p>
 

@@ -50,7 +50,7 @@ export function AboutView({ onRegister, onNavigate }: { onRegister: () => void, 
             A Private Institution for a <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent hover:from-[#1e3a8a] hover:via-accent hover:to-secondary active:from-[#1e3a8a] active:via-accent active:to-secondary cursor-pointer transition-all duration-300">Select Few</span>
           </h1>
           <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed">
-            Global Elite Bank was founded on a singular principle: true banking excellence requires selectivity. We are not a mass-market bank. We are a curated community of the world's most accomplished individuals.
+            Elite Digital Finance was founded on a singular principle: true banking excellence requires selectivity. We are not a mass-market bank. We are a curated community of the world's most accomplished individuals.
           </p>
         </div>
       </section>
@@ -65,7 +65,7 @@ export function AboutView({ onRegister, onNavigate }: { onRegister: () => void, 
               <div className="space-y-8">
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-3">The Founding Vision</h3>
-                  <p className="text-foreground/70 leading-relaxed">Global Elite Bank was established in 2016 by a consortium of private bankers, wealth managers, and technology pioneers who recognized a gap in the market: the world's elite deserved a bank that combined the discretion and service of traditional private banking with the speed and innovation of modern technology.</p>
+                  <p className="text-foreground/70 leading-relaxed">Elite Digital Finance was established in 2016 by a consortium of private bankers, wealth managers, and technology pioneers who recognized a gap in the market: the world's elite deserved a bank that combined the discretion and service of traditional private banking with the speed and innovation of modern technology.</p>
                 </div>
                 
                 <div>
@@ -74,7 +74,7 @@ export function AboutView({ onRegister, onNavigate }: { onRegister: () => void, 
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">The Global Elite Network</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-3">The Elite Digital Network</h3>
                   <p className="text-foreground/70 leading-relaxed">Today, our 48,500+ members form one of the world's most powerful financial networks. From entrepreneurs and investors to family offices and global enterprises, our members share a commitment to excellence and a desire for banking that matches their ambition.</p>
                 </div>
               </div>
@@ -132,7 +132,7 @@ export function AboutView({ onRegister, onNavigate }: { onRegister: () => void, 
               {content.committeeSectionHeading || "The Gatekeepers of Excellence"}
             </h2>
             <p className="text-foreground/70 max-w-3xl text-lg leading-relaxed mb-8">
-              Every application to Global Elite Bank is reviewed by our Membership Committee — a distinguished panel of senior bankers, compliance experts, and business leaders. The Committee evaluates each applicant on:
+              Every application to Elite Digital Finance is reviewed by our Membership Committee — a distinguished panel of senior bankers, compliance experts, and business leaders. The Committee evaluates each applicant on:
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-foreground/80">
               <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary mt-2"></div> <strong className="text-foreground">Financial Standing:</strong> Verified assets, income sources, and financial stability</li>

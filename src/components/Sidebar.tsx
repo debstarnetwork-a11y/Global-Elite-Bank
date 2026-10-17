@@ -55,22 +55,16 @@ export function Sidebar({ currentView, setCurrentView, onLogout }: { currentView
 
   return (
     <div className="w-64 h-screen bg-background border-r border-border hidden md:flex flex-col sticky top-0 p-6 space-y-8">
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center">
         <img
-          src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : '/logo.png'}
-          alt="Bank Logo"
-          className="w-10 h-10 object-contain"
+          src={adminSettings?.logoUrl && !adminSettings.logoUrl.includes('ibb.co') ? adminSettings.logoUrl : 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png'}
+          alt="Elite Digital Finance"
+          className="h-11 w-auto max-w-[190px] object-contain drop-shadow-sm"
           onError={(e) => {
             const target = e.currentTarget as HTMLImageElement;
-            if (!target.src.includes('postimg.cc')) {
-              target.src = 'https://i.postimg.cc/vBZjpPr4/GEB-logo.png';
-            }
+            target.src = 'https://i.postimg.cc/zXswZC0Y/Elite-Digital-Gold-Globe-Logo.png';
           }}
         />
-        <div className="leading-tight">
-          <h1 className="font-bold text-sm tracking-tight uppercase text-foreground">{adminSettings?.websiteName || 'Global Elite Bank'}</h1>
-          <p className="text-[10px] text-foreground/50 font-medium"></p>
-        </div>
       </div>
       
       <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">

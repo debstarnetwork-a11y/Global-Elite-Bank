@@ -22,10 +22,10 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
       return "Ihre 4-stellige Transaktions-PIN ist ein hochverschlüsselter Sicherheitsschlüssel, der für alle ausgehenden Überweisungen, SWIFT-Transaktionen und Kartenverifizierungen benötigt wird. Sie können Ihre PIN im Online-Banking unter Ihren Kontoeinstellungen einsehen und aktualisieren.";
     }
     if (lower.includes('konto') || lower.includes('eröffnen') || lower.includes('anmeld') || lower.includes('registrier')) {
-      return "Um ein exklusives Konto bei der Global Elite Bank zu eröffnen, klicken Sie bitte oben in der Navigationsleiste auf 'Mitgliedschaft beantragen'. Unser Zulassungsausschuss prüft Anträge von vermögenden Privatkunden und Unternehmen diskret innerhalb von 24 Stunden.";
+      return "Um ein exklusives Konto bei der Elite Digital Finance zu eröffnen, klicken Sie bitte oben in der Navigationsleiste auf 'Mitgliedschaft beantragen'. Unser Zulassungsausschuss prüft Anträge von vermögenden Privatkunden und Unternehmen diskret innerhalb von 24 Stunden.";
     }
     if (lower.includes('überweisung') || lower.includes('swift') || lower.includes('sepa') || lower.includes('limit')) {
-      return "Global Elite Bank führt internationale Überweisungen über unser Schweizer FINMA-reguliertes Netzwerk in über 30 Währungen aus. Verifizierte Kontoinhaber profitieren von unbegrenzten Transaktionsvolumina mit garantierter Echtzeitabrechnung.";
+      return "Elite Digital Finance führt internationale Überweisungen über unser Schweizer FINMA-reguliertes Netzwerk in über 30 Währungen aus. Verifizierte Kontoinhaber profitieren von unbegrenzten Transaktionsvolumina mit garantierter Echtzeitabrechnung.";
     }
     if (lower.includes('krypto') || lower.includes('bitcoin') || lower.includes('wallet') || lower.includes('eth')) {
       return "Unsere institutionelle Krypto-Verwahrung lagert Vermögenswerte in FINMA-zertifizierten Schweizer Tiefstollen-Tresoren (Cold Storage). Wir unterstützen BTC, ETH, USDT und SOL mit sofortigen Konvertierungen in CHF, USD und EUR.";
@@ -45,7 +45,7 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
       return "Pour ouvrir un compte d'élite, veuillez cliquer sur 'Demander l\\'adhésion' dans la barre de navigation. Notre comité d'admission suisse examine confidentiellement chaque dossier sous 24 heures.";
     }
     if (lower.includes('virement') || lower.includes('swift') || lower.includes('sepa') || lower.includes('limite')) {
-      return "Global Elite Bank propose des virements prioritaires via SWIFT et SEPA dans plus de 30 devises, sans plafond pour les membres de Niveau 1, avec traçabilité FINMA intégrale.";
+      return "Elite Digital Finance propose des virements prioritaires via SWIFT et SEPA dans plus de 30 devises, sans plafond pour les membres de Niveau 1, avec traçabilité FINMA intégrale.";
     }
     if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('sol') || lower.includes('sécurité')) {
       return "Notre infrastructure de conservation d'actifs numériques repose sur des coffres-forts froids souterrains dans les Alpes suisses, garantissant une protection maximale pour vos BTC, ETH, USDT et SOL.";
@@ -59,7 +59,7 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
       return "Su PIN de transacción de 4 dígitos es una clave cifrada indispensable para autorizar transferencias internacionales SWIFT y proteger sus fondos contra operaciones no autorizadas. Puede consultarlo y gestionarlo en la vista de su cuenta.";
     }
     if (lower.includes('cuenta') || lower.includes('abrir') || lower.includes('membresía')) {
-      return "Para solicitar una cuenta exclusiva en Global Elite Bank, haga clic en 'Solicitar Membresía' en la parte superior. Nuestro comité evalúa las solicitudes con estricta confidencialidad en menos de 24 horas.";
+      return "Para solicitar una cuenta exclusiva en Elite Digital Finance, haga clic en 'Solicitar Membresía' en la parte superior. Nuestro comité evalúa las solicitudes con estricta confidencialidad en menos de 24 horas.";
     }
     if (lower.includes('transferencia') || lower.includes('swift') || lower.includes('sepa')) {
       return "Ofrecemos transferencias internacionales prioritarias mediante SWIFT y SEPA en más de 30 divisas con liquidación en tiempo real y sin límites estrictos para cuentas verificadas.";
@@ -76,15 +76,15 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
   }
 
   if (lower.includes('cot') || lower.includes('swift') || lower.includes('imf') || lower.includes('aml') || lower.includes('clearance')) {
-    return "Global Elite Bank implements multi-tier international clearance protocols (SWIFT-SEC, COT, IMF Clearance, and AML Validation) complying with Swiss FINMA and FATF directives. These codes guarantee sovereign legal compliance for high-value cross-border liquidity settlements.";
+    return "Elite Digital Finance implements multi-tier international clearance protocols (SWIFT-SEC, COT, IMF Clearance, and AML Validation) complying with Swiss FINMA and FATF directives. These codes guarantee sovereign legal compliance for high-value cross-border liquidity settlements.";
   }
 
   if (lower.includes('open') || lower.includes('account') || lower.includes('apply') || lower.includes('register') || lower.includes('membership')) {
-    return "To establish an account with Global Elite Bank, click the 'Apply for Membership' button in the navigation bar. Our admissions desk discreetly evaluates each application within 24 hours. Upon approval, your multi-currency IBAN, checking account, and private credentials will be provisioned.";
+    return "To establish an account with Elite Digital Finance, click the 'Apply for Membership' button in the navigation bar. Our admissions desk discreetly evaluates each application within 24 hours. Upon approval, your multi-currency IBAN, checking account, and private credentials will be provisioned.";
   }
 
   if (lower.includes('wire') || lower.includes('transfer') || lower.includes('send') || lower.includes('limit')) {
-    return "Global Elite Bank facilitates unlimited priority wire transfers worldwide across 30+ reserve currencies (USD, CHF, EUR, GBP, AED, JPY) via direct SWIFT and SEPA integration. Outgoing transfers for verified accounts settle rapidly with Swiss cryptographic authentication.";
+    return "Elite Digital Finance facilitates unlimited priority wire transfers worldwide across 30+ reserve currencies (USD, CHF, EUR, GBP, AED, JPY) via direct SWIFT and SEPA integration. Outgoing transfers for verified accounts settle rapidly with Swiss cryptographic authentication.";
   }
 
   if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('btc') || lower.includes('eth') || lower.includes('usdt') || lower.includes('vault') || lower.includes('sol')) {
@@ -92,7 +92,7 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
   }
 
   if (lower.includes('card') || lower.includes('visa') || lower.includes('mastercard') || lower.includes('virtual')) {
-    return "Global Elite Bank provisions both instant Virtual Black Cards and bespoke Laser-Engraved Metal Titanium Cards. You can toggle full card number visibility, set custom daily spending thresholds, and connect directly to Apple Pay or Google Pay from your client dashboard.";
+    return "Elite Digital Finance provisions both instant Virtual Black Cards and bespoke Laser-Engraved Metal Titanium Cards. You can toggle full card number visibility, set custom daily spending thresholds, and connect directly to Apple Pay or Google Pay from your client dashboard.";
   }
 
   if (lower.includes('interest') || lower.includes('deposit') || lower.includes('yield') || lower.includes('invest')) {
@@ -108,10 +108,10 @@ function generateIntelligentBankingResponse(text: string, language: string = 'en
   }
 
   if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('good morning') || lower.includes('good afternoon') || lower.includes('who are you')) {
-    return "Greetings. I am Aura, your dedicated 24/7 AI Private Wealth Concierge for Global Elite Bank. How may I assist your private banking affairs, transfers, or account operations today?";
+    return "Greetings. I am Aura, your dedicated 24/7 AI Private Wealth Concierge for Elite Digital Finance. How may I assist your private banking affairs, transfers, or account operations today?";
   }
 
-  return `Thank you for your question regarding "${text}". As your Global Elite Bank Private Concierge, I can assist you with your 4-digit transaction PIN, multi-currency IBAN accounts, Swiss cold-storage crypto vaults, and priority SWIFT transfers. Please let me know what specific details you would like me to review.`;
+  return `Thank you for your question regarding "${text}". As your Elite Digital Finance Private Concierge, I can assist you with your 4-digit transaction PIN, multi-currency IBAN accounts, Swiss cold-storage crypto vaults, and priority SWIFT transfers. Please let me know what specific details you would like me to review.`;
 }
 
 export function AIChatWidget() {
@@ -142,7 +142,7 @@ export function AIChatWidget() {
           role: 'model',
           content: t(
             'welcomeMessage',
-            'Welcome to Global Elite Bank. I am Aura, your dedicated 24/7 AI Private Wealth Concierge. How may I assist your private banking inquiries today?'
+            'Welcome to Elite Digital Finance. I am Aura, your dedicated 24/7 AI Private Wealth Concierge. How may I assist your private banking inquiries today?'
           ),
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
@@ -233,7 +233,7 @@ export function AIChatWidget() {
               { role: 'user', parts: [{ text }] }
             ],
             systemInstruction: {
-              parts: [{ text: `You are Aura, the 24/7 AI Private Wealth Concierge for Global Elite Bank. You provide courteous, prompt, Swiss private banking assistance. Language: ${language}. Keep replies professional and concise (2-3 paragraphs).` }]
+              parts: [{ text: `You are Aura, the 24/7 AI Private Wealth Concierge for Elite Digital Finance. You provide courteous, prompt, Swiss private banking assistance. Language: ${language}. Keep replies professional and concise (2-3 paragraphs).` }]
             }
           })
         });
@@ -275,7 +275,7 @@ export function AIChatWidget() {
       role: 'model',
       content: t(
         'welcomeMessage',
-        'Welcome to Global Elite Bank. I am Aura, your dedicated 24/7 AI Private Wealth Concierge. How may I assist your private banking inquiries today?'
+        'Welcome to Elite Digital Finance. I am Aura, your dedicated 24/7 AI Private Wealth Concierge. How may I assist your private banking inquiries today?'
       ),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
